@@ -11,10 +11,12 @@
 #include "HeadMountedDisplayFunctionLibrary.h"
 #include "Materials/Material.h"
 
-ACowboynoutCharacter::ACowboynoutCharacter()
-{
+ACowboynoutCharacter::ACowboynoutCharacter() {
 	// Set size for player capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
+
+	muzzleLocation = CreateDefaultSubobject<USceneComponent>(TEXT("MuzzleLocation"));
+	muzzleLocation->SetupAttachment(RootComponent);
 
 	// Don't rotate character to camera direction
 	bUseControllerRotationPitch = false;
@@ -44,8 +46,7 @@ ACowboynoutCharacter::ACowboynoutCharacter()
 	CursorToWorld = CreateDefaultSubobject<UDecalComponent>("CursorToWorld");
 	CursorToWorld->SetupAttachment(RootComponent);
 	static ConstructorHelpers::FObjectFinder<UMaterial> DecalMaterialAsset(TEXT("Material'/Game/TopDownCPP/Blueprints/M_Cursor_Decal.M_Cursor_Decal'"));
-	if (DecalMaterialAsset.Succeeded())
-	{
+	if (DecalMaterialAsset.Succeeded())	{
 		CursorToWorld->SetDecalMaterial(DecalMaterialAsset.Object);
 	}
 	CursorToWorld->DecalSize = FVector(16.0f, 32.0f, 32.0f);
@@ -55,6 +56,11 @@ ACowboynoutCharacter::ACowboynoutCharacter()
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.bStartWithTickEnabled = true;
 }
+
+void ACowboynoutCharacter::DebugMsg(FString msg, float dTime, FColor clr) {
+	GEngine->AddOnScreenDebugMessage(-1, dTime, clr, msg);
+}
+
 
 void ACowboynoutCharacter::Tick(float DeltaSeconds)
 {
@@ -86,4 +92,28 @@ void ACowboynoutCharacter::Tick(float DeltaSeconds)
 			CursorToWorld->SetWorldRotation(CursorR);
 		}
 	}
+}
+
+
+void ACowboynoutCharacter::Damage(int dmg) {
+
+}
+
+void ACowboynoutCharacter::FireSkillOne() {
+	FRotator rot = GetActorRotation();
+	DebugMsg(rot.ToString(), 1.f, FColor::White);
+	FActorSpawnParameters spawnInfo;
+	AProjectile* bullet = GetWorld()->SpawnActor<AProjectile>(ProjectileClass, muzzleLocation->GetComponentLocation(), rot, spawnInfo);
+	if (bullet) DebugMsg("skill one fired", 1.f, FColor::Yellow);
+	else DebugMsg("404, bullet not found", 1.f, FColor::Red);
+}
+
+void ACowboynoutCharacter::FireSkillTwo() {
+	FRotator rot = GetActorRotation();
+	rot.Pitch = 60.f;
+	DebugMsg(rot.ToString(), 1.f, FColor::White);
+	FActorSpawnParameters spawnInfo;
+	AGrenade* nade = GetWorld()->SpawnActor<AGrenade>(GrenadeClass, muzzleLocation->GetComponentLocation(), rot, spawnInfo);
+	if (nade) DebugMsg("skill two fired", 1.f, FColor::Yellow);
+	else DebugMsg("404, no fire in the hole", 1.f, FColor::Red);
 }

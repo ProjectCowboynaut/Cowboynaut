@@ -2,8 +2,10 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "Engine.h"
 #include "GameFramework/Character.h"
+#include "Projectile.h"
+#include "Grenade.h"
 #include "CowboynoutCharacter.generated.h"
 
 UCLASS(Blueprintable)
@@ -14,27 +16,66 @@ class ACowboynoutCharacter : public ACharacter
 public:
 	ACowboynoutCharacter();
 
+	/** Location on gun mesh where projectiles should spawn. */
+	UPROPERTY(VisibleDefaultsOnly, Category = "Character")
+	class USceneComponent* muzzleLocation;
+
 	// Called every frame.
 	virtual void Tick(float DeltaSeconds) override;
 
 	/** Returns TopDownCameraComponent subobject **/
 	FORCEINLINE class UCameraComponent* GetTopDownCameraComponent() const { return TopDownCameraComponent; }
+
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
+
 	/** Returns CursorToWorld subobject **/
 	FORCEINLINE class UDecalComponent* GetCursorToWorld() { return CursorToWorld; }
 
+	void Damage(int dmg);
+	void DebugMsg(FString msg, float dTime, FColor clr);
+
+	/** Projectile class to spawn */
+	UPROPERTY(EditDefaultsOnly, Category = "Projectile")
+	TSubclassOf<class AProjectile> ProjectileClass;
+
+	/** Projectile class to spawn */
+	UPROPERTY(EditDefaultsOnly, Category = "Projectile")
+	TSubclassOf<class AGrenade> GrenadeClass;
+
+	UFUNCTION()
+	void FireSkillOne();
+
+	UFUNCTION()
+	void FireSkillTwo();
+
+
 private:
 	/** Top down camera */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* TopDownCameraComponent;
 
 	/** Camera boom positioning the camera above the character */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
 	class USpringArmComponent* CameraBoom;
 
 	/** A decal that projects to the cursor location. */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
 	class UDecalComponent* CursorToWorld;
+
+
+protected:
+	// stats
+	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "PlayerStats")
+	int life = 100;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "PlayerStats")
+	int speed = 1;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "PlayerStats")
+	int attack = 1;
+
+
+
 };
 
