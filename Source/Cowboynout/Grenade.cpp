@@ -10,8 +10,7 @@ AGrenade::AGrenade() {
 	CollisionComp->BodyInstance.SetCollisionProfileName("Projectile");
 	CollisionComp->OnComponentHit.AddDynamic(this, &AGrenade::OnHit);		// set up a notification for when this component hits something blocking
 
-																				// Players can't walk on it
-	CollisionComp->SetWalkableSlopeOverride(FWalkableSlopeOverride(WalkableSlope_Unwalkable, 0.f));
+	CollisionComp->SetWalkableSlopeOverride(FWalkableSlopeOverride(WalkableSlope_Unwalkable, 0.f)); // Players can't walk on it
 	CollisionComp->CanCharacterStepUpOn = ECB_No;
 
 	// Set as root component
@@ -28,22 +27,28 @@ AGrenade::AGrenade() {
 
 	// Die after 3 seconds by default
 	InitialLifeSpan = 3.0f;
+
+}
+
+
+void AGrenade::DebugMsg(FString msg, float dTime, FColor clr) {
+	GEngine->AddOnScreenDebugMessage(-1, dTime, clr, msg);
 }
 
 
 void AGrenade::Initialize(int damage)
 {
 	grenadeDamage = damage;
-	//ACowboynoutPlayerState* pState = Cast<AShodonPlayerState>(character->PlayerState);
-	//sourceTeam = pState->GetTeam();
 
-	//CollisionComp->MoveIgnoreActors.Add(sourceChar);
 }
-
 
 
 void AGrenade::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
+	FString msg = "[skill 2] hit";
+	FString hitObjectName = OtherActor->GetFName().ToString();
+	DebugMsg(msg + " " + hitObjectName, 1.5f, FColor::Yellow);
+
 	ACowboynoutCharacter* hittedPlayer = Cast<ACowboynoutCharacter>(OtherActor);
 	// Only add impulse and destroy projectile if we hit a physics
 	if ((OtherActor != NULL) && (OtherActor != this) && (OtherComp != NULL) && Role == ROLE_Authority)
@@ -67,4 +72,12 @@ void AGrenade::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiv
 	}
 	if (!ProjectileMovement->bShouldBounce)
 		Destroy();
+
+
+	UObject* WorldContextObject = GetWorld();
+	FVector SpawnLocation = this->GetActorLocation();
+	FRotator SpawnRotation = GetActorRotation();;
+	
+	UGameplayStatics::SpawnEmitterAtLocation(WorldContextObject, EmitterTemplate, SpawnLocation, SpawnRotation, true);
+	
 }

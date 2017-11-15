@@ -57,6 +57,7 @@ ACowboynoutCharacter::ACowboynoutCharacter() {
 	PrimaryActorTick.bStartWithTickEnabled = true;
 }
 
+
 void ACowboynoutCharacter::DebugMsg(FString msg, float dTime, FColor clr) {
 	GEngine->AddOnScreenDebugMessage(-1, dTime, clr, msg);
 }
@@ -99,21 +100,23 @@ void ACowboynoutCharacter::Damage(int dmg) {
 
 }
 
+
 void ACowboynoutCharacter::FireSkillOne() {
 	FRotator rot = GetActorRotation();
-	DebugMsg(rot.ToString(), 1.f, FColor::White);
+	//DebugMsg(rot.ToString(), 1.f, FColor::White);
 	FActorSpawnParameters spawnInfo;
 	AProjectile* bullet = GetWorld()->SpawnActor<AProjectile>(ProjectileClass, muzzleLocation->GetComponentLocation(), rot, spawnInfo);
-	if (bullet) DebugMsg("skill one fired", 1.f, FColor::Yellow);
-	else DebugMsg("404, bullet not found", 1.f, FColor::Red);
+	//if (bullet) DebugMsg("skill one fired", 1.f, FColor::Yellow);
+	//else DebugMsg("404, bullet not found", 1.f, FColor::Red);
 }
+
 
 void ACowboynoutCharacter::FireSkillTwo() {
 	FRotator rot = GetActorRotation();
 	rot.Pitch = 60.f;
-	DebugMsg(rot.ToString(), 1.f, FColor::White);
+	//DebugMsg(rot.ToString(), 1.f, FColor::White);
 	FActorSpawnParameters spawnInfo;
 	AGrenade* nade = GetWorld()->SpawnActor<AGrenade>(GrenadeClass, muzzleLocation->GetComponentLocation(), rot, spawnInfo);
-	if (nade) DebugMsg("skill two fired", 1.f, FColor::Yellow);
-	else DebugMsg("404, no fire in the hole", 1.f, FColor::Red);
+	//if (nade) DebugMsg("skill two fired", 1.f, FColor::Yellow);
+	//else DebugMsg("404, no fire in the hole", 1.f, FColor::Red);
 }

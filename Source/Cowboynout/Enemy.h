@@ -2,7 +2,8 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "Engine.h"
+#include "CowboynoutCharacter.h"
 #include "GameFramework/Character.h"
 #include "Enemy.generated.h"
 
@@ -10,6 +11,18 @@ UCLASS()
 class COWBOYNOUT_API AEnemy : public ACharacter
 {
 	GENERATED_BODY()
+
+	//// Static Mesh Component to interact with
+	UPROPERTY(EditDefaultsOnly, Category = "Character")
+	UStaticMeshComponent* TargetComponent;
+
+	// Component to interact with
+	//UPROPERTY(EditDefaultsOnly, Category = "Character")
+	//UCapsuleComponent * TargetComponent;
+
+	//Function to handle the interaction
+	UFUNCTION()
+	void CustomOnBeginMouseOver(UPrimitiveComponent* TouchedComponent);
 
 public:
 	// Sets default values for this character's properties

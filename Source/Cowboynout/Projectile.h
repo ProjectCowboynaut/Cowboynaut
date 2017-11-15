@@ -15,6 +15,13 @@ class AProjectile : public AActor
 
 public:
 	AProjectile();
+	
+	UFUNCTION()
+	void DebugMsg(FString msg, float dTime, FColor clr);
+
+
+	UPROPERTY(EditDefaultsOnly)
+	UParticleSystem* lazor;
 
 	/** Sphere collision component */
 	UPROPERTY(VisibleDefaultsOnly, Category = "Projectile")
@@ -28,11 +35,7 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Projectile")
 	int projectileDamage = 10.f;
 
-	/*	
-	UPROPERTY()
-	ACowboynoutCharacter* sourceChar;
-	*/
-
+	UFUNCTION()
 	void Initialize(int damage);
 
 	/** called when projectile hits something */
