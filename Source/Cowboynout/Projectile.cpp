@@ -50,30 +50,31 @@ void AProjectile::Initialize(int damage)
 
 void AProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	FString msg = "[skill 1] hit";
-	FString hitObjectName = OtherActor->GetFName().ToString();
-	DebugMsg(msg + " " + hitObjectName, 1.5f, FColor::Yellow);
+	if (OtherActor != NULL) {
+		FString msg = "[skill 1] hit";
+		FString hitObjectName = OtherActor->GetFName().ToString();
+		DebugMsg(msg + " " + hitObjectName, 1.5f, FColor::Yellow);
 
-	ACowboynoutCharacter* hittedPlayer = Cast<ACowboynoutCharacter>(OtherActor);
-	// Only add impulse and destroy projectile if we hit a physics
-	if ((OtherActor != NULL) && (OtherActor != this) && (OtherComp != NULL) && Role == ROLE_Authority)
-	{
-		ProjectileMovement->bShouldBounce = false;
-		Destroy();
-	}
-	else if ((OtherActor != NULL) && (OtherActor != this) && (OtherComp != NULL) && OtherComp->IsSimulatingPhysics())
-	{
-		OtherComp->AddImpulseAtLocation(GetVelocity() * 10.0f, GetActorLocation());
-		ProjectileMovement->bShouldBounce = false;
-		Destroy();
-	}
-	if ((OtherActor != NULL) && (OtherActor != this) && (OtherComp != NULL) && hittedPlayer != NULL && Role == ROLE_Authority)
-	{
-		ProjectileMovement->bShouldBounce = false;
-		//hitted other player
-		hittedPlayer->Damage(projectileDamage);
-
-		Destroy();
+		ACowboynoutCharacter* hittedPlayer = Cast<ACowboynoutCharacter>(OtherActor);
+		// Only add impulse and destroy projectile if we hit a physics
+		if ((OtherActor != this) && (OtherComp != NULL) && Role == ROLE_Authority)
+		{
+			ProjectileMovement->bShouldBounce = false;
+			Destroy();
+		}
+		else if ((OtherActor != this) && (OtherComp != NULL) && OtherComp->IsSimulatingPhysics())
+		{
+			OtherComp->AddImpulseAtLocation(GetVelocity() * 10.0f, GetActorLocation());
+			ProjectileMovement->bShouldBounce = false;
+			Destroy();
+		}
+		if ((OtherActor != this) && (OtherComp != NULL) && hittedPlayer != NULL && Role == ROLE_Authority)
+		{
+			ProjectileMovement->bShouldBounce = false;
+			//hitted other player
+			hittedPlayer->Damage(projectileDamage);
+			Destroy();
+		}
 	}
 	if (!ProjectileMovement->bShouldBounce)
 		Destroy();
