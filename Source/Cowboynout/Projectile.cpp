@@ -1,6 +1,7 @@
 // Copyright 1998-2017 Epic Games, Inc. All Rights Reserved.
 
 #include "Projectile.h"
+#include "CowboynoutCharacter.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 
 AProjectile::AProjectile()
@@ -35,18 +36,14 @@ AProjectile::AProjectile()
 	//UGameplayStatics::SpawnEmitterAtLocation(WorldContextObject, lazor, SpawnLocation, SpawnRotation, true);
 }
 
-
 void AProjectile::DebugMsg(FString msg, float dTime, FColor clr) {
 	GEngine->AddOnScreenDebugMessage(-1, dTime, clr, msg);
 }
-
 
 void AProjectile::Initialize(int damage)
 {
 	projectileDamage = damage;
 }
-
-
 
 void AProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {

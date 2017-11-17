@@ -8,6 +8,7 @@
 
 ACowboynoutPlayerController::ACowboynoutPlayerController() {
 	bShowMouseCursor = true;
+	bEnableMouseOverEvents = true;
 	DefaultMouseCursor = EMouseCursor::Crosshairs;
 	gunPosition = FVector(0.f, 15.f, 0.f);
 	MyPawn = GetPawn();

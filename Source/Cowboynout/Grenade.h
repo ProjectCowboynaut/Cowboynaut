@@ -4,9 +4,7 @@
 
 #include "Cowboynout.h"
 #include "GameFramework/Actor.h"
-#include "CowboynoutCharacter.h"
 #include "Grenade.generated.h"
-
 
 UCLASS()
 class AGrenade : public AActor

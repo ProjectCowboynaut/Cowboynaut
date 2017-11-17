@@ -12,36 +12,23 @@ class COWBOYNOUT_API AEnemy : public ACharacter
 {
 	GENERATED_BODY()
 
-	//// Static Mesh Component to interact with
-	UPROPERTY(EditDefaultsOnly, Category = "Character")
-	UStaticMeshComponent* TargetComponent;
-
-	// Component to interact with
-	//UPROPERTY(EditDefaultsOnly, Category = "Character")
-	//UCapsuleComponent * TargetComponent;
-
-	//Function to handle the interaction
-	UFUNCTION()
-	void CustomOnBeginMouseOver(UPrimitiveComponent* TouchedComponent);
-
 public:
-	// Sets default values for this character's properties
+
 	AEnemy();
 
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
-public:	
-	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
-	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	UFUNCTION(BlueprintCallable, Category = "Pawn|Character")
+	void MouseOver(UPrimitiveComponent* TouchedComponent);
+
+	UFUNCTION()
 	void SetNewMoveDestination(const FVector DestLocation);
+	UFUNCTION()
 	void RotateCharacter(const FVector DestLocation);
-	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Character") AActor* myActor;
-	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Character") APawn* MyPawn;
-	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Character") UNavigationSystem* NavSys;
+
+protected:
+
+	virtual void BeginPlay() override;
+
 };

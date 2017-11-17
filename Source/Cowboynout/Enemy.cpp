@@ -2,20 +2,12 @@
 
 #include "Enemy.h"
 
-
 // Sets default values
-AEnemy::AEnemy() {
+AEnemy::AEnemy()
+{
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	//TargetComponent = GetCapsuleComponent();
-	
-	TargetComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Test Component"));
-	TargetComponent->AttachTo(RootComponent);
-
-	//GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Cyan, TargetComponent->GetFName().ToString());
-
-	TargetComponent->OnBeginCursorOver.AddDynamic(this, &AEnemy::CustomOnBeginMouseOver);
 }
 
 // Called when the game starts or when spawned
@@ -43,7 +35,8 @@ void AEnemy::RotateCharacter(const FVector DestLocation) {
 	SetActorRotation(rot);
 }
 
-void AEnemy::CustomOnBeginMouseOver(UPrimitiveComponent* TouchedComponent){
+void AEnemy::MouseOver(UPrimitiveComponent* TouchedComponent) {
+
 	FString msg = "[mouse over]";
 	FString hitObjectName = TouchedComponent->GetFName().ToString();
 	GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Cyan, msg + " " + hitObjectName);
