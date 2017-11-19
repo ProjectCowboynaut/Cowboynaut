@@ -3,6 +3,7 @@
 #include "Projectile.h"
 #include "CowboynoutCharacter.h"
 #include "GameFramework/ProjectileMovementComponent.h"
+#include "Enemy.h"
 
 AProjectile::AProjectile()
 {
@@ -36,7 +37,8 @@ AProjectile::AProjectile()
 	//UGameplayStatics::SpawnEmitterAtLocation(WorldContextObject, lazor, SpawnLocation, SpawnRotation, true);
 }
 
-void AProjectile::DebugMsg(FString msg, float dTime, FColor clr) {
+void AProjectile::DebugMsg(FString msg, float dTime, FColor clr) 
+{
 	GEngine->AddOnScreenDebugMessage(-1, dTime, clr, msg);
 }
 
@@ -50,28 +52,43 @@ void AProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimi
 	if (OtherActor != NULL && !OtherActor->ActorHasTag("Player")) {
 		FString msg = "[skill 1] hit";
 		FString hitObjectName = OtherActor->GetFName().ToString();
-		DebugMsg(msg + " " + hitObjectName, 1.5f, FColor::Yellow);
+		//DebugMsg(msg + " " + hitObjectName, 1.5f, FColor::Yellow);
 
 		ACowboynoutCharacter* hittedPlayer = Cast<ACowboynoutCharacter>(OtherActor);
+		
+		
 		// Only add impulse and destroy projectile if we hit a physics
 		if ((OtherActor != this) && (OtherComp != NULL) && Role == ROLE_Authority)
 		{
 			ProjectileMovement->bShouldBounce = false;
 			Destroy();
+			DebugMsg("<1>", 1.5f, FColor::Yellow);
 		}
 		else if ((OtherActor != this) && (OtherComp != NULL) && OtherComp->IsSimulatingPhysics())
 		{
 			OtherComp->AddImpulseAtLocation(GetVelocity() * 10.0f, GetActorLocation());
 			ProjectileMovement->bShouldBounce = false;
 			Destroy();
+			DebugMsg("<2>", 1.5f, FColor::Yellow);
 		}
+
+		if (OtherActor->ActorHasTag("Enemy")) {
+			DebugMsg("<0>", 1.5f, FColor::Yellow);
+			// set dmg on enemy
+			AEnemy* hitEnemy = Cast<AEnemy>(OtherActor);
+			hitEnemy->Damage(projectileDamage);
+			Destroy();
+		}
+		/*
 		if ((OtherActor != this) && (OtherComp != NULL) && hittedPlayer != NULL && Role == ROLE_Authority)
 		{
 			ProjectileMovement->bShouldBounce = false;
 			//hitted other player
 			hittedPlayer->Damage(projectileDamage);
 			Destroy();
+			DebugMsg("<3> " + hittedPlayer->GetFName().ToString(), 1.5f, FColor::Yellow);
 		}
+		*/
 	}
 	if (!ProjectileMovement->bShouldBounce)
 		Destroy();

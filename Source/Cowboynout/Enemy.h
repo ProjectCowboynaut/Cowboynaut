@@ -33,9 +33,28 @@ public:
 	UPROPERTY()
 	ACowboynoutCharacter* player;
 
+	UFUNCTION()
+	void Damage(int dmg);
+
 protected:
 
 	virtual void BeginPlay() override;
+	
+	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "EnemyStats")
+	int health = 100;
+	
+	//behaviour variables
+	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "EnemyStats")
+	int behaviour = 0;							// 0 = go combat range, attack on sight; 1 = alert others; 2 = go close range, explode
+
+	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "EnemyStats")
+	int type = 0;								// 0 = trash mob; 1 = boss mob
+
+	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "EnemyStats")
+	int state = 0;								// 0 = passiv; 1 = allerted, 2 = attacking/triggered
+
+	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "EnemyStats")
+	int armor = 0;								// used to check how many enemies can be punshed through with 1 shot
 
 	//UPROPERTY()
 	//ACharacter* player;

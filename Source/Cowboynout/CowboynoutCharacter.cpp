@@ -58,9 +58,16 @@ ACowboynoutCharacter::ACowboynoutCharacter() {
 	PrimaryActorTick.bStartWithTickEnabled = true;
 }
 
+// set if the player has a target
 void ACowboynoutCharacter::SetTarget(bool targetStatus) {
-	if (targetStatus) hasTarget = true;
-	else hasTarget = false;
+	if (targetStatus == 1) {
+		hasTarget = true;
+		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Cyan, "Target Aquired!");
+	}
+	else if (targetStatus == 0) {
+		hasTarget = false;
+		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Cyan, "Target Lost!");
+	}
 }
 
 void ACowboynoutCharacter::Tick(float DeltaSeconds)

@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "Projectile.generated.h"
 
+
 UCLASS()
 class AProjectile : public AActor
 {
@@ -47,6 +48,6 @@ public:
 
 	/** Projectile Damage */
 	UPROPERTY(EditAnywhere, Category = "Projectile")
-	int projectileDamage = 10.f;
+	int projectileDamage = 50.f;
 
 };

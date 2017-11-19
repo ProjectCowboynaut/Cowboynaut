@@ -19,6 +19,9 @@ void AEnemy::BeginPlay() {
 // Called every frame
 void AEnemy::Tick(float DeltaTime) {
 	Super::Tick(DeltaTime);
+	if (health <= 0) {
+		Destroy();
+	}
 }
 
 void AEnemy::SetNewMoveDestination(const FVector DestLocation) {
@@ -34,8 +37,8 @@ void AEnemy::RotateCharacter(const FVector DestLocation) {
 void AEnemy::MouseOverBegin(UPrimitiveComponent* TouchedComponent) {
 	//player->hasTarget = true;
 	//ACowboynoutCharacter::SetTarget(1);
-	//player = Cast<ACowboynoutCharacter>(GetCharacter());
-	if (player) player->SetTarget(1);
+	player = Cast<ACowboynoutCharacter>(Cast<APlayerController>(GetController()));
+	if (player != NULL) player->SetTarget(1);
 
 	FString msg = "[mouse over]";
 	FString hitObjectName = TouchedComponent->GetFName().ToString();
@@ -44,5 +47,9 @@ void AEnemy::MouseOverBegin(UPrimitiveComponent* TouchedComponent) {
 
 void AEnemy::MouseOverEnd() {
 	
-	if (player) player->SetTarget(0);
+	if (player != NULL) player->SetTarget(0);
+}
+
+void AEnemy::Damage(int dmg) {
+	health -= dmg;
 }
