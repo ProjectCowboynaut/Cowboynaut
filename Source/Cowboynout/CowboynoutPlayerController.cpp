@@ -92,7 +92,6 @@ void ACowboynoutPlayerController::PlayerTick(float DeltaTime) {
 			activeTimerSkillThree = 0;
 		}
 	}
-
 }
 
 
@@ -158,7 +157,7 @@ void ACowboynoutPlayerController::OnSkillTwoPressed() {
 	// if skill is active / flying  
 	if (skillTwoCD) {
 		// port to nade
-		SkillTwoTP();
+		//SkillTwoTP();
 	}
 	else {
 		// use skill two
@@ -204,19 +203,20 @@ void ACowboynoutPlayerController::RotatePlayer() {
 	GetCharacter()->SetActorRotation(rot);
 }
 
-
 void ACowboynoutPlayerController::Stop() {
-	isStationairy = true;
+	//isStationairy = true;
 	canMove = false;
+	AController::StopMovement();
+	/*
 	MyPawn = GetPawn();
 	if (MyPawn) {
 		NavSys = GetWorld()->GetNavigationSystem();
 		if (MyPawn && NavSys) {
-			NavSys->SimpleMoveToLocation(this, MyPawn->GetActorLocation());
+			 NavSys->SimpleMoveToLocation(this, MyPawn->GetActorLocation());
 		}
 	}
+	*/
 }
-
 
 void ACowboynoutPlayerController::SkillOne() {
 	if (!skillOneCD) {
@@ -250,8 +250,7 @@ void ACowboynoutPlayerController::SkillTwo() {
 	// stop movement
 	Stop();
 	skillTwoCD = true;	// set CD
-	
-	//GetWorld()->SpawnActor()
+
 	// play sound at player location
 }
 
@@ -269,7 +268,6 @@ void ACowboynoutPlayerController::SkillTwoTP() {
 	}
 }
 
-
 void ACowboynoutPlayerController::SkillThree() {
 	if (!skillThreeCD) DebugMsg("skill three fired", displayTime, FColor::Yellow);
 	else {
@@ -280,9 +278,6 @@ void ACowboynoutPlayerController::SkillThree() {
 	// stop movement
 	Stop();
 	skillThreeCD = true;	// set CD
-	// spawn projectile @gunPosition.worldtransform
-	//GetWorld()->SpawnActor()
-	// play sound at player location
 }
 
 

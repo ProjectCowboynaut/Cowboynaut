@@ -47,7 +47,7 @@ void AProjectile::Initialize(int damage)
 
 void AProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	if (OtherActor != NULL) {
+	if (OtherActor != NULL && !OtherActor->ActorHasTag("Player")) {
 		FString msg = "[skill 1] hit";
 		FString hitObjectName = OtherActor->GetFName().ToString();
 		DebugMsg(msg + " " + hitObjectName, 1.5f, FColor::Yellow);
