@@ -32,8 +32,8 @@ public:
 	/** Returns CursorToWorld subobject **/
 	FORCEINLINE class UDecalComponent* GetCursorToWorld() { return CursorToWorld; }
 
+	UFUNCTION()
 	void Damage(int dmg);
-	void DebugMsg(FString msg, float dTime, FColor clr);
 
 	/** Projectile class to spawn */
 	UPROPERTY(EditDefaultsOnly, Category = "Projectile")
@@ -49,6 +49,8 @@ public:
 	UFUNCTION()
 	void FireSkillTwo();
 
+	UFUNCTION()
+	void SetTarget(bool targetStatus);
 
 private:
 	/** Top down camera */
@@ -63,7 +65,6 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
 	class UDecalComponent* CursorToWorld;
 
-
 protected:
 	// stats
 	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "PlayerStats")
@@ -75,7 +76,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "PlayerStats")
 	int attack = 1;
 
-
-
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "PlayerStats")
+	bool hasTarget = false;
 };
 

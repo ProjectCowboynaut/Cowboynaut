@@ -5,7 +5,6 @@
 #include "Runtime/Engine/Classes/Components/DecalComponent.h"
 #include "CowboynoutCharacter.h"
 
-
 ACowboynoutPlayerController::ACowboynoutPlayerController() {
 	bShowMouseCursor = true;
 	bEnableMouseOverEvents = true;
@@ -14,13 +13,15 @@ ACowboynoutPlayerController::ACowboynoutPlayerController() {
 	MyPawn = GetPawn();
 }
 
-
 void ACowboynoutPlayerController::SetupInputComponent() {
 	// set up gameplay key bindings
 	Super::SetupInputComponent();
 
 	InputComponent->BindAction("SetDestination", IE_Pressed, this, &ACowboynoutPlayerController::OnSetDestinationPressed);
 	InputComponent->BindAction("SetDestination", IE_Released, this, &ACowboynoutPlayerController::OnSetDestinationReleased);
+
+	InputComponent->BindAction("MovementMode", IE_Pressed, this, &ACowboynoutPlayerController::OnMovementModePressed);
+	InputComponent->BindAction("MovementMode", IE_Released, this, &ACowboynoutPlayerController::OnMovementModeReleased);
 
 	// stationairy mode
 	InputComponent->BindAction("StationairyMode", IE_Pressed, this, &ACowboynoutPlayerController::OnSetStationairyPressed);
@@ -36,7 +37,6 @@ void ACowboynoutPlayerController::SetupInputComponent() {
 	InputComponent->BindAction("SkillThree", IE_Pressed, this, &ACowboynoutPlayerController::OnSkillThreePressed);
 	InputComponent->BindAction("SkillThree", IE_Released, this, &ACowboynoutPlayerController::OnSkillThreeReleased);
 }
-
 
 void ACowboynoutPlayerController::PlayerTick(float DeltaTime) {
 	Super::PlayerTick(DeltaTime);
@@ -62,7 +62,6 @@ void ACowboynoutPlayerController::PlayerTick(float DeltaTime) {
 		activeTimerSkillOne += DeltaTime;
 		if (activeTimerSkillOne >= breakSkillOne) {		// enable movement again after break time
 			canMove = true;
-			isStationairy = false;
 		}
 		if (activeTimerSkillOne >= timerSkillOne) {
 			skillOneCD = false;
@@ -73,7 +72,6 @@ void ACowboynoutPlayerController::PlayerTick(float DeltaTime) {
 		activeTimerSkillTwo += DeltaTime;
 		if (activeTimerSkillTwo >= breakSkillTwo) {		// enable movement again after break time
 			canMove = true;	
-			isStationairy = false;
 		}
 		if (activeTimerSkillTwo >= timerSkillTwo) {
 			skillTwoCD = false;
@@ -85,7 +83,6 @@ void ACowboynoutPlayerController::PlayerTick(float DeltaTime) {
 		activeTimerSkillThree += DeltaTime;
 		if (activeTimerSkillThree >= breakSkillThree) {	// enable movement again after break time
 			canMove = true;	
-			isStationairy = false;
 		}
 		if (activeTimerSkillThree >= timerSkillThree) {
 			skillThreeCD = false;
@@ -93,7 +90,6 @@ void ACowboynoutPlayerController::PlayerTick(float DeltaTime) {
 		}
 	}
 }
-
 
 void ACowboynoutPlayerController::MoveToMouseCursor() {
 	// Trace to see what is under the mouse cursor && move therrrre
@@ -104,50 +100,52 @@ void ACowboynoutPlayerController::MoveToMouseCursor() {
 	}
 }
 
-
 void ACowboynoutPlayerController::SetNewMoveDestination(const FVector DestLocation) {
-	if (canMove) {
-		MyPawn = GetPawn();
+	if (canMove && !isStationairy) {
+		MyPawn = GetPawn();						// needed again for some reason, won't move without.
 		if (MyPawn) {
 			NavSys = GetWorld()->GetNavigationSystem();
 			float const Distance = FVector::Dist(DestLocation, MyPawn->GetActorLocation());
-			if (!isStationairy) {
-				if (MyPawn && NavSys && (Distance > 120.0f)) {
-					NavSys->SimpleMoveToLocation(this, DestLocation);
-				}
-			}
-			else if (MyPawn && NavSys) {
-				NavSys->SimpleMoveToLocation(this, MyPawn->GetActorLocation());
+
+			if (NavSys && (Distance > 120.0f)) {
+				NavSys->SimpleMoveToLocation(this, DestLocation);
 			}
 		}
 	}
 }
 
-
 void ACowboynoutPlayerController::OnSetDestinationPressed() {
-	if (isStationairy) return;
-	// set flag to keep updating destination until released
-	bMoveToMouseCursor = true;
+	if (canMove && !isStationairy)
+		// set flag to keep updating destination until released
+		bMoveToMouseCursor = true;
 }
+
 void ACowboynoutPlayerController::OnSetDestinationReleased() {
-	if (isStationairy) return;
 	// clear flag to indicate we should stop updating the destination
 	bMoveToMouseCursor = false;
 }
 
+void ACowboynoutPlayerController::OnMovementModePressed() {
+	moveOnly = true;
+}
+
+void ACowboynoutPlayerController::OnMovementModeReleased() {
+	moveOnly = false;
+}
 
 void ACowboynoutPlayerController::OnSetStationairyPressed() {
-	Stop();
+	isStationairy = true;
+	AController::StopMovement();
 }
+
 void ACowboynoutPlayerController::OnSetStationairyReleased() {
 	isStationairy = false;
 }
 
-
 void ACowboynoutPlayerController::OnSkillOnePressed() {
-	SkillOne();
-	
+	if (!moveOnly) SkillOne();
 }
+
 void ACowboynoutPlayerController::OnSkillOneReleased() {
 
 }
@@ -161,20 +159,21 @@ void ACowboynoutPlayerController::OnSkillTwoPressed() {
 	}
 	else {
 		// use skill two
-		SkillTwo();
+		if (!moveOnly) SkillTwo();
 	}
 }
+
 void ACowboynoutPlayerController::OnSkillTwoReleased() {
 
 }
 
 void ACowboynoutPlayerController::OnSkillThreePressed() {
-	SkillThree();
+	if (!moveOnly) SkillThree();
 }
+
 void ACowboynoutPlayerController::OnSkillThreeReleased() {
 
 }
-
 
 void ACowboynoutPlayerController::RotatePlayer() {
 	// Get mouse position on screen
@@ -203,21 +202,6 @@ void ACowboynoutPlayerController::RotatePlayer() {
 	GetCharacter()->SetActorRotation(rot);
 }
 
-void ACowboynoutPlayerController::Stop() {
-	//isStationairy = true;
-	canMove = false;
-	AController::StopMovement();
-	/*
-	MyPawn = GetPawn();
-	if (MyPawn) {
-		NavSys = GetWorld()->GetNavigationSystem();
-		if (MyPawn && NavSys) {
-			 NavSys->SimpleMoveToLocation(this, MyPawn->GetActorLocation());
-		}
-	}
-	*/
-}
-
 void ACowboynoutPlayerController::SkillOne() {
 	if (!skillOneCD) {
 		cowboy = Cast<ACowboynoutCharacter>(GetCharacter());
@@ -230,7 +214,7 @@ void ACowboynoutPlayerController::SkillOne() {
 	}
 
 	// stop movement
-	Stop();
+	AController::StopMovement();
 	skillOneCD = true;		// set CD
 	
 	// play sound at player location
@@ -248,7 +232,7 @@ void ACowboynoutPlayerController::SkillTwo() {
 	}
 
 	// stop movement
-	Stop();
+	AController::StopMovement();
 	skillTwoCD = true;	// set CD
 
 	// play sound at player location
@@ -276,7 +260,7 @@ void ACowboynoutPlayerController::SkillThree() {
 	}
 
 	// stop movement
-	Stop();
+	AController::StopMovement();
 	skillThreeCD = true;	// set CD
 }
 

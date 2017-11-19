@@ -17,18 +17,26 @@ public:
 	AEnemy();
 
 	virtual void Tick(float DeltaTime) override;
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	UFUNCTION(BlueprintCallable, Category = "Pawn|Character")
-	void MouseOver(UPrimitiveComponent* TouchedComponent);
+	UFUNCTION(BlueprintCallable)
+	void MouseOverBegin(UPrimitiveComponent* TouchedComponent);
+
+	UFUNCTION(BlueprintCallable)
+	void MouseOverEnd();
 
 	UFUNCTION()
 	void SetNewMoveDestination(const FVector DestLocation);
+
 	UFUNCTION()
 	void RotateCharacter(const FVector DestLocation);
+
+	UPROPERTY()
+	ACowboynoutCharacter* player;
 
 protected:
 
 	virtual void BeginPlay() override;
 
+	//UPROPERTY()
+	//ACharacter* player;
 };

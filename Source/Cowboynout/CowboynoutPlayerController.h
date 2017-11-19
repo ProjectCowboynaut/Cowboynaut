@@ -25,6 +25,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Debug")
 	float displayTime = .5f;
 
+	UFUNCTION()
+	void DebugMsg(FString msg, float dTime, FColor clr);
+
 protected:
 	/** True if the controlled character should navigate to the mouse cursor. */
 	uint32 bMoveToMouseCursor : 1;
@@ -32,43 +35,75 @@ protected:
 	UPROPERTY()
 	ACowboynoutCharacter* cowboy;
 
+
 	// Begin PlayerController interface
+	UFUNCTION()
 	virtual void PlayerTick(float DeltaTime) override;
+
+	UFUNCTION()
 	virtual void SetupInputComponent() override;
 	// End PlayerController interface
 
-	/** Navigate player to the current mouse cursor location. */
-	void MoveToMouseCursor();
 
+	UFUNCTION()
+	void MoveToMouseCursor();
 	
 	/** Navigate player to the given world location. */
+	UFUNCTION()
 	void SetNewMoveDestination(const FVector DestLocation);
 
 	/** Input handlers for SetDestination action. */
+	UFUNCTION()
 	void OnSetDestinationPressed();
+
+	UFUNCTION()
 	void OnSetDestinationReleased();
 
-	void DebugMsg(FString msg, float displayTime, FColor clr);
+	UFUNCTION()
+	void OnMovementModePressed();
 
+	UFUNCTION()
+	void OnMovementModeReleased();
+
+	UFUNCTION()
 	void OnSetStationairyPressed();
+
+	UFUNCTION()
 	void OnSetStationairyReleased();
 
-	void Stop();
-
 	// Rotation
+	UFUNCTION()
 	void RotatePlayer();
 
 	/** Input handlers for Skills */
+	UFUNCTION()
 	void OnSkillOnePressed();
+
+	UFUNCTION()
 	void OnSkillOneReleased();
+
+	UFUNCTION()
 	void OnSkillTwoPressed();
+
+	UFUNCTION()
 	void OnSkillTwoReleased();
+
+	UFUNCTION()
 	void OnSkillThreePressed();
+
+	UFUNCTION()
 	void OnSkillThreeReleased();
 
+	UFUNCTION()
 	void SkillOne();
+
+	UFUNCTION()
 	void SkillTwo();
+
+	UFUNCTION()
 	void SkillTwoTP();
+
+	UFUNCTION()
 	void SkillThree();
 
 
@@ -87,78 +122,79 @@ protected:
 
 
 	// combat vars
-	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Combat|Attack") 
+	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Info") 
 	bool saveAttack;
 
-	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Combat|Attack") 
+	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Info") 
 	bool isAttacking;
 
-	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Combat|Attack") 
+	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Info") 
 	bool combat;
 
-	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Combat|Attack") 
+	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Info") 
 	bool hasTarget;
 
-	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Combat|Attack") 
+	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Info") 
 	float shotsPerSecond;
 
 
 	// skill one
-	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Combat|Skills") 
+	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Skills") 
 	float timerSkillOne = .2f; 
 
-	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Combat|Skills") 
-	float breakSkillOne = .2f;			//  no movement for x seconds on skill
+	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Skills") 
+	float breakSkillOne = .2f;				//  no movement for x seconds on skill
 
-	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Combat|Skills") 
+	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Skills") 
 	float activeTimerSkillOne = .0f;
 
-	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Combat|Skills") 
+	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Skills") 
 	bool skillOneCD = false;
 
 
 	// skill two
-	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Combat|Skills") 
+	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Skills") 
 	float timerSkillTwo = 1.25f;
 
-	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Combat|Skills") 
-	float breakSkillTwo = .6f;			//  no movement for x seconds on skill
+	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Skills") 
+	float breakSkillTwo = .6f;				//  no movement for x seconds on skill
 
-	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Combat|Skills") 
+	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Skills") 
 	float activeTimerSkillTwo = .0f;
 
-	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Combat|Skills") 
+	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Skills") 
 	bool skillTwoCD = false;
 
-	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Combat|Skills") 
+	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Skills") 
 	bool skillTwoTPCD = false;
 
 
 	// skill three
-	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Combat|Skills") 
+	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Skills") 
 	float timerSkillThree = 2.5f;
 
-	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Combat|Skills") 
+	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Skills") 
 	float breakSkillThree = 1.25f;			//  no movement for x seconds on skill
 
-	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Combat|Skills") 
+	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Skills") 
 	float activeTimerSkillThree = .0f;
 
-	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Combat|Skills") 
+	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Skills") 
 	bool skillThreeCD = false;
 
 
 	// movement
-	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Movement|Keys") 
-	bool isStationairy;
+	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Movement") 
+	bool isStationairy = false;				// used when stationairy key is pressed
+
+	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Movement")
+	bool moveOnly = false;
 
 	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Movement") 
-	bool canMove = true;
+	bool canMove = true;					// used to break movement on skill use
 
 	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Movement") 
-	bool isMoving = false;
-
-
+	bool isMoving = false;					// durr, used to see if moving
 };
 
 

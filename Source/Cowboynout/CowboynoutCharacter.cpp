@@ -10,6 +10,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "HeadMountedDisplayFunctionLibrary.h"
 #include "Materials/Material.h"
+#include "Enemy.h"
 
 ACowboynoutCharacter::ACowboynoutCharacter() {
 	// Set size for player capsule
@@ -57,11 +58,10 @@ ACowboynoutCharacter::ACowboynoutCharacter() {
 	PrimaryActorTick.bStartWithTickEnabled = true;
 }
 
-
-void ACowboynoutCharacter::DebugMsg(FString msg, float dTime, FColor clr) {
-	GEngine->AddOnScreenDebugMessage(-1, dTime, clr, msg);
+void ACowboynoutCharacter::SetTarget(bool targetStatus) {
+	if (targetStatus) hasTarget = true;
+	else hasTarget = false;
 }
-
 
 void ACowboynoutCharacter::Tick(float DeltaSeconds)
 {
@@ -69,21 +69,7 @@ void ACowboynoutCharacter::Tick(float DeltaSeconds)
 
 	if (CursorToWorld != nullptr)
 	{
-		if (UHeadMountedDisplayFunctionLibrary::IsHeadMountedDisplayEnabled())
-		{
-			if (UWorld* World = GetWorld())
-			{
-				FHitResult HitResult;
-				FCollisionQueryParams Params(NAME_None, FCollisionQueryParams::GetUnknownStatId());
-				FVector StartLocation = TopDownCameraComponent->GetComponentLocation();
-				FVector EndLocation = TopDownCameraComponent->GetComponentRotation().Vector() * 2000.0f;
-				Params.AddIgnoredActor(this);
-				World->LineTraceSingleByChannel(HitResult, StartLocation, EndLocation, ECC_Visibility, Params);
-				FQuat SurfaceRotation = HitResult.ImpactNormal.ToOrientationRotator().Quaternion();
-				CursorToWorld->SetWorldLocationAndRotation(HitResult.Location, SurfaceRotation);
-			}
-		}
-		else if (APlayerController* PC = Cast<APlayerController>(GetController()))
+		if (APlayerController* PC = Cast<APlayerController>(GetController()))
 		{
 			FHitResult TraceHitResult;
 			PC->GetHitResultUnderCursor(ECC_Visibility, true, TraceHitResult);
@@ -95,21 +81,20 @@ void ACowboynoutCharacter::Tick(float DeltaSeconds)
 	}
 }
 
-
 void ACowboynoutCharacter::Damage(int dmg) {
 
 }
 
-
 void ACowboynoutCharacter::FireSkillOne() {
-	FRotator rot = GetActorRotation();
-	//DebugMsg(rot.ToString(), 1.f, FColor::White);
-	FActorSpawnParameters spawnInfo;
-	AProjectile* bullet = GetWorld()->SpawnActor<AProjectile>(ProjectileClass, muzzleLocation->GetComponentLocation(), rot, spawnInfo);
-	//if (bullet) DebugMsg("skill one fired", 1.f, FColor::Yellow);
-	//else DebugMsg("404, bullet not found", 1.f, FColor::Red);
+	//if (hasTarget) {
+		FRotator rot = GetActorRotation();
+		//DebugMsg(rot.ToString(), 1.f, FColor::White);
+		FActorSpawnParameters spawnInfo;
+		AProjectile* bullet = GetWorld()->SpawnActor<AProjectile>(ProjectileClass, muzzleLocation->GetComponentLocation(), rot, spawnInfo);
+		//if (bullet) DebugMsg("skill one fired", 1.f, FColor::Yellow);
+		//else DebugMsg("404, bullet not found", 1.f, FColor::Red);
+	//}
 }
-
 
 void ACowboynoutCharacter::FireSkillTwo() {
 	FRotator rot = GetActorRotation();

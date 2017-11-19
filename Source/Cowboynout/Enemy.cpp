@@ -7,7 +7,8 @@ AEnemy::AEnemy()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
+	//player = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
+	//GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Cyan, player->GetFName().ToString());
 }
 
 // Called when the game starts or when spawned
@@ -20,11 +21,6 @@ void AEnemy::Tick(float DeltaTime) {
 	Super::Tick(DeltaTime);
 }
 
-// Called to bind functionality to input
-void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) {
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-}
-
 void AEnemy::SetNewMoveDestination(const FVector DestLocation) {
 	
 }
@@ -35,10 +31,18 @@ void AEnemy::RotateCharacter(const FVector DestLocation) {
 	SetActorRotation(rot);
 }
 
-void AEnemy::MouseOver(UPrimitiveComponent* TouchedComponent) {
+void AEnemy::MouseOverBegin(UPrimitiveComponent* TouchedComponent) {
+	//player->hasTarget = true;
+	//ACowboynoutCharacter::SetTarget(1);
+	//player = Cast<ACowboynoutCharacter>(GetCharacter());
+	if (player) player->SetTarget(1);
 
 	FString msg = "[mouse over]";
 	FString hitObjectName = TouchedComponent->GetFName().ToString();
 	GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Cyan, msg + " " + hitObjectName);
+}
 
+void AEnemy::MouseOverEnd() {
+	
+	if (player) player->SetTarget(0);
 }
