@@ -37,17 +37,20 @@ void AEnemy::RotateCharacter(const FVector DestLocation) {
 void AEnemy::MouseOverBegin(UPrimitiveComponent* TouchedComponent) {
 	//player->hasTarget = true;
 	//ACowboynoutCharacter::SetTarget(1);
-	player = Cast<ACowboynoutCharacter>(Cast<APlayerController>(GetController()));
-	if (player != NULL) player->SetTarget(1);
+	player = Cast<ACowboynoutCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+	if (player) player->SetTarget(true);
 
-	FString msg = "[mouse over]";
+	FString msg = "[mouse over begin]";
 	FString hitObjectName = TouchedComponent->GetFName().ToString();
 	GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Cyan, msg + " " + hitObjectName);
 }
 
 void AEnemy::MouseOverEnd() {
-	
-	if (player != NULL) player->SetTarget(0);
+	player = Cast<ACowboynoutCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+	if (player) player->SetTarget(false);
+
+	FString msg = "[mouse over end]";
+	GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, msg);
 }
 
 void AEnemy::Damage(int dmg) {

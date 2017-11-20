@@ -60,13 +60,13 @@ ACowboynoutCharacter::ACowboynoutCharacter() {
 
 // set if the player has a target
 void ACowboynoutCharacter::SetTarget(bool targetStatus) {
-	if (targetStatus == 1) {
+	if (targetStatus == true) {
 		hasTarget = true;
-		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Cyan, "Target Aquired!");
+		GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Green, "Target Aquired!");
 	}
-	else if (targetStatus == 0) {
+	else if (targetStatus == false) {
 		hasTarget = false;
-		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Cyan, "Target Lost!");
+		GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, "Target Lost!");
 	}
 }
 

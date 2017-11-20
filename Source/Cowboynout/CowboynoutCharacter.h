@@ -24,13 +24,16 @@ public:
 	virtual void Tick(float DeltaSeconds) override;
 
 	/** Returns TopDownCameraComponent subobject **/
-	FORCEINLINE class UCameraComponent* GetTopDownCameraComponent() const { return TopDownCameraComponent; }
+	FORCEINLINE 
+	class UCameraComponent* GetTopDownCameraComponent() const { return TopDownCameraComponent; }
 
 	/** Returns CameraBoom subobject **/
-	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
+	FORCEINLINE 
+	class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 
 	/** Returns CursorToWorld subobject **/
-	FORCEINLINE class UDecalComponent* GetCursorToWorld() { return CursorToWorld; }
+	FORCEINLINE 
+	class UDecalComponent* GetCursorToWorld() { return CursorToWorld; }
 
 	UFUNCTION()
 	void Damage(int dmg);
@@ -76,7 +79,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "PlayerStats")
 	int attack = 1;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "PlayerStats")
-	bool hasTarget = false;
+	UPROPERTY(EditAnywhere, Category = "PlayerStats")
+	bool hasTarget = true;
 };
 
