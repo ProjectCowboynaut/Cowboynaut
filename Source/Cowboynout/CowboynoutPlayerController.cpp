@@ -140,18 +140,11 @@ void ACowboynoutPlayerController::OnSetStationairyReleased() {
 }
 
 void ACowboynoutPlayerController::OnSkillOnePressed() {
-	if (!moveOnly){
+	if (!moveOnly ){
 		if (Cast<ACowboynoutCharacter>(GetCharacter())->hasTarget || isStationairy) {
 			AController::StopMovement();
 			RotatePlayer();
 			SkillOne();
-		}
-	}
-	else {
-		FHitResult Hit;
-		GetHitResultUnderCursor(ECC_Visibility, false, Hit);
-		if (Hit.bBlockingHit && !isStationairy) {
-			SetNewMoveDestination(Hit.ImpactPoint);
 		}
 	}
 }
