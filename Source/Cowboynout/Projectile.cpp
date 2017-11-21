@@ -56,29 +56,26 @@ void AProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimi
 
 		ACowboynoutCharacter* hittedPlayer = Cast<ACowboynoutCharacter>(OtherActor);
 		
+		if (OtherActor->ActorHasTag("Enemy")) {
+			// set dmg on enemy
+			AEnemy* hitEnemy = Cast<AEnemy>(OtherActor);
+			hitEnemy->Damage(projectileDamage);
+			Destroy();
+		}
 		
 		// Only add impulse and destroy projectile if we hit a physics
-		if ((OtherActor != this) && (OtherComp != NULL) && Role == ROLE_Authority)
+		else if ((OtherActor != this) && (OtherComp != NULL) && Role == ROLE_Authority)
 		{
 			ProjectileMovement->bShouldBounce = false;
 			Destroy();
-			DebugMsg("<1>", 1.5f, FColor::Yellow);
 		}
 		else if ((OtherActor != this) && (OtherComp != NULL) && OtherComp->IsSimulatingPhysics())
 		{
 			OtherComp->AddImpulseAtLocation(GetVelocity() * 10.0f, GetActorLocation());
 			ProjectileMovement->bShouldBounce = false;
 			Destroy();
-			DebugMsg("<2>", 1.5f, FColor::Yellow);
 		}
 
-		if (OtherActor->ActorHasTag("Enemy")) {
-			DebugMsg("<0>", 1.5f, FColor::Yellow);
-			// set dmg on enemy
-			AEnemy* hitEnemy = Cast<AEnemy>(OtherActor);
-			hitEnemy->Damage(projectileDamage);
-			Destroy();
-		}
 		/*
 		if ((OtherActor != this) && (OtherComp != NULL) && hittedPlayer != NULL && Role == ROLE_Authority)
 		{

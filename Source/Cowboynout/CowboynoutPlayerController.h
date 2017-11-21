@@ -17,6 +17,9 @@ class ACowboynoutPlayerController : public APlayerController
 public:
 	ACowboynoutPlayerController();
 
+	UFUNCTION()
+	void DebugMsg(FString msg, float dTime, FColor clr);
+
 	// character
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character")
 	FVector gunPosition;
@@ -25,8 +28,8 @@ public:
 	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Debug")
 	float displayTime = .5f;
 
-	UFUNCTION()
-	void DebugMsg(FString msg, float dTime, FColor clr);
+	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Movement")
+	bool isStationairy = false;							// used when stationairy key is pressed
 
 protected:
 	/** True if the controlled character should navigate to the mouse cursor. */
@@ -34,7 +37,6 @@ protected:
 	
 	UPROPERTY()
 	ACowboynoutCharacter* cowboy;
-
 
 	// Begin PlayerController interface
 	UFUNCTION()
@@ -107,7 +109,6 @@ protected:
 	void SkillThree();
 
 
-
 	UPROPERTY(VisibleAnywhere, BluePrintReadWrite, Category = "Character")
 	AProjectile* projectile;
 
@@ -120,7 +121,6 @@ protected:
 	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Character") 
 	UNavigationSystem* NavSys;
 
-
 	// combat vars
 	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Info") 
 	bool saveAttack;
@@ -132,11 +132,7 @@ protected:
 	bool combat;
 
 	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Info") 
-	bool hasTarget;
-
-	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Info") 
 	float shotsPerSecond;
-
 
 	// skill one
 	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Skills") 
@@ -150,7 +146,6 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Skills") 
 	bool skillOneCD = false;
-
 
 	// skill two
 	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Skills") 
@@ -168,7 +163,6 @@ protected:
 	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Skills") 
 	bool skillTwoTPCD = false;
 
-
 	// skill three
 	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Skills") 
 	float timerSkillThree = 2.5f;
@@ -182,10 +176,8 @@ protected:
 	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Skills") 
 	bool skillThreeCD = false;
 
-
 	// movement
-	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Movement") 
-	bool isStationairy = false;				// used when stationairy key is pressed
+
 
 	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Movement")
 	bool moveOnly = false;

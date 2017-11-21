@@ -11,6 +11,7 @@
 #include "HeadMountedDisplayFunctionLibrary.h"
 #include "Materials/Material.h"
 #include "Enemy.h"
+#include "CowboynoutPlayerController.h"
 
 ACowboynoutCharacter::ACowboynoutCharacter() {
 	// Set size for player capsule
@@ -93,22 +94,22 @@ void ACowboynoutCharacter::Damage(int dmg) {
 }
 
 void ACowboynoutCharacter::FireSkillOne() {
-	//if (hasTarget) {
-		FRotator rot = GetActorRotation();
-		//DebugMsg(rot.ToString(), 1.f, FColor::White);
-		FActorSpawnParameters spawnInfo;
-		AProjectile* bullet = GetWorld()->SpawnActor<AProjectile>(ProjectileClass, muzzleLocation->GetComponentLocation(), rot, spawnInfo);
-		//if (bullet) DebugMsg("skill one fired", 1.f, FColor::Yellow);
-		//else DebugMsg("404, bullet not found", 1.f, FColor::Red);
-	//}
+	if (ACowboynoutPlayerController* PC = Cast<ACowboynoutPlayerController>(GetController())) {
+		if (hasTarget || PC->isStationairy) {
+			FRotator rot = GetActorRotation();
+			FActorSpawnParameters spawnInfo;
+			AProjectile* bullet = GetWorld()->SpawnActor<AProjectile>(ProjectileClass, muzzleLocation->GetComponentLocation(), rot, spawnInfo);
+		}
+	}
 }
 
 void ACowboynoutCharacter::FireSkillTwo() {
-	FRotator rot = GetActorRotation();
-	rot.Pitch = 60.f;
-	//DebugMsg(rot.ToString(), 1.f, FColor::White);
-	FActorSpawnParameters spawnInfo;
-	AGrenade* nade = GetWorld()->SpawnActor<AGrenade>(GrenadeClass, muzzleLocation->GetComponentLocation(), rot, spawnInfo);
-	//if (nade) DebugMsg("skill two fired", 1.f, FColor::Yellow);
-	//else DebugMsg("404, no fire in the hole", 1.f, FColor::Red);
+	if (ACowboynoutPlayerController* PC = Cast<ACowboynoutPlayerController>(GetController())) {
+		if (hasTarget || PC->isStationairy) {
+			FRotator rot = GetActorRotation();
+			rot.Pitch = 60.f;
+			FActorSpawnParameters spawnInfo;
+			AGrenade* nade = GetWorld()->SpawnActor<AGrenade>(GrenadeClass, muzzleLocation->GetComponentLocation(), rot, spawnInfo);
+		}
+	}
 }

@@ -14,11 +14,8 @@ class ACowboynoutCharacter : public ACharacter
 	GENERATED_BODY()
 
 public:
-	ACowboynoutCharacter();
 
-	/** Location on gun mesh where projectiles should spawn. */
-	UPROPERTY(VisibleDefaultsOnly, Category = "Character")
-	class USceneComponent* muzzleLocation;
+	ACowboynoutCharacter();
 
 	// Called every frame.
 	virtual void Tick(float DeltaSeconds) override;
@@ -41,11 +38,6 @@ public:
 	/** Projectile class to spawn */
 	UPROPERTY(EditDefaultsOnly, Category = "Projectile")
 	TSubclassOf<class AProjectile> ProjectileClass;
-
-	/** Projectile class to spawn */
-	UPROPERTY(EditDefaultsOnly, Category = "Projectile")
-	TSubclassOf<class AGrenade> GrenadeClass;
-
 	UFUNCTION()
 	void FireSkillOne();
 
@@ -55,7 +47,20 @@ public:
 	UFUNCTION()
 	void SetTarget(bool targetStatus);
 
+	/** Location on gun mesh where projectiles should spawn. */
+	UPROPERTY(VisibleDefaultsOnly, Category = "Character")
+	class USceneComponent* muzzleLocation;
+
+	/** Projectile class to spawn */
+	UPROPERTY(EditDefaultsOnly, Category = "Projectile")
+	TSubclassOf<class AGrenade> GrenadeClass;
+
+
+	UPROPERTY(EditAnywhere, Category = "PlayerStats")
+	bool hasTarget = false;
+
 private:
+
 	/** Top down camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* TopDownCameraComponent;
@@ -69,6 +74,7 @@ private:
 	class UDecalComponent* CursorToWorld;
 
 protected:
+
 	// stats
 	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "PlayerStats")
 	int life = 100;
@@ -79,7 +85,5 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "PlayerStats")
 	int attack = 1;
 
-	UPROPERTY(EditAnywhere, Category = "PlayerStats")
-	bool hasTarget = true;
 };
 

@@ -92,7 +92,6 @@ void ACowboynoutPlayerController::PlayerTick(float DeltaTime) {
 }
 
 void ACowboynoutPlayerController::MoveToMouseCursor() {
-	// Trace to see what is under the mouse cursor && move therrrre
 	FHitResult Hit;
 	GetHitResultUnderCursor(ECC_Visibility, false, Hit);
 	if (Hit.bBlockingHit && !isStationairy) {
@@ -116,12 +115,10 @@ void ACowboynoutPlayerController::SetNewMoveDestination(const FVector DestLocati
 
 void ACowboynoutPlayerController::OnSetDestinationPressed() {
 	if (canMove && !isStationairy)
-		// set flag to keep updating destination until released
 		bMoveToMouseCursor = true;
 }
 
 void ACowboynoutPlayerController::OnSetDestinationReleased() {
-	// clear flag to indicate we should stop updating the destination
 	bMoveToMouseCursor = false;
 }
 
@@ -143,14 +140,27 @@ void ACowboynoutPlayerController::OnSetStationairyReleased() {
 }
 
 void ACowboynoutPlayerController::OnSkillOnePressed() {
-	if (!moveOnly) SkillOne();
+	if (!moveOnly){
+		if (Cast<ACowboynoutCharacter>(GetCharacter())->hasTarget || isStationairy) {
+			AController::StopMovement();
+			RotatePlayer();
+			SkillOne();
+		}
+	}
+	else {
+		FHitResult Hit;
+		GetHitResultUnderCursor(ECC_Visibility, false, Hit);
+		if (Hit.bBlockingHit && !isStationairy) {
+			SetNewMoveDestination(Hit.ImpactPoint);
+		}
+	}
 }
 
 void ACowboynoutPlayerController::OnSkillOneReleased() {
 
 }
 
-// WiP :: not good, fix later
+/// WiP :: not good, fix later
 void ACowboynoutPlayerController::OnSkillTwoPressed() {
 	// if skill is active / flying  
 	if (skillTwoCD) {
@@ -159,7 +169,9 @@ void ACowboynoutPlayerController::OnSkillTwoPressed() {
 	}
 	else {
 		// use skill two
-		if (!moveOnly) SkillTwo();
+		if (!moveOnly) {
+			SkillTwo();
+		}
 	}
 }
 
@@ -212,9 +224,7 @@ void ACowboynoutPlayerController::SkillOne() {
 		DebugMsg("skill one on CD", displayTime, FColor::Red);
 		return;
 	}
-
-	// stop movement
-	AController::StopMovement();
+	AController::StopMovement();						// stop movement
 	skillOneCD = true;		// set CD
 	
 	// play sound at player location
@@ -222,6 +232,7 @@ void ACowboynoutPlayerController::SkillOne() {
 
 void ACowboynoutPlayerController::SkillTwo() {
 	if (!skillOneCD) {
+		
 		cowboy = Cast<ACowboynoutCharacter>(GetCharacter());
 		if (cowboy) cowboy->FireSkillTwo();
 		else DebugMsg("cowboy nullptr", displayTime, FColor::Red);
