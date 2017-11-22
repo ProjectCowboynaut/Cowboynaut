@@ -57,6 +57,7 @@ ACowboynoutCharacter::ACowboynoutCharacter() {
 	// Activate ticking in order to update the cursor every frame.
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.bStartWithTickEnabled = true;
+
 }
 
 // set if the player has a target

@@ -85,5 +85,6 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "PlayerStats")
 	int attack = 1;
 
+
 };
 
