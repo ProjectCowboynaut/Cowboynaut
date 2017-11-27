@@ -2,6 +2,8 @@
 
 #include "CowboynoutPlayerController.h"
 #include "AI/Navigation/NavigationSystem.h"
+#include "Perception/AISense.h"
+#include "Perception/AISenseConfig_Sight.h"
 #include "Runtime/Engine/Classes/Components/DecalComponent.h"
 #include "CowboynoutCharacter.h"
 
@@ -36,6 +38,8 @@ void ACowboynoutPlayerController::SetupInputComponent() {
 	// Skill Three
 	InputComponent->BindAction("SkillThree", IE_Pressed, this, &ACowboynoutPlayerController::OnSkillThreePressed);
 	InputComponent->BindAction("SkillThree", IE_Released, this, &ACowboynoutPlayerController::OnSkillThreeReleased);
+
+	//UAIPerceptionSystem::RegisterPerceptionStimuliSource(this, sightConfig->GetSenseImplementation(), GetControlledPawn());
 }
 
 void ACowboynoutPlayerController::PlayerTick(float DeltaTime) {

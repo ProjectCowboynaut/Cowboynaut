@@ -13,6 +13,7 @@
 #include "Enemy.h"
 #include "CowboynoutPlayerController.h"
 
+
 ACowboynoutCharacter::ACowboynoutCharacter() {
 	// Set size for player capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
@@ -58,17 +59,19 @@ ACowboynoutCharacter::ACowboynoutCharacter() {
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.bStartWithTickEnabled = true;
 
+
+
 }
 
 // set if the player has a target
 void ACowboynoutCharacter::SetTarget(bool targetStatus) {
 	if (targetStatus == true) {
 		hasTarget = true;
-		GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Green, "Target Aquired!");
+		//GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Green, "Target Aquired!");
 	}
 	else if (targetStatus == false) {
 		hasTarget = false;
-		GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, "Target Lost!");
+		//GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, "Target Lost!");
 	}
 }
 

@@ -49,5 +49,4 @@ public:
 	/** Projectile Damage */
 	UPROPERTY(EditAnywhere, Category = "Projectile")
 	int projectileDamage = 50.f;
-
 };

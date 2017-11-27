@@ -38,6 +38,7 @@ public:
 	/** Projectile class to spawn */
 	UPROPERTY(EditDefaultsOnly, Category = "Projectile")
 	TSubclassOf<class AProjectile> ProjectileClass;
+
 	UFUNCTION()
 	void FireSkillOne();
 
@@ -49,15 +50,23 @@ public:
 
 	/** Location on gun mesh where projectiles should spawn. */
 	UPROPERTY(VisibleDefaultsOnly, Category = "Character")
-	class USceneComponent* muzzleLocation;
+	USceneComponent* muzzleLocation;
 
-	/** Projectile class to spawn */
+	/** nade class to spawn */
 	UPROPERTY(EditDefaultsOnly, Category = "Projectile")
 	TSubclassOf<class AGrenade> GrenadeClass;
 
-
 	UPROPERTY(EditAnywhere, Category = "PlayerStats")
 	bool hasTarget = false;
+
+	UPROPERTY(EditAnywhere, Category= "Loot")
+	int chipsA = 0;
+
+	UPROPERTY(EditAnywhere, Category = "Loot")
+	int chipsB = 0;
+
+	UPROPERTY(EditAnywhere, Category = "Loot")
+	int chipsC = 0;
 
 private:
 
