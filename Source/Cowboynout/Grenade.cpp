@@ -2,6 +2,8 @@
 
 #include "Grenade.h"
 #include "CowboynoutCharacter.h"
+#include "Enemy.h"
+#include "CowboynoutPlayerController.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 
 AGrenade::AGrenade() {
@@ -33,7 +35,7 @@ AGrenade::AGrenade() {
 
 	// Die after 3 seconds by default
 	InitialLifeSpan = 3.0f;
-
+	grenadeDamage = 100.f;
 }
 
 void AGrenade::DebugMsg(FString msg, float dTime, FColor clr) {
@@ -52,52 +54,34 @@ void AGrenade::OnHit(UPrimitiveComponent* HitComp,
 					FVector NormalImpulse,
 					const FHitResult& Hit)
 {
-	FString msg = "[skill 2] hit";
-	FString hitObjectName = OtherActor->GetFName().ToString();
-	DebugMsg(msg + " " + hitObjectName, 1.5f, FColor::Yellow);
 
-	ACowboynoutCharacter* hittedPlayer = Cast<ACowboynoutCharacter>(OtherActor);
-	// Only add impulse and destroy projectile if we hit a physics
-	if ((OtherActor != NULL) &&
-		(OtherActor != this) &&
-		(OtherComp != NULL) &&
-		Role == ROLE_Authority)
-	{
-		ProjectileMovement->bShouldBounce = false;
-		Destroy();
+	if (OtherActor != NULL) {
+		//DebugMsg("BOOM goes " + OtherActor->GetFName().ToString(), 1.5f, FColor::Red);
+		AEnemy* hitEnemy = Cast<AEnemy>(OtherActor);
+		if (hitEnemy != NULL) hitEnemy->Damage(grenadeDamage);
+
+		FHitResult Hit;
+		APlayerController* pCtrl = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+		if (pCtrl != NULL) pCtrl->GetHitResultUnderCursor(ECC_Visibility, false, Hit);
+		
+		float const distance = FVector::Dist(Hit.ImpactPoint, pCtrl->GetPawn()->GetActorLocation());
+		if (distance) DebugMsg(FString::SanitizeFloat(distance), 1.5f, FColor::Yellow);
+	}
+	else {
+		FString msg = "[skill 2] hit";
+		FString hitObjectName = OtherActor->GetFName().ToString();
+		//DebugMsg(msg + " " + hitObjectName, 1.5f, FColor::Yellow);
 	}
 
-	else if ((OtherActor != NULL) &&
-			(OtherActor != this) &&
-			(OtherComp != NULL) &&
-			OtherComp->IsSimulatingPhysics())
-	{
-		OtherComp->AddImpulseAtLocation(
-			GetVelocity() * 10.0f, GetActorLocation()
-		);
+	//ACowboynoutCharacter* hittedPlayer = Cast<ACowboynoutCharacter>(OtherActor);
+	
 
-		ProjectileMovement->bShouldBounce = false;
-		Destroy();
-	}
-
-	if ((OtherActor != NULL) &&
-		(OtherActor != this) &&
-		(OtherComp != NULL) &&
-		hittedPlayer != NULL &&
-		Role == ROLE_Authority)
-	{
-		ProjectileMovement->bShouldBounce = false;
-		//hitted other player
-		hittedPlayer->Damage(grenadeDamage);
-
-		Destroy();
-	}
 	if (!ProjectileMovement->bShouldBounce)
 		Destroy();
 
 	UObject* WorldContextObject = GetWorld();
 	FVector SpawnLocation = this->GetActorLocation();
-	FRotator SpawnRotation = GetActorRotation();;
+	FRotator SpawnRotation = GetActorRotation();
 	
 	UGameplayStatics::SpawnEmitterAtLocation(
 		WorldContextObject,

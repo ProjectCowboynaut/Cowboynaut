@@ -19,8 +19,8 @@ void ACowboynoutPlayerController::SetupInputComponent() {
 	// set up gameplay key bindings
 	Super::SetupInputComponent();
 
-	InputComponent->BindAction("SetDestination", IE_Pressed, this, &ACowboynoutPlayerController::OnSetDestinationPressed);
-	InputComponent->BindAction("SetDestination", IE_Released, this, &ACowboynoutPlayerController::OnSetDestinationReleased);
+	//InputComponent->BindAction("SetDestination", IE_Pressed, this, &ACowboynoutPlayerController::OnSetDestinationPressed);
+	//InputComponent->BindAction("SetDestination", IE_Released, this, &ACowboynoutPlayerController::OnSetDestinationReleased);
 
 	InputComponent->BindAction("MovementMode", IE_Pressed, this, &ACowboynoutPlayerController::OnMovementModePressed);
 	InputComponent->BindAction("MovementMode", IE_Released, this, &ACowboynoutPlayerController::OnMovementModeReleased);
@@ -38,6 +38,17 @@ void ACowboynoutPlayerController::SetupInputComponent() {
 	// Skill Three
 	InputComponent->BindAction("SkillThree", IE_Pressed, this, &ACowboynoutPlayerController::OnSkillThreePressed);
 	InputComponent->BindAction("SkillThree", IE_Released, this, &ACowboynoutPlayerController::OnSkillThreeReleased);
+
+	// mouse
+	InputComponent->BindAction("LeftClick", IE_Pressed, this, &ACowboynoutPlayerController::OnLeftMousePressed);
+	InputComponent->BindAction("LeftClick", IE_Released, this, &ACowboynoutPlayerController::OnLeftMouseReleased);
+
+	InputComponent->BindAction("RightClick", IE_Pressed, this, &ACowboynoutPlayerController::OnRightMousePressed);
+	InputComponent->BindAction("RightClick", IE_Released, this, &ACowboynoutPlayerController::OnRightMouseReleased);
+
+	// simulate damage
+	InputComponent->BindAction("SimulateDamage", IE_Pressed, this, &ACowboynoutPlayerController::OnSimulateDamagePressed);
+	InputComponent->BindAction("SimulateDamage", IE_Released, this, &ACowboynoutPlayerController::OnSimulateDamageReleased);
 
 	//UAIPerceptionSystem::RegisterPerceptionStimuliSource(this, sightConfig->GetSenseImplementation(), GetControlledPawn());
 }
@@ -143,13 +154,45 @@ void ACowboynoutPlayerController::OnSetStationairyReleased() {
 	isStationairy = false;
 }
 
+// ## mouse functions
+
+void ACowboynoutPlayerController::OnLeftMousePressed() {
+	ACowboynoutCharacter* playerChar = Cast<ACowboynoutCharacter>(GetCharacter());
+	if (playerChar->hasTarget) {
+		OnSkillOnePressed();
+	}
+	else {
+		OnSetDestinationPressed();
+	}
+}
+
+void ACowboynoutPlayerController::OnLeftMouseReleased() {
+	OnSetDestinationReleased();
+}
+
+void ACowboynoutPlayerController::OnRightMousePressed() {
+	ACowboynoutCharacter* playerChar = Cast<ACowboynoutCharacter>(GetCharacter());
+	//if (playerChar->hasTarget) {
+		OnSkillTwoPressed();
+	//}
+}
+
+void ACowboynoutPlayerController::OnRightMouseReleased() {
+
+}
+
 void ACowboynoutPlayerController::OnSkillOnePressed() {
 	if (!moveOnly ){
-		if (Cast<ACowboynoutCharacter>(GetCharacter())->hasTarget || isStationairy) {
-			AController::StopMovement();
+		AController::StopMovement();
+		//if (Cast<ACowboynoutCharacter>(GetCharacter())->hasTarget || isStationairy) {
+		if (skillOneCD) {
+
+		}
+		else {
 			RotatePlayer();
 			SkillOne();
 		}
+		//}
 	}
 }
 
@@ -184,6 +227,20 @@ void ACowboynoutPlayerController::OnSkillThreeReleased() {
 
 }
 
+void ACowboynoutPlayerController::OnSimulateDamagePressed() {
+	// increase chip ammount
+	SimulateDamage();
+}
+
+void ACowboynoutPlayerController::SimulateDamage() {
+	ACowboynoutCharacter* playerChar = Cast<ACowboynoutCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+	playerChar->life -= 10.f;
+}
+
+void ACowboynoutPlayerController::OnSimulateDamageReleased() {
+
+}
+
 void ACowboynoutPlayerController::RotatePlayer() {
 	// Get mouse position on screen
 	float xMouse;
@@ -191,27 +248,32 @@ void ACowboynoutPlayerController::RotatePlayer() {
 	GetMousePosition(xMouse, yMouse);
 
 	// Get Character position on screen
-	FVector charLoc = GetCharacter()->GetActorLocation();
-	FVector2D charInScreen;
-	ProjectWorldLocationToScreen(charLoc, charInScreen);
+	ACharacter* character = GetCharacter();
+	if (character != NULL) {
+		FVector charLoc = character->GetActorLocation();
+		FVector2D charInScreen;
+		ProjectWorldLocationToScreen(charLoc, charInScreen);
 
-	// Get mouse position relative to the Character.
-	FVector2D result;
-	result.X = -(yMouse - charInScreen.Y);
-	result.Y = xMouse - charInScreen.X;
+		// Get mouse position relative to the Character.
+		FVector2D result;
+		result.X = -(yMouse - charInScreen.Y);
+		result.Y = xMouse - charInScreen.X;
+		// Get angle rotation and rotation Character
+		float angle = FMath::RadiansToDegrees(FMath::Acos(result.X / result.Size()));
 
-	// Get angle rotation and rotation Character
-	float angle = FMath::RadiansToDegrees(FMath::Acos(result.X / result.Size()));
+		if (result.Y < 0)
+			angle = 360 - angle;
 
-	if (result.Y < 0)
-		angle = 360 - angle;
+		FRotator rot(0, angle, 0);
 
-	FRotator rot(0, angle, 0);
+		character->SetActorRotation(rot);
+	}
+	
 
-	GetCharacter()->SetActorRotation(rot);
 }
 
 void ACowboynoutPlayerController::SkillOne() {
+	DebugMsg("pewpew", displayTime, FColor::Green);
 	if (!skillOneCD) {
 		cowboy = Cast<ACowboynoutCharacter>(GetCharacter());
 		if (cowboy) cowboy->FireSkillOne();
@@ -228,8 +290,8 @@ void ACowboynoutPlayerController::SkillOne() {
 }
 
 void ACowboynoutPlayerController::SkillTwo() {
-	if (!skillOneCD) {
-		
+	DebugMsg("pewpew²", displayTime, FColor::Green);
+	if (!skillTwoCD) {
 		cowboy = Cast<ACowboynoutCharacter>(GetCharacter());
 		if (cowboy) cowboy->FireSkillTwo();
 		else DebugMsg("cowboy nullptr", displayTime, FColor::Red);

@@ -77,6 +77,18 @@ protected:
 	UFUNCTION()
 	void RotatePlayer();
 
+	UFUNCTION()
+	void OnLeftMousePressed();
+
+	UFUNCTION()
+	void OnLeftMouseReleased();
+
+	UFUNCTION()
+	void OnRightMousePressed();
+
+	UFUNCTION()
+	void OnRightMouseReleased();
+
 	/** Input handlers for Skills */
 	UFUNCTION()
 	void OnSkillOnePressed();
@@ -108,6 +120,14 @@ protected:
 	UFUNCTION()
 	void SkillThree();
 
+	UFUNCTION()
+	void OnSimulateDamagePressed();
+
+	UFUNCTION()
+	void OnSimulateDamageReleased();
+	
+	UFUNCTION()
+	void SimulateDamage();
 
 	UPROPERTY(VisibleAnywhere, BluePrintReadWrite, Category = "Character")
 	AProjectile* projectile;

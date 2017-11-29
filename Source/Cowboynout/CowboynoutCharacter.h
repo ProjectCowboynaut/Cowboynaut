@@ -48,6 +48,33 @@ public:
 	UFUNCTION()
 	void SetTarget(bool targetStatus);
 
+	UFUNCTION(BlueprintCallable)
+	int GetChipsA();
+
+	UFUNCTION(BlueprintCallable)
+	int GetChipsB();
+
+	UFUNCTION(BlueprintCallable)
+	int GetChipsC();
+
+	UFUNCTION(BlueprintCallable)
+	float GetHealth();
+
+	UFUNCTION(BlueprintCallable)
+	void ConvertChipSkillA();
+
+	UFUNCTION(BlueprintCallable)
+	void ConvertChipSkillB();
+
+	UFUNCTION(BlueprintCallable)
+	void ConvertChipStatA();
+
+	UFUNCTION(BlueprintCallable)
+	void ConvertChipStatB();
+
+	UFUNCTION(BlueprintCallable)
+	void ConvertChipStatC();
+	
 	/** Location on gun mesh where projectiles should spawn. */
 	UPROPERTY(VisibleDefaultsOnly, Category = "Character")
 	USceneComponent* muzzleLocation;
@@ -56,7 +83,7 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Projectile")
 	TSubclassOf<class AGrenade> GrenadeClass;
 
-	UPROPERTY(EditAnywhere, Category = "PlayerStats")
+	UPROPERTY(BlueprintReadOnly, Category = "PlayerStats")
 	bool hasTarget = false;
 
 	UPROPERTY(EditAnywhere, Category= "Loot")
@@ -67,6 +94,26 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "Loot")
 	int chipsC = 0;
+
+	// stats
+	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "PlayerStats")
+	float life = 100;
+
+	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "PlayerStats")
+	float lifeMax = 100;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "PlayerStats")
+	int speed = 1;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "PlayerStats")
+	int attack = 1;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "PlayerStats")
+	int skillLvlTwo = 1;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "PlayerStats")
+	int skillLvlOne = 1;
+
 
 private:
 
@@ -82,18 +129,7 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
 	class UDecalComponent* CursorToWorld;
 
-protected:
-
-	// stats
-	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "PlayerStats")
-	int life = 100;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "PlayerStats")
-	int speed = 1;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "PlayerStats")
-	int attack = 1;
-
+//protected:
 
 };
 

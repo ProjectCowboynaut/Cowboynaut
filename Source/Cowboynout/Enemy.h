@@ -7,6 +7,7 @@
 #include "AIController.h"
 #include "Perception/AISense.h"
 #include "GameFramework/Character.h"
+#include "Projectile.h"
 #include "Enemy.generated.h"
 
 UCLASS()
@@ -38,38 +39,71 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SenseStuff(TArray<AActor*> testActors);
 
-	UPROPERTY()
-	ACowboynoutCharacter* player;
+	UFUNCTION()
+	void DoAPeriodicCheck();
+
+	UFUNCTION(BlueprintCallable)
+	void Attack();
+
+	UFUNCTION()
+	void AttackFrequence();
+
+	/** Location on gun mesh where projectiles should spawn. */
+	UPROPERTY(VisibleDefaultsOnly, Category = "Character")
+	USceneComponent* muzzleLocation;
+
+	/** Projectile class to spawn */
+	UPROPERTY(EditDefaultsOnly, Category = "Projectile")
+	TSubclassOf<class AProjectile> ProjectileClass;
+
+	UPROPERTY(EditAnywhere)
+	float attackRatio;
+
+	UPROPERTY(EditAnywhere)
+	float loopTime;
+
+	UPROPERTY(EditAnywhere, BluePrintReadWrite, Category = "EnemyStats")
+	int type;								// 0 = not initialized type; 1 = trash mob; 666 = boss mob
+
+	UPROPERTY(VisibleAnywhere, BluePrintReadWrite, Category = "EnemyStats")
+	int health;
+
+	//behaviour variables
+	UPROPERTY(EditAnywhere, BluePrintReadWrite, Category = "EnemyStats")
+	int behaviour;							// 0 = go combat range, attack on sight; 1 = alert others; 2 = go close range, explode
+
+	UPROPERTY(EditAnywhere, BluePrintReadWrite, Category = "EnemyStats")
+	int state;								// 0 = passiv; 1 = allerted, 2 = attacking/triggered
+
+	UPROPERTY(EditAnywhere, BluePrintReadWrite, Category = "EnemyStats")
+	int armor;								// used to check how many enemies can be punshed through with 1 shot	
 
 	UPROPERTY()
-	int chipsA = 0;
+	ACowboynoutCharacter* playerChar;
 
-	UPROPERTY() 
-	int chipsB = 0;
+	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Loot")
+	int chipsA;
 
-	UPROPERTY()
-	int chipsC = 0;
+	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Loot")
+	int chipsB;
+
+	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Loot")
+	int chipsC;
+
+	UPROPERTY(VisibleAnywhere, BluePrintReadWrite, Category = "Combat")
+	bool canSeePlayer;
 
 protected:
+
+	UPROPERTY(VisibleAnywhere)
+	float timer;
+
+	UPROPERTY(VisibleAnywhere)
+	bool timerActive;
 
 	virtual void BeginPlay() override;
 
 	UFUNCTION()
 	void Die();
 
-	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "EnemyStats")
-	int health = 100;
-
-	//behaviour variables
-	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "EnemyStats")
-	int behaviour = 0;							// 0 = go combat range, attack on sight; 1 = alert others; 2 = go close range, explode
-
-	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "EnemyStats")
-	int type = 0;								// 0 = trash mob; 1 = boss mob
-
-	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "EnemyStats")
-	int state = 0;								// 0 = passiv; 1 = allerted, 2 = attacking/triggered
-
-	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "EnemyStats")
-	int armor = 0;								// used to check how many enemies can be punshed through with 1 shot	
 };

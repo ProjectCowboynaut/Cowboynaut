@@ -29,30 +29,52 @@ void ULoot::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentT
 	// ...
 }
 
-void ULoot::DropChance(FVector spawnLoc) {
+void ULoot::DropChance(FVector spawnLoc, AEnemy* enemyChar) {
 
-	// dropchance minor chip
-	rnd = FMath::RandRange(.0f, 1.0f);
+	// temp fix
+
+	if (enemyChar) enemyType = enemyChar->type;
+	else enemyType = 1;
 	
-	if (rnd < dropChanceA) {
-		//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Purple, "m: " + FString::SanitizeFloat(rnd) + " < " + FString::SanitizeFloat(dropChanceMinorChip));
-		LootDropA(spawnLoc);
+	// adjust loot gain for enemy types
+	int lootMass;
+	// trash mob
+	if (enemyType == 1)
+		lootMass = 1;
+	// some other mob
+	else if (enemyType == 2)
+		lootMass = 2;
+	// boss mob
+	else if (enemyType == 666)
+		lootMass = 4;
+
+	// dropchance chip A
+	rnd = FMath::RandRange(.0f, 1.0f);
+	for (int i = 0; i < lootMass; i++){
+		if (rnd < dropChanceA) {
+			//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Purple, "m: " + FString::SanitizeFloat(rnd) + " < " + FString::SanitizeFloat(dropChanceMinorChip));
+			LootDropA(spawnLoc);
+		}
 	}
 	//else GEngine->AddOnScreenDebugMessage(-1, 5, FColor::White, "m: " + FString::SanitizeFloat(rnd) + " < " + FString::SanitizeFloat(dropChanceMinorChip));
 
-	// dropchance major chip skill one
+	// dropchance chip B
 	rnd = FMath::RandRange(.0f, 1.0f);
-	if (rnd < dropChanceB) {
-		//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Purple, "A: " + FString::SanitizeFloat(rnd) + " < " + FString::SanitizeFloat(dropChanceMajorChipA));
-		LootDropB(spawnLoc);
+	for (int i = 0; i < lootMass; i++) {
+		if (rnd < dropChanceB) {
+			//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Purple, "A: " + FString::SanitizeFloat(rnd) + " < " + FString::SanitizeFloat(dropChanceMajorChipA));
+			LootDropB(spawnLoc);
+		}
 	}
 	//else GEngine->AddOnScreenDebugMessage(-1, 5, FColor::White, "m: " + FString::SanitizeFloat(rnd) + " < " + FString::SanitizeFloat(dropChanceMinorChip));
 
-	// dropchance major chip skill two
+	// dropchance chip C
 	rnd = FMath::RandRange(.0f, 1.0f);
-	if (rnd < dropChanceC) {
-		//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Purple, "B: " + FString::SanitizeFloat(rnd) + " < " + FString::SanitizeFloat(dropChanceMajorChipB));
-		LootDropC(spawnLoc);
+	for (int i = 0; i < lootMass; i++) {
+		if (rnd < dropChanceC) {
+			//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Purple, "B: " + FString::SanitizeFloat(rnd) + " < " + FString::SanitizeFloat(dropChanceMajorChipB));
+			LootDropC(spawnLoc);
+		}
 	}
 	//else GEngine->AddOnScreenDebugMessage(-1, 5, FColor::White, "m: " + FString::SanitizeFloat(rnd) + " < " + FString::SanitizeFloat(dropChanceMinorChip));
 }

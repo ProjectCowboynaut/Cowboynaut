@@ -30,7 +30,7 @@ public:
 
 	/** Projectile Damage */
 	UPROPERTY(EditAnywhere, Category = "Projectile")
-	int grenadeDamage = 40.f;
+	int grenadeDamage;
 
 	void Initialize(int damage);
 

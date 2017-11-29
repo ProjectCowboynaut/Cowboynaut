@@ -34,6 +34,8 @@ AProjectile::AProjectile()
 	FVector SpawnLocation = this->GetActorLocation();
 	FRotator SpawnRotation = GetActorRotation();;
 
+	projectileDamage = 50.f;
+
 	//UGameplayStatics::SpawnEmitterAtLocation(WorldContextObject, lazor, SpawnLocation, SpawnRotation, true);
 }
 

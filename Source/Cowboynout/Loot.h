@@ -21,7 +21,7 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	UFUNCTION()
-	void DropChance(FVector spawnLoc);
+	void DropChance(FVector spawnLoc, AEnemy* enemyChar);
 
 	UFUNCTION()
 	void LootDropA(FVector spawnLoc);
@@ -33,16 +33,19 @@ public:
 	void LootDropC(FVector spawnLoc);
 
 	UPROPERTY()
-	float dropChanceA = .7f;
+	float dropChanceA = .6f;
 
 	UPROPERTY()
-	float dropChanceB = .15f;
+	float dropChanceB = .6f;
 
 	UPROPERTY()
-	float dropChanceC = .15f;
+	float dropChanceC = .6f;
 
 	UPROPERTY()
 	float rnd;
+	
+	UPROPERTY()
+	int enemyType;
 
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<class AActor> droppedItemA;

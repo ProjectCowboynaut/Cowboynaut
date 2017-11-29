@@ -97,23 +97,88 @@ void ACowboynoutCharacter::Damage(int dmg) {
 
 }
 
+float ACowboynoutCharacter::GetHealth() {
+	float healthReturn = life / 100.f;
+	//GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "[" + FString::SanitizeFloat(healthReturn) + "] [" + FString::SanitizeFloat(life) + "]");
+	return healthReturn;
+}
+
+void ACowboynoutCharacter::ConvertChipStatA() {
+	if (chipsA >= 5) {
+		chipsA -= 5;
+		lifeMax += 10;
+	}
+	else
+		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "not enough chips to convert to stat A");
+}
+
+void ACowboynoutCharacter::ConvertChipStatB() {
+	if (chipsB >= 5) {
+		chipsB -= 5;
+		speed++;
+	}
+	else
+		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "not enough chips to convert to stat B");
+}
+
+void ACowboynoutCharacter::ConvertChipStatC() {
+	if (chipsC >= 5) {
+		chipsC -= 5;
+		attack += 1;
+	}
+	else
+		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "not enough chips to convert to stat C");
+}
+
+void ACowboynoutCharacter::ConvertChipSkillA() {
+	if (chipsA >= 10 && chipsB >= 10) {
+		chipsA -= 10;
+		chipsB -= 10;
+		skillLvlOne++;
+	}
+	else
+		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "not enough chips to convert to skill A");
+}
+
+void ACowboynoutCharacter::ConvertChipSkillB() {
+	if (chipsB >= 10 && chipsC >= 10) {
+		chipsB -= 10;
+		chipsC -= 10;
+		skillLvlTwo++;
+	}
+	else
+		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "not enough chips to convert to skill B");
+}
+
+int ACowboynoutCharacter::GetChipsA() {
+	return chipsA;
+}
+
+int ACowboynoutCharacter::GetChipsB() {
+	return chipsB;
+}
+
+int ACowboynoutCharacter::GetChipsC() {
+	return chipsC;
+}
+
 void ACowboynoutCharacter::FireSkillOne() {
 	if (ACowboynoutPlayerController* PC = Cast<ACowboynoutPlayerController>(GetController())) {
-		if (hasTarget || PC->isStationairy) {
+		//if (hasTarget || PC->isStationairy) {
 			FRotator rot = GetActorRotation();
 			FActorSpawnParameters spawnInfo;
 			AProjectile* bullet = GetWorld()->SpawnActor<AProjectile>(ProjectileClass, muzzleLocation->GetComponentLocation(), rot, spawnInfo);
-		}
+		//}
 	}
 }
 
 void ACowboynoutCharacter::FireSkillTwo() {
 	if (ACowboynoutPlayerController* PC = Cast<ACowboynoutPlayerController>(GetController())) {
-		if (hasTarget || PC->isStationairy) {
+		//if (hasTarget || PC->isStationairy) {
 			FRotator rot = GetActorRotation();
 			rot.Pitch = 60.f;
 			FActorSpawnParameters spawnInfo;
 			AGrenade* nade = GetWorld()->SpawnActor<AGrenade>(GrenadeClass, muzzleLocation->GetComponentLocation(), rot, spawnInfo);
-		}
+		//}
 	}
 }
