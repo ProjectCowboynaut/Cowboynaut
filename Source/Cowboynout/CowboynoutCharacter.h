@@ -74,6 +74,22 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void ConvertChipStatC();
+
+	UFUNCTION()
+	void Die();
+
+	// animations triggers
+	UPROPERTY(VisibleAnywhere, BluePrintReadWrite, Category="Animations")
+	bool animRunning;
+
+	UPROPERTY(VisibleAnywhere, BluePrintReadWrite, Category = "Animations")
+	bool animShooting;
+
+	UPROPERTY(VisibleAnywhere, BluePrintReadWrite, Category = "Animations")
+	bool animIdle;
+
+	UPROPERTY(VisibleAnywhere, BluePrintReadWrite, Category = "Animations")
+	bool animDying;
 	
 	/** Location on gun mesh where projectiles should spawn. */
 	UPROPERTY(VisibleDefaultsOnly, Category = "Character")

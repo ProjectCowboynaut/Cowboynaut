@@ -3,6 +3,7 @@
 #include "Enemy.h"
 #include "Loot.h"
 #include "Perception/AIPerceptionComponent.h"
+#include "CowboynoutPlayerController.h"
 
 
 
@@ -33,16 +34,16 @@ void AEnemy::BeginPlay() {
 	// trash mob stats
 	if (type == 1) {
 		health = 100;
-		attackRatio = 3.f;					// faster attacks, less dmg
+		//attackRatio = 3.f;					// faster attacks, less dmg
 	}
 	// boss mob stats
 	else if (type == 666) {
 		health = 500;
-		attackRatio = 5.f;					// lower ratio, more dmg per shot
+		//attackRatio = 5.f;					// lower ratio, more dmg per shot
 	}
 	else {
 		health = 100;
-		attackRatio = 3.f;
+		//attackRatio = 3.f;
 	}
 
 
@@ -62,12 +63,29 @@ void AEnemy::Tick(float deltaTime) {
 	Super::Tick(deltaTime);
 	if (timerActive)
 		timer += deltaTime;
-	FString msg = FString::SanitizeFloat(timer);
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, msg);
+	if (timer > attackRatio) {
+		timerActive = false;
+		timer = 0;
+	}
+	
+	
+
+	//FString msg = FString::SanitizeFloat(timer);
+	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, msg);
 
 	if (health <= 0) {
 		Die();
 	}
+
+	if (deathTimerActive) {
+		ACowboynoutPlayerController* Ctrl = Cast<ACowboynoutPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+		if (playerChar) {
+			Ctrl->endGame = true;
+			Ctrl->deathTimerFull = Ctrl->endCD;
+		}
+
+	}
+	
 }
 
 void AEnemy::SenseStuff(TArray<AActor*> testActors)
@@ -102,11 +120,14 @@ void AEnemy::Die() {
 	playerChar = Cast<ACowboynoutCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
 	if (playerChar) playerChar->SetTarget(false);
 
+	if (type == 666) {
+		deathTimerActive = true;
+
+	}
+
 	Destroy();
-}
 
-void AEnemy::AttackFrequence() {
-
+	
 }
 
 void AEnemy::DoAPeriodicCheck()
@@ -117,11 +138,13 @@ void AEnemy::DoAPeriodicCheck()
 }
 
 void AEnemy::Attack() {
-	if (AEnemy* eChar = Cast<AEnemy>(GetController())) {
-		FRotator rot = GetActorRotation();
-		FActorSpawnParameters spawnInfo;
-		AProjectile* bullet = GetWorld()->SpawnActor<AProjectile>(ProjectileClass, muzzleLocation->GetComponentLocation(), rot, spawnInfo);
-	}
+	timerActive = true;
+	//GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::White, ": pewpew");
+	//if (AEnemy* eChar = Cast<AEnemy>(GetController())) {
+	FRotator rot = GetActorRotation();
+	FActorSpawnParameters spawnInfo;
+	AProjectile* bullet = GetWorld()->SpawnActor<AProjectile>(ProjectileClass, muzzleLocation->GetComponentLocation(), rot, spawnInfo);
+	//}
 }
 
 void AEnemy::MouseOverEnd() {

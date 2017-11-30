@@ -31,6 +31,24 @@ public:
 	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Movement")
 	bool isStationairy = false;							// used when stationairy key is pressed
 
+	UPROPERTY()
+	float deathTimer;
+
+	UPROPERTY()
+	bool endGame;
+
+	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Level")
+	float endCD;
+
+	UPROPERTY()
+	float deathTimerFull;
+
+	UPROPERTY()
+	bool deathTimerNotSet = false;
+
+	UPROPERTY()
+	float countDown;
+
 protected:
 	/** True if the controlled character should navigate to the mouse cursor. */
 	uint32 bMoveToMouseCursor : 1;

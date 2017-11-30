@@ -53,9 +53,26 @@ void ACowboynoutPlayerController::SetupInputComponent() {
 	//UAIPerceptionSystem::RegisterPerceptionStimuliSource(this, sightConfig->GetSenseImplementation(), GetControlledPawn());
 }
 
-void ACowboynoutPlayerController::PlayerTick(float DeltaTime) {
-	Super::PlayerTick(DeltaTime);
+void ACowboynoutPlayerController::PlayerTick(float deltaTime) {
+	Super::PlayerTick(deltaTime);
 	
+	// end cd timer 
+
+	if (endGame) {
+		deathTimer += deltaTime;
+		if (endCD == 0 && deathTimerNotSet) {
+			deathTimerFull = deathTimer;
+			deathTimerNotSet = true;
+		}
+		countDown = deathTimerFull - deathTimer;
+		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Cyan, FString::SanitizeFloat(countDown));
+		
+		if (deathTimer >= deathTimerFull) {
+			UGameplayStatics::OpenLevel(this, TEXT("/Game/Maps/WinScreen"), false);
+			deathTimer = 0;
+		}
+	}
+
 	if (MyPawn) {
 		FVector velo = MyPawn->GetVelocity();
 		if (velo.X != 0 || velo.Y != 0)
@@ -74,7 +91,7 @@ void ACowboynoutPlayerController::PlayerTick(float DeltaTime) {
 
 	// reset skill CDs if time passed
 	if (skillOneCD) {
-		activeTimerSkillOne += DeltaTime;
+		activeTimerSkillOne += deltaTime;
 		if (activeTimerSkillOne >= breakSkillOne) {		// enable movement again after break time
 			canMove = true;
 		}
@@ -84,7 +101,7 @@ void ACowboynoutPlayerController::PlayerTick(float DeltaTime) {
 		}
 	}
 	if (skillTwoCD) {
-		activeTimerSkillTwo += DeltaTime;
+		activeTimerSkillTwo += deltaTime;
 		if (activeTimerSkillTwo >= breakSkillTwo) {		// enable movement again after break time
 			canMove = true;	
 		}
@@ -95,7 +112,7 @@ void ACowboynoutPlayerController::PlayerTick(float DeltaTime) {
 		}
 	}
 	if (skillThreeCD) {
-		activeTimerSkillThree += DeltaTime;
+		activeTimerSkillThree += deltaTime;
 		if (activeTimerSkillThree >= breakSkillThree) {	// enable movement again after break time
 			canMove = true;	
 		}
@@ -122,6 +139,8 @@ void ACowboynoutPlayerController::SetNewMoveDestination(const FVector DestLocati
 			float const Distance = FVector::Dist(DestLocation, MyPawn->GetActorLocation());
 
 			if (NavSys && (Distance > 120.0f)) {
+				ACowboynoutCharacter* playerChar = Cast<ACowboynoutCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+				if (playerChar) playerChar->animRunning = true;
 				NavSys->SimpleMoveToLocation(this, DestLocation);
 			}
 		}
@@ -158,7 +177,7 @@ void ACowboynoutPlayerController::OnSetStationairyReleased() {
 
 void ACowboynoutPlayerController::OnLeftMousePressed() {
 	ACowboynoutCharacter* playerChar = Cast<ACowboynoutCharacter>(GetCharacter());
-	if (playerChar->hasTarget) {
+	if (playerChar->hasTarget || isStationairy) {
 		OnSkillOnePressed();
 	}
 	else {
@@ -273,7 +292,7 @@ void ACowboynoutPlayerController::RotatePlayer() {
 }
 
 void ACowboynoutPlayerController::SkillOne() {
-	DebugMsg("pewpew", displayTime, FColor::Green);
+	//DebugMsg("pewpew", displayTime, FColor::Green);
 	if (!skillOneCD) {
 		cowboy = Cast<ACowboynoutCharacter>(GetCharacter());
 		if (cowboy) cowboy->FireSkillOne();
@@ -290,7 +309,7 @@ void ACowboynoutPlayerController::SkillOne() {
 }
 
 void ACowboynoutPlayerController::SkillTwo() {
-	DebugMsg("pewpew²", displayTime, FColor::Green);
+	//DebugMsg("pewpew²", displayTime, FColor::Green);
 	if (!skillTwoCD) {
 		cowboy = Cast<ACowboynoutCharacter>(GetCharacter());
 		if (cowboy) cowboy->FireSkillTwo();

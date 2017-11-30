@@ -36,6 +36,8 @@ AGrenade::AGrenade() {
 	// Die after 3 seconds by default
 	InitialLifeSpan = 3.0f;
 	grenadeDamage = 100.f;
+
+	cnt = 0;
 }
 
 void AGrenade::DebugMsg(FString msg, float dTime, FColor clr) {
@@ -60,11 +62,11 @@ void AGrenade::OnHit(UPrimitiveComponent* HitComp,
 		AEnemy* hitEnemy = Cast<AEnemy>(OtherActor);
 		if (hitEnemy != NULL) hitEnemy->Damage(grenadeDamage);
 
-		FHitResult Hit;
+		FHitResult cursorHit;
 		APlayerController* pCtrl = UGameplayStatics::GetPlayerController(GetWorld(), 0);
-		if (pCtrl != NULL) pCtrl->GetHitResultUnderCursor(ECC_Visibility, false, Hit);
+		if (pCtrl != NULL) pCtrl->GetHitResultUnderCursor(ECC_Visibility, false, cursorHit);
 		
-		float const distance = FVector::Dist(Hit.ImpactPoint, pCtrl->GetPawn()->GetActorLocation());
+		float const distance = FVector::Dist(cursorHit.ImpactPoint, pCtrl->GetPawn()->GetActorLocation());
 		if (distance) DebugMsg(FString::SanitizeFloat(distance), 1.5f, FColor::Yellow);
 	}
 	else {
@@ -75,14 +77,16 @@ void AGrenade::OnHit(UPrimitiveComponent* HitComp,
 
 	//ACowboynoutCharacter* hittedPlayer = Cast<ACowboynoutCharacter>(OtherActor);
 	
-
-	if (!ProjectileMovement->bShouldBounce)
+	
+	if (!ProjectileMovement->bShouldBounce || cnt > 3)
 		Destroy();
+
+	cnt++;
 
 	UObject* WorldContextObject = GetWorld();
 	FVector SpawnLocation = this->GetActorLocation();
 	FRotator SpawnRotation = GetActorRotation();
-	
+
 	UGameplayStatics::SpawnEmitterAtLocation(
 		WorldContextObject,
 		EmitterTemplate,

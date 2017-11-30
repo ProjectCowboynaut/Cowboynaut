@@ -45,8 +45,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void Attack();
 
-	UFUNCTION()
-	void AttackFrequence();
+	UPROPERTY()
+	float attackCD;
 
 	/** Location on gun mesh where projectiles should spawn. */
 	UPROPERTY(VisibleDefaultsOnly, Category = "Character")
@@ -61,6 +61,9 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	float loopTime;
+
+	UPROPERTY()
+	bool deathTimerActive;
 
 	UPROPERTY(EditAnywhere, BluePrintReadWrite, Category = "EnemyStats")
 	int type;								// 0 = not initialized type; 1 = trash mob; 666 = boss mob
@@ -93,17 +96,16 @@ public:
 	UPROPERTY(VisibleAnywhere, BluePrintReadWrite, Category = "Combat")
 	bool canSeePlayer;
 
-protected:
-
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, BluePrintReadWrite)
 	float timer;
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, BluePrintReadWrite)
 	bool timerActive;
-
-	virtual void BeginPlay() override;
-
+	
 	UFUNCTION()
 	void Die();
 
+protected:
+	
+	virtual void BeginPlay() override;
 };

@@ -21,10 +21,10 @@ AProjectile::AProjectile()
 	// Use a ProjectileMovementComponent to govern this projectile's movement
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileComp"));
 	ProjectileMovement->UpdatedComponent = CollisionComp;
-	ProjectileMovement->InitialSpeed = 1000.f;
-	ProjectileMovement->MaxSpeed = 1000.f;
+	ProjectileMovement->InitialSpeed = 2000.f;
+	ProjectileMovement->MaxSpeed = 2000.f;
 	ProjectileMovement->bRotationFollowsVelocity = true;
-	ProjectileMovement->bShouldBounce = true;
+	ProjectileMovement->bShouldBounce = false;
 	ProjectileMovement->ProjectileGravityScale = 0.f;
 
 	// Die after 3 seconds by default
@@ -61,34 +61,36 @@ void AProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimi
 		if (OtherActor->ActorHasTag("Enemy")) {
 			// set dmg on enemy
 			AEnemy* hitEnemy = Cast<AEnemy>(OtherActor);
-			hitEnemy->Damage(projectileDamage);
-			Destroy();
+			if (hitEnemy) {
+				hitEnemy->Damage(projectileDamage);
+				Destroy();
+			}
 		}
 		
-		// Only add impulse and destroy projectile if we hit a physics
-		else if ((OtherActor != this) && (OtherComp != NULL) && Role == ROLE_Authority)
-		{
-			ProjectileMovement->bShouldBounce = false;
-			Destroy();
-		}
-		else if ((OtherActor != this) && (OtherComp != NULL) && OtherComp->IsSimulatingPhysics())
-		{
-			OtherComp->AddImpulseAtLocation(GetVelocity() * 10.0f, GetActorLocation());
-			ProjectileMovement->bShouldBounce = false;
-			Destroy();
-		}
-
-		/*
-		if ((OtherActor != this) && (OtherComp != NULL) && hittedPlayer != NULL && Role == ROLE_Authority)
-		{
-			ProjectileMovement->bShouldBounce = false;
-			//hitted other player
-			hittedPlayer->Damage(projectileDamage);
-			Destroy();
-			DebugMsg("<3> " + hittedPlayer->GetFName().ToString(), 1.5f, FColor::Yellow);
-		}
-		*/
+		//// Only add impulse and destroy projectile if we hit a physics
+		//else if ((OtherActor != this) && (OtherComp != NULL) && Role == ROLE_Authority)
+		//{
+		//	ProjectileMovement->bShouldBounce = false;
+		//	Destroy();
+		//}
+		//else if ((OtherActor != this) && (OtherComp != NULL) && OtherComp->IsSimulatingPhysics())
+		//{
+		//	OtherComp->AddImpulseAtLocation(GetVelocity() * 10.0f, GetActorLocation());
+		//	ProjectileMovement->bShouldBounce = false;
+		//	Destroy();
+		//}
 	}
-	if (!ProjectileMovement->bShouldBounce)
+	else if (OtherActor != NULL && OtherActor->ActorHasTag("Player")) {
+		//DebugMsg("<!> pwned", 1.5f, FColor::Red);
+		ACowboynoutCharacter* playerChar = Cast<ACowboynoutCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+		if (playerChar) playerChar->Damage(projectileDamage);
+	}
+	else if (OtherActor != NULL) {
+		DebugMsg("<...>", 1.5f, FColor::Red);
+	}
+
+
+	if (!ProjectileMovement->bShouldBounce && !OtherActor->ActorHasTag("PlayerShot") && !OtherActor->ActorHasTag("EnemyShot")) {
 		Destroy();
+	}
 }

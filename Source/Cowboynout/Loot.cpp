@@ -37,7 +37,7 @@ void ULoot::DropChance(FVector spawnLoc, AEnemy* enemyChar) {
 	else enemyType = 1;
 	
 	// adjust loot gain for enemy types
-	int lootMass;
+	int lootMass = 1;
 	// trash mob
 	if (enemyType == 1)
 		lootMass = 1;
@@ -52,7 +52,7 @@ void ULoot::DropChance(FVector spawnLoc, AEnemy* enemyChar) {
 	rnd = FMath::RandRange(.0f, 1.0f);
 	for (int i = 0; i < lootMass; i++){
 		if (rnd < dropChanceA) {
-			//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Purple, "m: " + FString::SanitizeFloat(rnd) + " < " + FString::SanitizeFloat(dropChanceMinorChip));
+			GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Purple, "m: " + FString::SanitizeFloat(rnd) + " < " + FString::SanitizeFloat(dropChanceA));
 			LootDropA(spawnLoc);
 		}
 	}
@@ -62,7 +62,7 @@ void ULoot::DropChance(FVector spawnLoc, AEnemy* enemyChar) {
 	rnd = FMath::RandRange(.0f, 1.0f);
 	for (int i = 0; i < lootMass; i++) {
 		if (rnd < dropChanceB) {
-			//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Purple, "A: " + FString::SanitizeFloat(rnd) + " < " + FString::SanitizeFloat(dropChanceMajorChipA));
+			GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Purple, "A: " + FString::SanitizeFloat(rnd) + " < " + FString::SanitizeFloat(dropChanceB));
 			LootDropB(spawnLoc);
 		}
 	}
@@ -72,7 +72,7 @@ void ULoot::DropChance(FVector spawnLoc, AEnemy* enemyChar) {
 	rnd = FMath::RandRange(.0f, 1.0f);
 	for (int i = 0; i < lootMass; i++) {
 		if (rnd < dropChanceC) {
-			//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Purple, "B: " + FString::SanitizeFloat(rnd) + " < " + FString::SanitizeFloat(dropChanceMajorChipB));
+			GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Purple, "B: " + FString::SanitizeFloat(rnd) + " < " + FString::SanitizeFloat(dropChanceC));
 			LootDropC(spawnLoc);
 		}
 	}

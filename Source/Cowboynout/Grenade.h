@@ -32,6 +32,9 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Projectile")
 	int grenadeDamage;
 
+	UPROPERTY()
+	int cnt;
+
 	void Initialize(int damage);
 
 	/** called when projectile hits something */

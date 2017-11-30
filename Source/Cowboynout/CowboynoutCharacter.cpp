@@ -91,11 +91,17 @@ void ACowboynoutCharacter::Tick(float DeltaSeconds)
 			CursorToWorld->SetWorldRotation(CursorR);
 		}
 	}
+
 }
 
 void ACowboynoutCharacter::Damage(int dmg) {
-
+	life -= dmg;
+	if (life <= 0) {
+		Die();
+	}
 }
+
+
 
 float ACowboynoutCharacter::GetHealth() {
 	float healthReturn = life / 100.f;
@@ -110,6 +116,12 @@ void ACowboynoutCharacter::ConvertChipStatA() {
 	}
 	else
 		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "not enough chips to convert to stat A");
+}
+
+void ACowboynoutCharacter::Die() {
+	//GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "ouch. dead man walking!");
+	UGameplayStatics::OpenLevel(this, TEXT("/Game/Maps/DeathScreen"), false); 
+	animDying = true;
 }
 
 void ACowboynoutCharacter::ConvertChipStatB() {
@@ -163,6 +175,7 @@ int ACowboynoutCharacter::GetChipsC() {
 }
 
 void ACowboynoutCharacter::FireSkillOne() {
+	animShooting = true;
 	if (ACowboynoutPlayerController* PC = Cast<ACowboynoutPlayerController>(GetController())) {
 		//if (hasTarget || PC->isStationairy) {
 			FRotator rot = GetActorRotation();
@@ -173,6 +186,7 @@ void ACowboynoutCharacter::FireSkillOne() {
 }
 
 void ACowboynoutCharacter::FireSkillTwo() {
+	animShooting = true;
 	if (ACowboynoutPlayerController* PC = Cast<ACowboynoutPlayerController>(GetController())) {
 		//if (hasTarget || PC->isStationairy) {
 			FRotator rot = GetActorRotation();
