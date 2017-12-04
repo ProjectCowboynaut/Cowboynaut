@@ -295,7 +295,10 @@ void ACowboynoutPlayerController::SkillOne() {
 	//DebugMsg("pewpew", displayTime, FColor::Green);
 	if (!skillOneCD) {
 		cowboy = Cast<ACowboynoutCharacter>(GetCharacter());
-		if (cowboy) cowboy->FireSkillOne();
+		if (cowboy) {
+			cowboy->FireSkillOne();
+			skillOneCD = true;		// set CD
+		}
 		else DebugMsg("cowboy nullptr", displayTime, FColor::Red);
 	}
 	else {
@@ -303,7 +306,7 @@ void ACowboynoutPlayerController::SkillOne() {
 		return;
 	}
 	AController::StopMovement();						// stop movement
-	skillOneCD = true;		// set CD
+	
 	
 	// play sound at player location
 }

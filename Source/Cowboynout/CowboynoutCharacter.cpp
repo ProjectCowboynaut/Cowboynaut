@@ -98,6 +98,7 @@ void ACowboynoutCharacter::Damage(int dmg) {
 	life -= dmg;
 	if (life <= 0) {
 		Die();
+		animDead = true;
 	}
 }
 
@@ -175,12 +176,13 @@ int ACowboynoutCharacter::GetChipsC() {
 }
 
 void ACowboynoutCharacter::FireSkillOne() {
-	animShooting = true;
+	
 	if (ACowboynoutPlayerController* PC = Cast<ACowboynoutPlayerController>(GetController())) {
+		animShooting = true;
 		//if (hasTarget || PC->isStationairy) {
-			FRotator rot = GetActorRotation();
-			FActorSpawnParameters spawnInfo;
-			AProjectile* bullet = GetWorld()->SpawnActor<AProjectile>(ProjectileClass, muzzleLocation->GetComponentLocation(), rot, spawnInfo);
+		FRotator rot = GetActorRotation();
+		FActorSpawnParameters spawnInfo;
+		AProjectile* bullet = GetWorld()->SpawnActor<AProjectile>(ProjectileClass, muzzleLocation->GetComponentLocation(), rot, spawnInfo);
 		//}
 	}
 }

@@ -79,17 +79,20 @@ public:
 	void Die();
 
 	// animations triggers
+	UPROPERTY(VisibleAnywhere, BluePrintReadWrite, Category = "Animations")
+	bool animDead = false;
+
 	UPROPERTY(VisibleAnywhere, BluePrintReadWrite, Category="Animations")
-	bool animRunning;
+	bool animRunning = false;
 
 	UPROPERTY(VisibleAnywhere, BluePrintReadWrite, Category = "Animations")
-	bool animShooting;
+	bool animShooting = false;
 
 	UPROPERTY(VisibleAnywhere, BluePrintReadWrite, Category = "Animations")
-	bool animIdle;
+	bool animIdle = false;
 
 	UPROPERTY(VisibleAnywhere, BluePrintReadWrite, Category = "Animations")
-	bool animDying;
+	bool animDying = false;
 	
 	/** Location on gun mesh where projectiles should spawn. */
 	UPROPERTY(VisibleDefaultsOnly, Category = "Character")

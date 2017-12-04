@@ -174,7 +174,7 @@ protected:
 
 	// skill one
 	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Skills") 
-	float timerSkillOne = .2f; 
+	float timerSkillOne = .6f; 
 
 	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Skills") 
 	float breakSkillOne = .2f;				//  no movement for x seconds on skill
