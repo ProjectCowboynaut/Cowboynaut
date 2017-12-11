@@ -13,6 +13,33 @@ ACowboynoutPlayerController::ACowboynoutPlayerController() {
 	DefaultMouseCursor = EMouseCursor::Crosshairs;
 	gunPosition = FVector(0.f, 15.f, 0.f);
 	MyPawn = GetPawn();
+
+	// ## var init
+	displayTime = .5f;
+	isStationairy = false;
+	deathTimerNotSet = false;
+	deathTimer = 10.f;
+
+	// break == "no movement time"; timer == cd on skill
+	timerSkillOne = .6f;
+	breakSkillOne = .2f;
+	activeTimerSkillOne = .0f;
+	skillOneCD = false;
+	timerSkillTwo = 1.25f;
+	breakSkillTwo = .6f;
+	activeTimerSkillTwo = .0f;
+	skillTwoCD = false;
+	skillTwoTPCD = false;
+	timerSkillThree = 2.5f;
+	breakSkillThree = 1.25f;
+	activeTimerSkillThree = .0f;
+	skillThreeCD = false;
+	
+	moveOnly = false;
+	canMove = true;
+	isMoving = false;
+	//cowboy = Cast<ACowboynoutCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+	//if (!cowboy) cowboy = Cast<ACowboynoutCharacter>(GetCharacter());
 }
 
 void ACowboynoutPlayerController::SetupInputComponent() {
@@ -22,27 +49,23 @@ void ACowboynoutPlayerController::SetupInputComponent() {
 	//InputComponent->BindAction("SetDestination", IE_Pressed, this, &ACowboynoutPlayerController::OnSetDestinationPressed);
 	//InputComponent->BindAction("SetDestination", IE_Released, this, &ACowboynoutPlayerController::OnSetDestinationReleased);
 
+	// movement modes
 	InputComponent->BindAction("MovementMode", IE_Pressed, this, &ACowboynoutPlayerController::OnMovementModePressed);
 	InputComponent->BindAction("MovementMode", IE_Released, this, &ACowboynoutPlayerController::OnMovementModeReleased);
-
-	// stationairy mode
 	InputComponent->BindAction("StationairyMode", IE_Pressed, this, &ACowboynoutPlayerController::OnSetStationairyPressed);
 	InputComponent->BindAction("StationairyMode", IE_Released, this, &ACowboynoutPlayerController::OnSetStationairyReleased);
 
-	// Skill One
+	// skills
 	InputComponent->BindAction("SkillOne", IE_Pressed, this, &ACowboynoutPlayerController::OnSkillOnePressed);
 	InputComponent->BindAction("SkillOne", IE_Released, this, &ACowboynoutPlayerController::OnSkillOneReleased);
-	// Skill Two
 	InputComponent->BindAction("SkillTwo", IE_Pressed, this, &ACowboynoutPlayerController::OnSkillTwoPressed);
 	InputComponent->BindAction("SkillTwo", IE_Released, this, &ACowboynoutPlayerController::OnSkillTwoReleased);
-	// Skill Three
 	InputComponent->BindAction("SkillThree", IE_Pressed, this, &ACowboynoutPlayerController::OnSkillThreePressed);
 	InputComponent->BindAction("SkillThree", IE_Released, this, &ACowboynoutPlayerController::OnSkillThreeReleased);
 
 	// mouse
 	InputComponent->BindAction("LeftClick", IE_Pressed, this, &ACowboynoutPlayerController::OnLeftMousePressed);
 	InputComponent->BindAction("LeftClick", IE_Released, this, &ACowboynoutPlayerController::OnLeftMouseReleased);
-
 	InputComponent->BindAction("RightClick", IE_Pressed, this, &ACowboynoutPlayerController::OnRightMousePressed);
 	InputComponent->BindAction("RightClick", IE_Released, this, &ACowboynoutPlayerController::OnRightMouseReleased);
 
@@ -60,7 +83,7 @@ void ACowboynoutPlayerController::PlayerTick(float deltaTime) {
 
 	if (endGame) {
 		deathTimer += deltaTime;
-		if (endCD == 0 && deathTimerNotSet) {
+		if (endCD == 0 && !deathTimerNotSet) {
 			deathTimerFull = deathTimer;
 			deathTimerNotSet = true;
 		}
@@ -81,12 +104,15 @@ void ACowboynoutPlayerController::PlayerTick(float deltaTime) {
 			isMoving = false;
 	}
 
-	// keep updating the destination every tick while presed
-	if (bMoveToMouseCursor)	{
-		MoveToMouseCursor();
-	}
-	if (!isMoving) {
-		RotatePlayer();
+	cowboy = Cast<ACowboynoutCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+	if (cowboy) {
+		// keep updating the destination every tick while presed
+		if (bMoveToMouseCursor && !cowboy->dead)	{
+			MoveToMouseCursor();
+		}
+		if (!isMoving && !cowboy->dead) {
+			RotatePlayer();
+		}
 	}
 
 	// reset skill CDs if time passed
@@ -139,8 +165,8 @@ void ACowboynoutPlayerController::SetNewMoveDestination(const FVector DestLocati
 			float const Distance = FVector::Dist(DestLocation, MyPawn->GetActorLocation());
 
 			if (NavSys && (Distance > 120.0f)) {
-				ACowboynoutCharacter* playerChar = Cast<ACowboynoutCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
-				if (playerChar) playerChar->animRunning = true;
+				cowboy = Cast<ACowboynoutCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+				if (cowboy) cowboy->animRunning = true;
 				NavSys->SimpleMoveToLocation(this, DestLocation);
 			}
 		}
@@ -177,7 +203,7 @@ void ACowboynoutPlayerController::OnSetStationairyReleased() {
 
 void ACowboynoutPlayerController::OnLeftMousePressed() {
 	ACowboynoutCharacter* playerChar = Cast<ACowboynoutCharacter>(GetCharacter());
-	if (playerChar->hasTarget || isStationairy) {
+	if (playerChar->hasTarget == 1 || isStationairy) {
 		OnSkillOnePressed();
 	}
 	else {
@@ -219,7 +245,7 @@ void ACowboynoutPlayerController::OnSkillOneReleased() {
 
 }
 
-/// WiP :: not good, fix later
+// WiP :: not good, fix later
 void ACowboynoutPlayerController::OnSkillTwoPressed() {
 	// if skill is active / flying  
 	if (skillTwoCD) {

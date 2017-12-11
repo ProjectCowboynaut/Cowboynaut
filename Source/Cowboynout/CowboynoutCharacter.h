@@ -46,7 +46,7 @@ public:
 	void FireSkillTwo();
 
 	UFUNCTION()
-	void SetTarget(bool targetStatus);
+	void SetTarget(int targetStatus);
 
 	UFUNCTION(BlueprintCallable)
 	int GetChipsA();
@@ -98,40 +98,52 @@ public:
 	UPROPERTY(VisibleDefaultsOnly, Category = "Character")
 	USceneComponent* muzzleLocation;
 
+	UPROPERTY()
+	float deathTimer;
+
+	UPROPERTY()
+	float deathTimerFull;
+
+	UPROPERTY()
+	bool dead;
+
 	/** nade class to spawn */
 	UPROPERTY(EditDefaultsOnly, Category = "Projectile")
 	TSubclassOf<class AGrenade> GrenadeClass;
 
-	UPROPERTY(BlueprintReadOnly, Category = "PlayerStats")
-	bool hasTarget = false;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "PlayerStats")
+	int hasTarget;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "PlayerStats")			// 0: no target; 1: enemy target; 2: usable
+	FString targetString;
 
 	UPROPERTY(EditAnywhere, Category= "Loot")
-	int chipsA = 0;
+	int chipsA;
 
 	UPROPERTY(EditAnywhere, Category = "Loot")
-	int chipsB = 0;
+	int chipsB;
 
 	UPROPERTY(EditAnywhere, Category = "Loot")
-	int chipsC = 0;
+	int chipsC;
 
 	// stats
 	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "PlayerStats")
-	float life = 100;
+	float life;
 
 	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "PlayerStats")
-	float lifeMax = 100;
+	float lifeMax;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "PlayerStats")
-	int speed = 1;
+	int speed;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "PlayerStats")
-	int attack = 1;
+	int attack;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "PlayerStats")
-	int skillLvlTwo = 1;
+	int skillLvlTwo;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "PlayerStats")
-	int skillLvlOne = 1;
+	int skillLvlOne;
 
 
 private:

@@ -5,8 +5,7 @@
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Enemy.h"
 
-AProjectile::AProjectile()
-{
+AProjectile::AProjectile() {
 	// Use a sphere as a simple collision representation
 	CollisionComp = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
 	CollisionComp->InitSphereRadius(5.0f);
@@ -18,11 +17,19 @@ AProjectile::AProjectile()
 	// Set as root component
 	RootComponent = CollisionComp;
 
+	ACowboynoutCharacter* playerChar = Cast<ACowboynoutCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
 	// Use a ProjectileMovementComponent to govern this projectile's movement
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileComp"));
 	ProjectileMovement->UpdatedComponent = CollisionComp;
-	ProjectileMovement->InitialSpeed = 2000.f;
-	ProjectileMovement->MaxSpeed = 2000.f;
+	if (playerChar) {
+		ProjectileMovement->InitialSpeed = 3000.f * playerChar->speed;
+		ProjectileMovement->MaxSpeed = 3000.f * playerChar->speed;
+	}
+	else {
+		ProjectileMovement->InitialSpeed = 3000.f;
+		ProjectileMovement->MaxSpeed = 3000.f;
+	}
+	
 	ProjectileMovement->bRotationFollowsVelocity = true;
 	ProjectileMovement->bShouldBounce = false;
 	ProjectileMovement->ProjectileGravityScale = 0.f;
@@ -39,18 +46,15 @@ AProjectile::AProjectile()
 	//UGameplayStatics::SpawnEmitterAtLocation(WorldContextObject, lazor, SpawnLocation, SpawnRotation, true);
 }
 
-void AProjectile::DebugMsg(FString msg, float dTime, FColor clr) 
-{
+void AProjectile::DebugMsg(FString msg, float dTime, FColor clr) {
 	GEngine->AddOnScreenDebugMessage(-1, dTime, clr, msg);
 }
 
-void AProjectile::Initialize(int damage)
-{
+void AProjectile::Initialize(int damage) {
 	projectileDamage = damage;
 }
 
-void AProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
-{
+void AProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit) {
 	if (OtherActor != NULL && !OtherActor->ActorHasTag("Player")) {
 		FString msg = "[skill 1] hit";
 		FString hitObjectName = OtherActor->GetFName().ToString();
@@ -61,8 +65,9 @@ void AProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimi
 		if (OtherActor->ActorHasTag("Enemy")) {
 			// set dmg on enemy
 			AEnemy* hitEnemy = Cast<AEnemy>(OtherActor);
-			if (hitEnemy) {
-				hitEnemy->Damage(projectileDamage);
+			ACowboynoutCharacter* playerChar = Cast<ACowboynoutCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+			if (playerChar && hitEnemy) {
+				hitEnemy->Damage(projectileDamage * ( 1 + (playerChar->attack / 10)));
 				Destroy();
 			}
 		}
@@ -86,7 +91,7 @@ void AProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimi
 		if (playerChar) playerChar->Damage(projectileDamage);
 	}
 	else if (OtherActor != NULL) {
-		DebugMsg("<...>", 1.5f, FColor::Red);
+		//DebugMsg("<...>", 1.5f, FColor::Red);
 	}
 
 

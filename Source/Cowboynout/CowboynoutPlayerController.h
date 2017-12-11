@@ -26,11 +26,13 @@ public:
 
 	// debug 
 	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Debug")
-	float displayTime = .5f;
+	float displayTime;
 
+	// used when stationairy key is pressed
 	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Movement")
-	bool isStationairy = false;							// used when stationairy key is pressed
+	bool isStationairy;							
 
+	// not an actual death timer, more the end game timer... sorry
 	UPROPERTY()
 	float deathTimer;
 
@@ -44,7 +46,7 @@ public:
 	float deathTimerFull;
 
 	UPROPERTY()
-	bool deathTimerNotSet = false;
+	bool deathTimerNotSet;
 
 	UPROPERTY()
 	float countDown;
@@ -63,7 +65,6 @@ protected:
 	UFUNCTION()
 	virtual void SetupInputComponent() override;
 	// End PlayerController interface
-
 
 	UFUNCTION()
 	void MoveToMouseCursor();
@@ -174,57 +175,56 @@ protected:
 
 	// skill one
 	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Skills") 
-	float timerSkillOne = .6f; 
+	float timerSkillOne; 
 
 	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Skills") 
-	float breakSkillOne = .2f;				//  no movement for x seconds on skill
+	float breakSkillOne;				//  no movement for x seconds on skill
 
 	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Skills") 
-	float activeTimerSkillOne = .0f;
+	float activeTimerSkillOne;
 
 	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Skills") 
-	bool skillOneCD = false;
+	bool skillOneCD;
 
 	// skill two
 	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Skills") 
-	float timerSkillTwo = 1.25f;
+	float timerSkillTwo;
 
 	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Skills") 
-	float breakSkillTwo = .6f;				//  no movement for x seconds on skill
+	float breakSkillTwo;				//  no movement for x seconds on skill
 
 	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Skills") 
-	float activeTimerSkillTwo = .0f;
+	float activeTimerSkillTwo;
 
 	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Skills") 
-	bool skillTwoCD = false;
+	bool skillTwoCD;
 
 	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Skills") 
-	bool skillTwoTPCD = false;
+	bool skillTwoTPCD;
 
 	// skill three
 	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Skills") 
-	float timerSkillThree = 2.5f;
+	float timerSkillThree;
 
 	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Skills") 
-	float breakSkillThree = 1.25f;			//  no movement for x seconds on skill
+	float breakSkillThree;			//  no movement for x seconds on skill
 
 	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Skills") 
-	float activeTimerSkillThree = .0f;
+	float activeTimerSkillThree;
 
 	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Skills") 
-	bool skillThreeCD = false;
+	bool skillThreeCD;
 
 	// movement
 
-
 	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Movement")
-	bool moveOnly = false;
+	bool moveOnly;
 
 	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Movement") 
-	bool canMove = true;					// used to break movement on skill use
+	bool canMove;					// used to break movement on skill use
 
 	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Movement") 
-	bool isMoving = false;					// durr, used to see if moving
+	bool isMoving;					// durr, used to see if moving
 };
 
 

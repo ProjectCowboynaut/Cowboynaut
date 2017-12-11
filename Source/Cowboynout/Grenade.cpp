@@ -21,10 +21,9 @@ AGrenade::AGrenade() {
 
 	CollisionComp->CanCharacterStepUpOn = ECB_No;
 
-	// Set as root component
+	// set as root component
 	RootComponent = CollisionComp;
 
-	// Use a ProjectileMovementComponent to govern this projectile's movement
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileComp"));
 	ProjectileMovement->UpdatedComponent = CollisionComp;
 	ProjectileMovement->InitialSpeed = 800.0f;
@@ -50,15 +49,9 @@ void AGrenade::Initialize(int damage)
 
 }
 
-void AGrenade::OnHit(UPrimitiveComponent* HitComp,
-					AActor* OtherActor,
-					UPrimitiveComponent* OtherComp,
-					FVector NormalImpulse,
-					const FHitResult& Hit)
-{
-
+void AGrenade::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit) {
 	if (OtherActor != NULL) {
-		//DebugMsg("BOOM goes " + OtherActor->GetFName().ToString(), 1.5f, FColor::Red);
+		// dmg should be inflicted by emitter later, not by this projectile
 		AEnemy* hitEnemy = Cast<AEnemy>(OtherActor);
 		if (hitEnemy != NULL) hitEnemy->Damage(grenadeDamage);
 
@@ -72,11 +65,7 @@ void AGrenade::OnHit(UPrimitiveComponent* HitComp,
 	else {
 		FString msg = "[skill 2] hit";
 		FString hitObjectName = OtherActor->GetFName().ToString();
-		//DebugMsg(msg + " " + hitObjectName, 1.5f, FColor::Yellow);
 	}
-
-	//ACowboynoutCharacter* hittedPlayer = Cast<ACowboynoutCharacter>(OtherActor);
-	
 	
 	if (!ProjectileMovement->bShouldBounce || cnt > 3)
 		Destroy();

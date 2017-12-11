@@ -2,8 +2,8 @@
 
 #include "Dungeon.h"
 #include "CowboynoutCharacter.h"
-#include <vector>
-#include <cmath>
+//#include <vector>
+//#include <cmath>
 
 // Sets default values
 ADungeon::ADungeon()
@@ -23,8 +23,8 @@ void ADungeon::BeginPlay()
 	Super::BeginPlay();
 
 
-	std::vector<std::vector<uint8>> matrix;
-	matrix.resize(gridSize, std::vector<uint8>(gridSize, 0));
+	//std::vector<std::vector<uint8>> matrix;
+	//matrix.resize(gridSize, std::vector<uint8>(gridSize, 0));
 
 
 
@@ -69,6 +69,7 @@ void ADungeon::BeginPlay()
 	*/
 
 	//---------------------------------------------------------------------------------------
+	/*
 
 	FRoom rooms[3];
 
@@ -274,13 +275,15 @@ void ADungeon::BeginPlay()
 		}
 	}
 
+	/**/
+
 	//-----------------------------------------------------------------------------------
 
 	for (int32 i = 0; i < gridSize; ++i)
 	{
 		for (int32 j = 0; j < gridSize; ++j)
 		{
-			uint8 rngType = matrix[i][j];// = FMath::RandRange(0, ((uint8)ETileEnum::TE_Max) - 1);
+			uint8 rngType = /*matrix[i][j];// /**/ FMath::RandRange(0, ((uint8)ETileEnum::TE_Max) - 1);
 			uint8 rngTile = FMath::RandRange(0, tilesArray[rngType].tiles.Num() - 1);
 
 			rngTile = FMath::RandRange(0, tilesArray[rngType].tiles.Num() - 1);
@@ -300,7 +303,7 @@ void ADungeon::BeginPlay()
 	FVector NewLocation = FVector(0.f, 0.f, 0.f);
 	FActorSpawnParameters SpawnInfo;
 	APlayerController* pControll = UGameplayStatics::GetPlayerController(GetWorld(), 0);
-	pControll->GetPawn()->SetActorLocation(FVector(rooms[0].GetCenterX() * tileSize, rooms[0].GetCenterY() * tileSize, 142));
+	//pControll->GetPawn()->SetActorLocation(FVector(rooms[0].GetCenterX() * tileSize, rooms[0].GetCenterY() * tileSize, 142));
 	GetWorld()->SpawnActor<APlayerStart>(NewLocation, FRotator::ZeroRotator, SpawnInfo);
 
 	GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Blue, TEXT("2"));

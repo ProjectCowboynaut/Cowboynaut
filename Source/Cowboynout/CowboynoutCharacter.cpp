@@ -48,7 +48,7 @@ ACowboynoutCharacter::ACowboynoutCharacter() {
 	// Create a decal in the world to show the cursor's location
 	CursorToWorld = CreateDefaultSubobject<UDecalComponent>("CursorToWorld");
 	CursorToWorld->SetupAttachment(RootComponent);
-	static ConstructorHelpers::FObjectFinder<UMaterial> DecalMaterialAsset(TEXT("Material'/Game/TopDownCPP/Blueprints/M_Cursor_Decal.M_Cursor_Decal'"));
+	static ConstructorHelpers::FObjectFinder<UMaterial> DecalMaterialAsset(TEXT("Material'/Game/Blueprints/M_Cursor_Decal.M_Cursor_Decal'"));
 	if (DecalMaterialAsset.Succeeded())	{
 		CursorToWorld->SetDecalMaterial(DecalMaterialAsset.Object);
 	}
@@ -59,20 +59,36 @@ ACowboynoutCharacter::ACowboynoutCharacter() {
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.bStartWithTickEnabled = true;
 
-
-
+	// ## var init
+	targetString = "";
+	dead = false;
+	hasTarget = 0;
+	deathTimer = 2.6f;
+	deathTimerFull = deathTimer;
+	hasTarget = 0;
+	life = 100;
+	lifeMax = 100;
+	speed = 1;
+	attack = 1;
+	skillLvlOne = 1;
+	skillLvlTwo = 1;
+	chipsA = 0;
+	chipsB = 0;
+	chipsC = 0;
 }
 
 // set if the player has a target
-void ACowboynoutCharacter::SetTarget(bool targetStatus) {
-	if (targetStatus == true) {
-		hasTarget = true;
-		//GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Green, "Target Aquired!");
+void ACowboynoutCharacter::SetTarget(int targetStatus) {			/// 0: no target; 1: enemy target; 2: usable
+	if (targetStatus == 0) {
+		hasTarget = 0;
 	}
-	else if (targetStatus == false) {
-		hasTarget = false;
-		//GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, "Target Lost!");
+	else if (targetStatus == 1) {
+		hasTarget = 1;
 	}
+	else if (targetStatus == 2) {
+		hasTarget = 2;
+	}
+	else hasTarget = 0;
 }
 
 void ACowboynoutCharacter::Tick(float DeltaSeconds)
@@ -81,10 +97,11 @@ void ACowboynoutCharacter::Tick(float DeltaSeconds)
 
 	if (CursorToWorld != nullptr)
 	{
-		if (APlayerController* PC = Cast<APlayerController>(GetController()))
+		APlayerController* playerCtrl = Cast<APlayerController>(GetController());
+		if (playerCtrl)
 		{
 			FHitResult TraceHitResult;
-			PC->GetHitResultUnderCursor(ECC_Visibility, true, TraceHitResult);
+			playerCtrl->GetHitResultUnderCursor(ECC_Visibility, true, TraceHitResult);
 			FVector CursorFV = TraceHitResult.ImpactNormal;
 			FRotator CursorR = CursorFV.Rotation();
 			CursorToWorld->SetWorldLocation(TraceHitResult.Location);
@@ -92,6 +109,16 @@ void ACowboynoutCharacter::Tick(float DeltaSeconds)
 		}
 	}
 
+
+	if (dead) {
+		if (deathTimer > 0) {
+			deathTimer -= DeltaSeconds;
+			FString msg = FString::SanitizeFloat(deathTimerFull - (deathTimerFull - deathTimer));
+			GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, msg);
+		}
+		if (deathTimer <= 0)
+			UGameplayStatics::OpenLevel(this, TEXT("/Game/Maps/DeathScreen"), false);
+	}
 }
 
 void ACowboynoutCharacter::Damage(int dmg) {
@@ -105,8 +132,7 @@ void ACowboynoutCharacter::Damage(int dmg) {
 
 
 float ACowboynoutCharacter::GetHealth() {
-	float healthReturn = life / 100.f;
-	//GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "[" + FString::SanitizeFloat(healthReturn) + "] [" + FString::SanitizeFloat(life) + "]");
+	float healthReturn = life / lifeMax;
 	return healthReturn;
 }
 
@@ -114,14 +140,15 @@ void ACowboynoutCharacter::ConvertChipStatA() {
 	if (chipsA >= 5) {
 		chipsA -= 5;
 		lifeMax += 10;
+		life = lifeMax;
 	}
 	else
 		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "not enough chips to convert to stat A");
 }
 
 void ACowboynoutCharacter::Die() {
+	dead = true;
 	//GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "ouch. dead man walking!");
-	UGameplayStatics::OpenLevel(this, TEXT("/Game/Maps/DeathScreen"), false); 
 	animDying = true;
 }
 
@@ -176,8 +203,8 @@ int ACowboynoutCharacter::GetChipsC() {
 }
 
 void ACowboynoutCharacter::FireSkillOne() {
-	
-	if (ACowboynoutPlayerController* PC = Cast<ACowboynoutPlayerController>(GetController())) {
+	ACowboynoutPlayerController* playerCtrl = Cast<ACowboynoutPlayerController>(GetController());
+	if (playerCtrl) {
 		animShooting = true;
 		//if (hasTarget || PC->isStationairy) {
 		FRotator rot = GetActorRotation();
@@ -189,7 +216,8 @@ void ACowboynoutCharacter::FireSkillOne() {
 
 void ACowboynoutCharacter::FireSkillTwo() {
 	animShooting = true;
-	if (ACowboynoutPlayerController* PC = Cast<ACowboynoutPlayerController>(GetController())) {
+	ACowboynoutPlayerController* playerCtrl = Cast<ACowboynoutPlayerController>(GetController());
+	if (playerCtrl) {
 		//if (hasTarget || PC->isStationairy) {
 			FRotator rot = GetActorRotation();
 			rot.Pitch = 60.f;

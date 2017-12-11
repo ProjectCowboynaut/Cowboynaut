@@ -103,14 +103,6 @@ void AEnemy::RotateCharacter(const FVector DestLocation) {
 	SetActorRotation(rot);
 }
 
-void AEnemy::MouseOverBegin(UPrimitiveComponent* TouchedComponent) {
-	playerChar = Cast<ACowboynoutCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
-	if (playerChar) playerChar->SetTarget(true);
-	FString msg = "[mouse over begin]";
-	FString hitObjectName = TouchedComponent->GetFName().ToString();
-	//GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Cyan, msg + " " + hitObjectName);
-}
-
 void AEnemy::Die() {
 	ULoot* loot = AActor::FindComponentByClass<ULoot>();
 	if (loot) {
@@ -118,7 +110,10 @@ void AEnemy::Die() {
 	}
 
 	playerChar = Cast<ACowboynoutCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
-	if (playerChar) playerChar->SetTarget(false);
+	if (playerChar) {
+		playerChar->SetTarget(0);
+		playerChar->targetString = "";
+	}
 
 	if (type == 666) {
 		deathTimerActive = true;
@@ -127,7 +122,6 @@ void AEnemy::Die() {
 
 	Destroy();
 
-	
 }
 
 void AEnemy::DoAPeriodicCheck()
@@ -147,12 +141,21 @@ void AEnemy::Attack() {
 	//}
 }
 
+void AEnemy::MouseOverBegin(UPrimitiveComponent* TouchedComponent) {
+	playerChar = Cast<ACowboynoutCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+	FString hitObjectName = TouchedComponent->GetFName().ToString();
+	if (playerChar) {
+		playerChar->SetTarget(1);
+		playerChar->targetString = hitObjectName;
+	}
+}
+
 void AEnemy::MouseOverEnd() {
 	playerChar = Cast<ACowboynoutCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
-	if (playerChar) playerChar->SetTarget(false);
-
-	FString msg = "[mouse over end]";
-	//GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, msg);
+	if (playerChar) {
+		playerChar->SetTarget(0);
+		playerChar->targetString = "";
+	}
 }
 
 void AEnemy::Damage(int dmg) {

@@ -33,13 +33,13 @@ public:
 	void LootDropC(FVector spawnLoc);
 
 	UPROPERTY()
-	float dropChanceA = 1.f;
+	float dropChanceA;
 
 	UPROPERTY()
-	float dropChanceB = 1.f;
+	float dropChanceB;
 
 	UPROPERTY(VisibleAnywhere, BluePrintReadWrite)
-	float dropChanceC = 1.f;
+	float dropChanceC;
 
 	UPROPERTY()
 	float rnd;
