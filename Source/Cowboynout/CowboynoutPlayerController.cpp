@@ -38,8 +38,6 @@ ACowboynoutPlayerController::ACowboynoutPlayerController() {
 	moveOnly = false;
 	canMove = true;
 	isMoving = false;
-	//cowboy = Cast<ACowboynoutCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
-	//if (!cowboy) cowboy = Cast<ACowboynoutCharacter>(GetCharacter());
 }
 
 void ACowboynoutPlayerController::SetupInputComponent() {

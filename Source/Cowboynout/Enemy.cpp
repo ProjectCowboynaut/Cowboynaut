@@ -67,11 +67,6 @@ void AEnemy::Tick(float deltaTime) {
 		timerActive = false;
 		timer = 0;
 	}
-	
-	
-
-	//FString msg = FString::SanitizeFloat(timer);
-	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, msg);
 
 	if (health <= 0) {
 		Die();
