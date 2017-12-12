@@ -24,6 +24,15 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character")
 	FVector gunPosition;
 
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widgets")
+	TSubclassOf<class UUserWidget> wInfoW;
+	UPROPERTY()
+	UUserWidget* myInfoW;
+
+	UPROPERTY()
+	bool info;
+
 	// debug 
 	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Debug")
 	float displayTime;

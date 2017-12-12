@@ -6,6 +6,8 @@
 #include "Perception/AISenseConfig_Sight.h"
 #include "Runtime/Engine/Classes/Components/DecalComponent.h"
 #include "CowboynoutCharacter.h"
+#include "Runtime/UMG/Public/UMG.h"
+#include "Slate.h"
 
 ACowboynoutPlayerController::ACowboynoutPlayerController() {
 	bShowMouseCursor = true;
@@ -15,6 +17,7 @@ ACowboynoutPlayerController::ACowboynoutPlayerController() {
 	MyPawn = GetPawn();
 
 	// ## var init
+	info = false;
 	displayTime = .5f;
 	isStationairy = false;
 	deathTimerNotSet = false;
@@ -25,8 +28,8 @@ ACowboynoutPlayerController::ACowboynoutPlayerController() {
 	breakSkillOne = .2f;
 	activeTimerSkillOne = .0f;
 	skillOneCD = false;
-	timerSkillTwo = 1.25f;
-	breakSkillTwo = .6f;
+	timerSkillTwo = 2.25f;
+	breakSkillTwo = 1.f;
 	activeTimerSkillTwo = .0f;
 	skillTwoCD = false;
 	skillTwoTPCD = false;
@@ -201,11 +204,36 @@ void ACowboynoutPlayerController::OnSetStationairyReleased() {
 
 void ACowboynoutPlayerController::OnLeftMousePressed() {
 	ACowboynoutCharacter* playerChar = Cast<ACowboynoutCharacter>(GetCharacter());
-	if (playerChar->hasTarget == 1 || isStationairy) {
-		OnSkillOnePressed();
-	}
-	else {
-		OnSetDestinationPressed();
+	if (playerChar) {
+		// click on enemy
+		if (playerChar->hasTarget == 1 || isStationairy) {
+			OnSkillOnePressed();
+		}
+		// click on usable item
+		else if (playerChar->hasTarget == 2) {
+			//DebugMsg("you clicked an info itam!", 3.f, FColor::White);
+			if (!info) {
+				if (wInfoW) 				{
+					info = true;
+					myInfoW = CreateWidget<UUserWidget>(this, wInfoW);
+					if (myInfoW) {
+						myInfoW->AddToViewport();
+					}
+					bShowMouseCursor = true;
+				}
+			}
+			else {
+				myInfoW->RemoveFromParent();
+				info = false;
+			}
+		}
+		// click on collectable item
+		else if (playerChar->hasTarget == 3) {
+			DebugMsg("you clicked a collectible itam!", 3.f, FColor::White);
+		}
+		else {
+			OnSetDestinationPressed();
+		}
 	}
 }
 
@@ -215,9 +243,9 @@ void ACowboynoutPlayerController::OnLeftMouseReleased() {
 
 void ACowboynoutPlayerController::OnRightMousePressed() {
 	ACowboynoutCharacter* playerChar = Cast<ACowboynoutCharacter>(GetCharacter());
-	//if (playerChar->hasTarget) {
+	if (playerChar) {
 		OnSkillTwoPressed();
-	//}
+	}
 }
 
 void ACowboynoutPlayerController::OnRightMouseReleased() {
@@ -225,18 +253,18 @@ void ACowboynoutPlayerController::OnRightMouseReleased() {
 }
 
 void ACowboynoutPlayerController::OnSkillOnePressed() {
-	if (!moveOnly ){
-		AController::StopMovement();
-		//if (Cast<ACowboynoutCharacter>(GetCharacter())->hasTarget || isStationairy) {
-		if (skillOneCD) {
+		if (!moveOnly ){
+			AController::StopMovement();
+		
+			if (skillOneCD || breakSkillTwo) {
+			}
+			else {
+				RotatePlayer();
+				SkillOne();
+			}
+			
+		}
 
-		}
-		else {
-			RotatePlayer();
-			SkillOne();
-		}
-		//}
-	}
 }
 
 void ACowboynoutPlayerController::OnSkillOneReleased() {

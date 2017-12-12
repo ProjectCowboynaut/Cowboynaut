@@ -7,18 +7,14 @@
 #include "GameFramework/ProjectileMovementComponent.h"
 
 AGrenade::AGrenade() {
+	PrimaryActorTick.bCanEverTick = true;
+
 	// Use a sphere as a simple collision representation
 	CollisionComp = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
 	CollisionComp->InitSphereRadius(5.0f);
 	CollisionComp->BodyInstance.SetCollisionProfileName("Projectile");
 	CollisionComp->OnComponentHit.AddDynamic(this, &AGrenade::OnHit);		// set up a notification for when this component hits something blocking
-
-	CollisionComp->SetWalkableSlopeOverride(
-		FWalkableSlopeOverride(
-			WalkableSlope_Unwalkable, 0.f
-		)
-	); // Players can't walk on it
-
+	CollisionComp->SetWalkableSlopeOverride(FWalkableSlopeOverride(WalkableSlope_Unwalkable, 0.f)); 
 	CollisionComp->CanCharacterStepUpOn = ECB_No;
 
 	// set as root component
@@ -26,27 +22,42 @@ AGrenade::AGrenade() {
 
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileComp"));
 	ProjectileMovement->UpdatedComponent = CollisionComp;
-	ProjectileMovement->InitialSpeed = 800.0f;
-	ProjectileMovement->MaxSpeed = 900.f;
-	ProjectileMovement->bRotationFollowsVelocity = true;
-	ProjectileMovement->bShouldBounce = true;
-	ProjectileMovement->ProjectileGravityScale = .7f;
-
-	// Die after 3 seconds by default
-	InitialLifeSpan = 3.0f;
+	InitialLifeSpan = 4.0f;
 	grenadeDamage = 100.f;
 
 	cnt = 0;
+
+	APlayerController* pCtrl = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+	if (pCtrl) {
+		pCtrl->GetHitResultUnderCursor(ECC_Visibility, false, cursorHit);
+		cursorLoc = cursorHit.Location;
+	}
+}
+
+void AGrenade::Tick(float DeltaTime) {
+	actorLoc = GetActorLocation();
+	actorLoc.Z = 0;
+	cursorLoc.Z = 0;
+	locDistance = FVector::Distance(actorLoc, cursorLoc);
+	FString msg = "";
+	if (locDistance < 100) {
+		UObject* WorldContextObject = GetWorld();
+		FVector SpawnLocation = GetActorLocation();
+		FRotator SpawnRotation = GetActorRotation();
+		UGameplayStatics::SpawnEmitterAtLocation(WorldContextObject, EmitterTemplate, SpawnLocation, SpawnRotation, true);
+
+		Destroy();
+	}
+
 }
 
 void AGrenade::DebugMsg(FString msg, float dTime, FColor clr) {
 	GEngine->AddOnScreenDebugMessage(-1, dTime, clr, msg);
 }
 
-void AGrenade::Initialize(int damage)
-{
-	grenadeDamage = damage;
+void AGrenade::Initialize(int damage) {
 
+	grenadeDamage = damage;
 }
 
 void AGrenade::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit) {
@@ -58,7 +69,7 @@ void AGrenade::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiv
 		FHitResult cursorHit;
 		APlayerController* pCtrl = UGameplayStatics::GetPlayerController(GetWorld(), 0);
 		if (pCtrl != NULL) pCtrl->GetHitResultUnderCursor(ECC_Visibility, false, cursorHit);
-		
+
 		float const distance = FVector::Dist(cursorHit.ImpactPoint, pCtrl->GetPawn()->GetActorLocation());
 		if (distance) DebugMsg(FString::SanitizeFloat(distance), 1.5f, FColor::Yellow);
 	}
@@ -66,7 +77,7 @@ void AGrenade::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiv
 		FString msg = "[skill 2] hit";
 		FString hitObjectName = OtherActor->GetFName().ToString();
 	}
-	
+
 	if (!ProjectileMovement->bShouldBounce || cnt > 3)
 		Destroy();
 
@@ -75,7 +86,6 @@ void AGrenade::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiv
 	UObject* WorldContextObject = GetWorld();
 	FVector SpawnLocation = this->GetActorLocation();
 	FRotator SpawnRotation = GetActorRotation();
-
 	UGameplayStatics::SpawnEmitterAtLocation(
 		WorldContextObject,
 		EmitterTemplate,
@@ -83,4 +93,10 @@ void AGrenade::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiv
 		SpawnRotation,
 		true
 	);
+}
+
+
+
+void AGrenade::SpawnEmitter() {
+	
 }

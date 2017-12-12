@@ -14,6 +14,39 @@ class AGrenade : public AActor
 public:
 	AGrenade();
 
+	UPROPERTY()
+	APlayerController* pCtrl;
+
+	UPROPERTY()
+	FHitResult cursorHit;
+
+	UPROPERTY()
+	FVector cursorLoc;
+
+	UPROPERTY()
+	float locDistance;
+
+	UPROPERTY()
+	FVector actorLoc;
+
+	UPROPERTY()
+	FVector nullVec;
+
+	UPROPERTY()
+	FString hitLocStr;
+
+	UPROPERTY()
+	FVector otherLoc;
+
+	UPROPERTY()
+	FString otherLocStr;
+
+	UFUNCTION()
+	void SpawnEmitter();
+
+	UFUNCTION()
+	virtual void Tick(float DeltaTime) override;
+
 	UFUNCTION()
 	void DebugMsg(FString msg, float dTime, FColor clr);
 
