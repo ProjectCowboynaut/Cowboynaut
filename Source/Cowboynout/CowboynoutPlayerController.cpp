@@ -97,6 +97,9 @@ void ACowboynoutPlayerController::PlayerTick(float deltaTime) {
 		}
 	}
 
+	cowboy = Cast<ACowboynoutCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+	if (cowboy && cowboy->dead) return;
+
 	if (MyPawn) {
 		FVector velo = MyPawn->GetVelocity();
 		if (velo.X != 0 || velo.Y != 0)
@@ -255,8 +258,9 @@ void ACowboynoutPlayerController::OnRightMouseReleased() {
 void ACowboynoutPlayerController::OnSkillOnePressed() {
 		if (!moveOnly ){
 			AController::StopMovement();
-		
-			if (skillOneCD || breakSkillTwo) {
+
+			if (skillOneCD || (activeTimerSkillTwo != 0 && activeTimerSkillTwo < breakSkillTwo)) {
+				// do something if you can't shot
 			}
 			else {
 				RotatePlayer();
@@ -279,8 +283,10 @@ void ACowboynoutPlayerController::OnSkillTwoPressed() {
 		//SkillTwoTP();
 	}
 	else {
+		
 		// use skill two
 		if (!moveOnly) {
+			RotatePlayer();
 			SkillTwo();
 		}
 	}

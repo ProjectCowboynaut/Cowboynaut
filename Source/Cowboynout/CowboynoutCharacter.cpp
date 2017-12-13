@@ -220,7 +220,6 @@ void ACowboynoutCharacter::FireSkillTwo() {
 	if (playerCtrl) {
 		//if (hasTarget || PC->isStationairy) {
 			FRotator rot = GetActorRotation();
-			rot.Pitch = 60.f;
 			FActorSpawnParameters spawnInfo;
 			AGrenade* nade = GetWorld()->SpawnActor<AGrenade>(GrenadeClass, muzzleLocation->GetComponentLocation(), rot, spawnInfo);
 		//}
