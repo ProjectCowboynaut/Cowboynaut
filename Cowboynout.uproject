@@ -13,6 +13,12 @@
 			]
 		}
 	],
+	"Plugins": [
+		{
+			"Name": "CWButton",
+			"Enabled": true
+		}
+	],
 	"TargetPlatforms": [
 		"WindowsNoEditor",
 		"AllDesktop",
