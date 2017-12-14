@@ -4,6 +4,7 @@
 #include "CowboynoutCharacter.h"
 #include "Enemy.h"
 #include "CowboynoutPlayerController.h"
+#include "Splosion.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 
 AGrenade::AGrenade() {
@@ -32,6 +33,7 @@ AGrenade::AGrenade() {
 		pCtrl->GetHitResultUnderCursor(ECC_Visibility, false, cursorHit);
 		cursorLoc = cursorHit.Location;
 	}
+
 }
 
 void AGrenade::Tick(float DeltaTime) {
@@ -44,8 +46,12 @@ void AGrenade::Tick(float DeltaTime) {
 		UObject* WorldContextObject = GetWorld();
 		FVector SpawnLocation = GetActorLocation();
 		FRotator SpawnRotation = GetActorRotation();
+		// spawn fx emitt0r
 		UGameplayStatics::SpawnEmitterAtLocation(WorldContextObject, EmitterTemplate, SpawnLocation, SpawnRotation, true);
-
+		FActorSpawnParameters spawnInfo;
+		// spawn sploding actor 
+		ASplosion* boomSphere = GetWorld()->SpawnActor<ASplosion>(SploderClass, SpawnLocation, SpawnRotation, spawnInfo);
+		// aaaaaand it's gone
 		Destroy();
 	}
 
@@ -63,8 +69,8 @@ void AGrenade::Initialize(int damage) {
 void AGrenade::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit) {
 	if (OtherActor != NULL) {
 		// dmg should be inflicted by emitter later, not by this projectile
-		AEnemy* hitEnemy = Cast<AEnemy>(OtherActor);
-		if (hitEnemy != NULL) hitEnemy->Damage(grenadeDamage);
+		//AEnemy* hitEnemy = Cast<AEnemy>(OtherActor);
+		//if (hitEnemy != NULL) hitEnemy->Damage(grenadeDamage);
 
 		FHitResult cursorHit;
 		APlayerController* pCtrl = UGameplayStatics::GetPlayerController(GetWorld(), 0);

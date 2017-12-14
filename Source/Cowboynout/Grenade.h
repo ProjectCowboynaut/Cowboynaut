@@ -4,6 +4,7 @@
 
 #include "Cowboynout.h"
 #include "GameFramework/Actor.h"
+#include "Splosion.h"
 #include "Grenade.generated.h"
 
 UCLASS()
@@ -39,6 +40,9 @@ public:
 	FVector otherLoc;
 
 	UPROPERTY()
+	bool nadeActive;
+
+	UPROPERTY()
 	FString otherLocStr;
 
 	UFUNCTION()
@@ -52,6 +56,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly)
 	UParticleSystem* EmitterTemplate;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Projectile")
+	TSubclassOf<class ASplosion> SploderClass;
 
 	/** Sphere collision component */
 	UPROPERTY(VisibleDefaultsOnly, Category = "Projectile")

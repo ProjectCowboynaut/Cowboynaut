@@ -39,11 +39,17 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Projectile")
 	TSubclassOf<class AProjectile> ProjectileClass;
 
+	UPROPERTY()
+	AGrenade* nade;
+
+	UPROPERTY()
+	FVector nadeLoc;
+
 	UFUNCTION()
 	void FireSkillOne();
 
 	UFUNCTION()
-	void FireSkillTwo();
+	void FireSkillTwo(int teleport);
 
 	UFUNCTION()
 	void SetTarget(int targetStatus);

@@ -24,7 +24,6 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character")
 	FVector gunPosition;
 
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widgets")
 	TSubclassOf<class UUserWidget> wInfoW;
 	UPROPERTY()
@@ -48,6 +47,9 @@ public:
 	UPROPERTY()
 	bool endGame;
 
+	UPROPERTY()
+	bool canTP;
+
 	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Level")
 	float endCD;
 
@@ -60,12 +62,13 @@ public:
 	UPROPERTY()
 	float countDown;
 
+	UPROPERTY()
+	ACowboynoutCharacter* cowboy;
+
 protected:
 	/** True if the controlled character should navigate to the mouse cursor. */
 	uint32 bMoveToMouseCursor : 1;
 	
-	UPROPERTY()
-	ACowboynoutCharacter* cowboy;
 
 	// Begin PlayerController interface
 	UFUNCTION()

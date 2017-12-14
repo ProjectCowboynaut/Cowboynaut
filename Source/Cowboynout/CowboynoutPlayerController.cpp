@@ -41,6 +41,8 @@ ACowboynoutPlayerController::ACowboynoutPlayerController() {
 	moveOnly = false;
 	canMove = true;
 	isMoving = false;
+
+	canTP = false;
 }
 
 void ACowboynoutPlayerController::SetupInputComponent() {
@@ -280,7 +282,7 @@ void ACowboynoutPlayerController::OnSkillTwoPressed() {
 	// if skill is active / flying  
 	if (skillTwoCD) {
 		// port to nade
-		//SkillTwoTP();
+		if (!skillTwoTPCD) SkillTwoTP();
 	}
 	else {
 		
@@ -373,7 +375,7 @@ void ACowboynoutPlayerController::SkillTwo() {
 	//DebugMsg("pewpew²", displayTime, FColor::Green);
 	if (!skillTwoCD) {
 		cowboy = Cast<ACowboynoutCharacter>(GetCharacter());
-		if (cowboy) cowboy->FireSkillTwo();
+		if (cowboy) cowboy->FireSkillTwo(0);
 		else DebugMsg("cowboy nullptr", displayTime, FColor::Red);
 	}
 	else {
@@ -393,12 +395,15 @@ void ACowboynoutPlayerController::SkillTwoTP() {
 	// get nade pos
 	// tele boom player at nade pos
 
-	if (!skillTwoTPCD) {
+	if (!skillTwoTPCD && canTP) {
 		DebugMsg("skill two TP activated", displayTime, FColor::Yellow);
+
+		cowboy = Cast<ACowboynoutCharacter>(GetCharacter());
+		if (cowboy) cowboy->FireSkillTwo(1);
 		skillTwoTPCD = true;
 	} 
 	else {
-		DebugMsg("skill two TP on CD", displayTime, FColor::Red);
+		DebugMsg("skill two TP on CD or something else, who cares, no TP FOR YOU!", displayTime, FColor::Red);
 	}
 }
 

@@ -214,14 +214,27 @@ void ACowboynoutCharacter::FireSkillOne() {
 	}
 }
 
-void ACowboynoutCharacter::FireSkillTwo() {
-	animShooting = true;
-	ACowboynoutPlayerController* playerCtrl = Cast<ACowboynoutPlayerController>(GetController());
-	if (playerCtrl) {
-		//if (hasTarget || PC->isStationairy) {
+void ACowboynoutCharacter::FireSkillTwo(int teleport) {
+	if (teleport == 0) {
+		animShooting = true;
+		ACowboynoutPlayerController* playerCtrl = Cast<ACowboynoutPlayerController>(GetController());
+		if (playerCtrl) {
+			//if (hasTarget || PC->isStationairy) {
 			FRotator rot = GetActorRotation();
 			FActorSpawnParameters spawnInfo;
-			AGrenade* nade = GetWorld()->SpawnActor<AGrenade>(GrenadeClass, muzzleLocation->GetComponentLocation(), rot, spawnInfo);
-		//}
+			nade = GetWorld()->SpawnActor<AGrenade>(GrenadeClass, muzzleLocation->GetComponentLocation(), rot, spawnInfo);
+			//}
+		}
 	}
+	else if (teleport == 1) {
+		ACowboynoutPlayerController* playerCtrl = Cast<ACowboynoutPlayerController>(GetController());
+		if (playerCtrl) {
+			SetActorLocation(nadeLoc);
+
+			ASplosion* boom = Cast<ASplosion>(nade);
+			if (boom) boom->Destroy();
+			else GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "fu");
+		}
+	}
+	
 }
