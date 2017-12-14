@@ -123,6 +123,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "PlayerStats")			// 0: no target; 1: enemy target; 2: usable
 	FString targetString;
 
+	UPROPERTY()
+	bool explodeNade;
+
 	UPROPERTY(EditAnywhere, Category= "Loot")
 	int chipsA;
 

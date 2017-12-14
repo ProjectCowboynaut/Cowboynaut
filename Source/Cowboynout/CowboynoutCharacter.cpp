@@ -75,6 +75,8 @@ ACowboynoutCharacter::ACowboynoutCharacter() {
 	chipsA = 0;
 	chipsB = 0;
 	chipsC = 0;
+
+	explodeNade = false;
 }
 
 // set if the player has a target
@@ -217,6 +219,7 @@ void ACowboynoutCharacter::FireSkillOne() {
 void ACowboynoutCharacter::FireSkillTwo(int teleport) {
 	if (teleport == 0) {
 		animShooting = true;
+		explodeNade = false;
 		ACowboynoutPlayerController* playerCtrl = Cast<ACowboynoutPlayerController>(GetController());
 		if (playerCtrl) {
 			//if (hasTarget || PC->isStationairy) {
@@ -230,10 +233,7 @@ void ACowboynoutCharacter::FireSkillTwo(int teleport) {
 		ACowboynoutPlayerController* playerCtrl = Cast<ACowboynoutPlayerController>(GetController());
 		if (playerCtrl) {
 			SetActorLocation(nadeLoc);
-
-			ASplosion* boom = Cast<ASplosion>(nade);
-			if (boom) boom->Destroy();
-			else GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "fu");
+			explodeNade = true;
 		}
 	}
 	
