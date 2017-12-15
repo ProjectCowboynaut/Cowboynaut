@@ -17,6 +17,10 @@
 		{
 			"Name": "CWButton",
 			"Enabled": true
+		},
+		{
+			"Name": "ApexDestruction",
+			"Enabled": true
 		}
 	],
 	"TargetPlatforms": [

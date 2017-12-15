@@ -19,7 +19,7 @@ ASplosion::ASplosion() {
 	CollisionComp->OnComponentBeginOverlap.AddDynamic(this, &ASplosion::OnOverlapBegin);
 	CollisionComp->OnComponentEndOverlap.AddDynamic(this, &ASplosion::OnOverlapEnd);
 	
-	RootComponent = CollisionComp;
+	//RootComponent = CollisionComp;
 
 	ACowboynoutPlayerController* pCtrl = Cast<ACowboynoutPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 	if (pCtrl) {
@@ -77,21 +77,21 @@ void ASplosion::DoDmg(int damage) {
 
 void ASplosion::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit) {
 	if (OtherActor != NULL && OtherActor->ActorHasTag("Enemy")) {
-		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "hit");
+		//GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "hit");
 		hitEnemies.AddUnique(OtherActor);
 	}
 }
 
 void ASplosion::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) {
 	if (OtherActor != NULL && OtherActor->ActorHasTag("Enemy")) {
-		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "o:b");
+		//GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "o:b");
 		hitEnemies.AddUnique(OtherActor);
 	}
 }
 
 void ASplosion::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex) {
 	if (OtherActor != NULL && OtherActor->ActorHasTag("Enemy")) {
-		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "o:e");
+		//GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "o:e");
 		hitEnemies.Remove(OtherActor);
 	}
 }

@@ -45,6 +45,8 @@ ACowboynoutCharacter::ACowboynoutCharacter() {
 	TopDownCameraComponent->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 	TopDownCameraComponent->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
+	/*
+
 	// Create a decal in the world to show the cursor's location
 	CursorToWorld = CreateDefaultSubobject<UDecalComponent>("CursorToWorld");
 	CursorToWorld->SetupAttachment(RootComponent);
@@ -55,9 +57,19 @@ ACowboynoutCharacter::ACowboynoutCharacter() {
 	CursorToWorld->DecalSize = FVector(16.0f, 32.0f, 32.0f);
 	CursorToWorld->SetRelativeRotation(FRotator(90.0f, 0.0f, 0.0f).Quaternion());
 
+	/**/
+
 	// Activate ticking in order to update the cursor every frame.
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.bStartWithTickEnabled = true;
+
+	// set outline stuff
+	TArray<UStaticMeshComponent*> components;
+	GetOwner()->GetComponents<UStaticMeshComponent>(components);
+	for (int32 i = 0; i < components.Num(); i++) {
+		UStaticMeshComponent* StaticMeshComponent = components[i];
+		StaticMeshComponent->SetRenderCustomDepth(true);
+	}
 
 	// ## var init
 	targetString = "";
