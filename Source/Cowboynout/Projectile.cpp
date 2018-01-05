@@ -148,6 +148,6 @@ void AProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimi
 				}
 			}
 		}
-		//else Destroy();
+		else Destroy();
 	}
 }
