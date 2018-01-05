@@ -30,6 +30,9 @@ public:
 		return CollisionComp;
 	}
 
+	UPROPERTY(VisibleAnywhere)
+	TArray<AActor*> hitEnemies;
+
 	/** Returns ProjectileMovement subobject **/
 	FORCEINLINE UProjectileMovementComponent* GetProjectileMovement() const {
 		return ProjectileMovement;
@@ -49,4 +52,8 @@ public:
 	/** Projectile Damage */
 	UPROPERTY(EditAnywhere, Category = "Projectile")
 	int projectileDamage;
+
+	UPROPERTY(EditAnywhere, Category = "Projectile")
+	int penetration;
+
 };

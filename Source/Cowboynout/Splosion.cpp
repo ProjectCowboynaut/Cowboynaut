@@ -33,7 +33,9 @@ ASplosion::ASplosion() {
 // Called when the game starts or when spawned
 void ASplosion::BeginPlay() {
 	Super::BeginPlay();
-	
+	ACowboynoutCharacter* playerChar = Cast<ACowboynoutCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+	if (playerChar)
+		playerChar->PlaySound(3);
 }
 
 // Called every frame
@@ -49,30 +51,32 @@ void ASplosion::Tick(float DeltaTime) {
 	}
 	// > timer end:
 	if (nadeTimer >= nadeTimerFull) {
-		//	TP not possible anymore
-		// do dmg
 		// spawn splosion actor
 		ACowboynoutPlayerController* pCtrl = Cast<ACowboynoutPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 		if (pCtrl) {
+			//	TP not possible anymore
 			pCtrl->canTP = false;
 		}
 		theEnd = true;
 	}
 
-
 	if (theEnd) {
 		doHit = true;
-		DoDmg(100);
+		// do dmg
+		DoDmg(100, 1);
 	}
 }
 
-void ASplosion::DoDmg(int damage) {
+void ASplosion::DoDmg(int damage, bool terminal) {
 	for (int32 Index = 0; Index != hitEnemies.Num(); ++Index) {
 		// do dmg
 		Cast<AEnemy>(hitEnemies[Index])->Damage(100);
 	}
 	// destroy orb
-	Destroy();
+	if (terminal == 1) {
+		hitEnemies.Empty();
+		Destroy();
+	}
 }
 
 void ASplosion::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit) {

@@ -32,14 +32,20 @@ public:
 	UFUNCTION()
 	void LootDropC(FVector spawnLoc);
 
-	UPROPERTY()
+	UFUNCTION()
+	void LootDropH(FVector spawnLoc);
+
+	UPROPERTY(VisibleAnywhere, BluePrintReadWrite)
 	float dropChanceA;
 
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere, BluePrintReadWrite)
 	float dropChanceB;
 
 	UPROPERTY(VisibleAnywhere, BluePrintReadWrite)
 	float dropChanceC;
+
+	UPROPERTY(VisibleAnywhere, BluePrintReadWrite)
+	float dropChanceH;
 
 	UPROPERTY()
 	float rnd;
@@ -55,6 +61,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<class AActor> droppedItemC;
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<class AActor> droppedItemH;
 
 protected:
 	// Called when the game starts

@@ -104,6 +104,12 @@ protected:
 	UFUNCTION()
 	void OnSetStationairyReleased();
 
+	UFUNCTION()
+	void OnSkillOneLevelUp();
+	
+	UFUNCTION()
+	void OnSkillTwoLevelUp();
+
 	// Rotation
 	UFUNCTION()
 	void RotatePlayer();

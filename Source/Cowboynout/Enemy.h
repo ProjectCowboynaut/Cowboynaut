@@ -43,6 +43,9 @@ public:
 	void DoAPeriodicCheck();
 
 	UFUNCTION(BlueprintCallable)
+	void DestroyShield();
+
+	UFUNCTION(BlueprintCallable)
 	void Attack();
 
 	UPROPERTY()
@@ -67,6 +70,30 @@ public:
 
 	UPROPERTY(EditAnywhere, BluePrintReadWrite, Category = "EnemyStats")
 	int type;								// 0 = not initialized type; 1 = trash mob; 666 = boss mob
+	
+	UPROPERTY(EditAnywhere, BluePrintReadWrite, Category = "EnemyStats")
+	bool shieldOneActive;
+
+	UPROPERTY(EditAnywhere, BluePrintReadWrite, Category = "EnemyStats")
+	float shieldOne;
+
+	UPROPERTY(EditAnywhere, BluePrintReadWrite, Category = "EnemyStats")
+	bool shieldTwoActive;
+
+	UPROPERTY(EditAnywhere, BluePrintReadWrite, Category = "EnemyStats")
+	float shieldTwo;
+	
+	UPROPERTY(EditAnywhere, BluePrintReadWrite, Category = "EnemyStats")
+	bool shieldThreeActive;
+
+	UPROPERTY(EditAnywhere, BluePrintReadWrite, Category = "EnemyStats")
+	float shieldThree;
+
+	UPROPERTY(EditAnywhere, BluePrintReadWrite, Category = "EnemyStats")
+	bool shieldFourActive;
+	
+	UPROPERTY(EditAnywhere, BluePrintReadWrite, Category = "EnemyStats")
+	float shieldFour;
 
 	UPROPERTY(VisibleAnywhere, BluePrintReadWrite, Category = "EnemyStats")
 	int health;
@@ -104,6 +131,24 @@ public:
 	
 	UFUNCTION()
 	void Die();
+
+	// sound stuff
+
+	// Soundstuff
+	UFUNCTION()
+	void PlaySound(int sound);
+
+	UPROPERTY(EditDefaultsOnly, Category = "SFX")
+	USoundBase* soundSkill1a;
+
+	UPROPERTY(EditDefaultsOnly, Category = "SFX")
+	USoundBase* soundSkill1b;
+
+	UPROPERTY(EditDefaultsOnly, Category = "SFX")
+	USoundBase* soundSkill1c;
+
+	UPROPERTY(EditDefaultsOnly, Category = "SFX")
+	USoundBase* soundHit;
 
 protected:
 	

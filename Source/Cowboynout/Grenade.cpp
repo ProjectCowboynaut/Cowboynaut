@@ -5,6 +5,7 @@
 #include "Enemy.h"
 #include "CowboynoutPlayerController.h"
 #include "Splosion.h"
+#include "GameFramework/PlayerController.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 
 AGrenade::AGrenade() {

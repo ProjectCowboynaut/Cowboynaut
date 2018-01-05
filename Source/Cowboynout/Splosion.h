@@ -46,7 +46,7 @@ public:
 	void OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 	UFUNCTION()
-	void DoDmg(int damage);
+	void DoDmg(int damage, bool terminal);
 
 protected:
 	// Called when the game starts or when spawned

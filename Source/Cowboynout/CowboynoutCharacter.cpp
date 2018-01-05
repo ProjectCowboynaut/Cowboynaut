@@ -21,6 +21,18 @@ ACowboynoutCharacter::ACowboynoutCharacter() {
 	muzzleLocation = CreateDefaultSubobject<USceneComponent>(TEXT("MuzzleLocation"));
 	muzzleLocation->SetupAttachment(RootComponent);
 
+	muzzleLocationL = CreateDefaultSubobject<USceneComponent>(TEXT("MuzzleLocationL"));
+	muzzleLocationL->SetupAttachment(RootComponent);
+
+	muzzleLocationR = CreateDefaultSubobject<USceneComponent>(TEXT("MuzzleLocationR"));
+	muzzleLocationR->SetupAttachment(RootComponent);
+
+	// set collision cmop
+	CollisionComp = CreateDefaultSubobject<USphereComponent>(TEXT("COLLIDAAAAAAAA"));
+	CollisionComp->InitSphereRadius(3.0f);
+	CollisionComp->OnComponentBeginOverlap.AddDynamic(this, &ACowboynoutCharacter::OnOverlapBegin);
+	CollisionComp->BodyInstance.SetCollisionProfileName("COLLIDAAAAAAAA");
+
 	// Don't rotate character to camera direction
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = false;
@@ -31,6 +43,7 @@ ACowboynoutCharacter::ACowboynoutCharacter() {
 	GetCharacterMovement()->RotationRate = FRotator(0.f, 640.f, 0.f);
 	GetCharacterMovement()->bConstrainToPlane = true;
 	GetCharacterMovement()->bSnapToPlaneAtStart = true;
+	GetCharacterMovement()->MaxWalkSpeed = 600;  // increases speed by 10% per skill lvl
 
 	// Create a camera boom... ermmm.... allready exists... kinda does nothing
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
@@ -63,19 +76,11 @@ ACowboynoutCharacter::ACowboynoutCharacter() {
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.bStartWithTickEnabled = true;
 
-	// set outline stuff
-	TArray<UStaticMeshComponent*> components;
-	GetOwner()->GetComponents<UStaticMeshComponent>(components);
-	for (int32 i = 0; i < components.Num(); i++) {
-		UStaticMeshComponent* StaticMeshComponent = components[i];
-		StaticMeshComponent->SetRenderCustomDepth(true);
-	}
-
 	// ## var init
 	targetString = "";
 	dead = false;
 	hasTarget = 0;
-	deathTimer = 2.6f;
+	deathTimer = 2.4f;
 	deathTimerFull = deathTimer;
 	hasTarget = 0;
 	life = 100;
@@ -88,7 +93,13 @@ ACowboynoutCharacter::ACowboynoutCharacter() {
 	chipsB = 0;
 	chipsC = 0;
 
+	// base level up gains in percent
+	lifeGainPerLevel = 10;
+	speedGainPerLevel = 10;
+	attackGainPerLevel = 10;
+
 	explodeNade = false;
+
 }
 
 // set if the player has a target
@@ -123,12 +134,17 @@ void ACowboynoutCharacter::Tick(float DeltaSeconds)
 		}
 	}
 
+	// play low life sound warning
+	if (life < lifeWarningValue) {
+		PlaySound(4);
+	}
+	
 
 	if (dead) {
 		if (deathTimer > 0) {
 			deathTimer -= DeltaSeconds;
-			FString msg = FString::SanitizeFloat(deathTimerFull - (deathTimerFull - deathTimer));
-			GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, msg);
+			//FString msg = FString::SanitizeFloat(deathTimerFull - (deathTimerFull - deathTimer));
+			//GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, msg);
 		}
 		if (deathTimer <= 0)
 			UGameplayStatics::OpenLevel(this, TEXT("/Game/Maps/DeathScreen"), false);
@@ -138,26 +154,15 @@ void ACowboynoutCharacter::Tick(float DeltaSeconds)
 void ACowboynoutCharacter::Damage(int dmg) {
 	life -= dmg;
 	if (life <= 0) {
+		PlaySound(5);
 		Die();
 		animDead = true;
 	}
 }
 
-
-
 float ACowboynoutCharacter::GetHealth() {
 	float healthReturn = life / lifeMax;
 	return healthReturn;
-}
-
-void ACowboynoutCharacter::ConvertChipStatA() {
-	if (chipsA >= 5) {
-		chipsA -= 5;
-		lifeMax += 10;
-		life = lifeMax;
-	}
-	else
-		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "not enough chips to convert to stat A");
 }
 
 void ACowboynoutCharacter::Die() {
@@ -166,10 +171,21 @@ void ACowboynoutCharacter::Die() {
 	animDying = true;
 }
 
+void ACowboynoutCharacter::ConvertChipStatA() {
+	if (chipsA >= 5) {
+		chipsA -= 5;
+		lifeMax += lifeGainPerLevel;
+		//life = lifeMax;
+	}
+	else
+		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "not enough chips to convert to stat A");
+}
+
 void ACowboynoutCharacter::ConvertChipStatB() {
 	if (chipsB >= 5) {
 		chipsB -= 5;
 		speed++;
+		GetCharacterMovement()->MaxWalkSpeed += speedGainPerLevel;
 	}
 	else
 		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "not enough chips to convert to stat B");
@@ -220,11 +236,25 @@ void ACowboynoutCharacter::FireSkillOne() {
 	ACowboynoutPlayerController* playerCtrl = Cast<ACowboynoutPlayerController>(GetController());
 	if (playerCtrl) {
 		animShooting = true;
-		//if (hasTarget || PC->isStationairy) {
-		FRotator rot = GetActorRotation();
+
 		FActorSpawnParameters spawnInfo;
-		AProjectile* bullet = GetWorld()->SpawnActor<AProjectile>(ProjectileClass, muzzleLocation->GetComponentLocation(), rot, spawnInfo);
-		//}
+		if (skillLvlOne == 1) {
+			AProjectile* bullet = GetWorld()->SpawnActor<AProjectile>(ProjectileClassT1, muzzleLocation->GetComponentLocation(), muzzleLocation->GetComponentRotation(), spawnInfo);
+		}
+		else if (skillLvlOne == 2) {
+			AProjectile* bullet = GetWorld()->SpawnActor<AProjectile>(ProjectileClassT2, muzzleLocation->GetComponentLocation(), muzzleLocation->GetComponentRotation(), spawnInfo);
+		}
+		else if (skillLvlOne == 3) {
+			// multiple projectiles spawned
+			FRotator rotL = muzzleLocation->GetComponentRotation();
+			rotL.Yaw += 30;
+			FRotator rotR = muzzleLocation->GetComponentRotation();
+			rotR.Yaw -= 30;
+			AProjectile* bulletL = GetWorld()->SpawnActor<AProjectile>(ProjectileClassT1, muzzleLocationL->GetComponentLocation(), rotL, spawnInfo);
+			AProjectile* bullet = GetWorld()->SpawnActor<AProjectile>(ProjectileClassT3, muzzleLocation->GetComponentLocation(), muzzleLocation->GetComponentRotation(), spawnInfo);
+			AProjectile* bulletR = GetWorld()->SpawnActor<AProjectile>(ProjectileClassT1, muzzleLocationR->GetComponentLocation(), rotR, spawnInfo);
+		}
+		PlaySound(1);
 	}
 }
 
@@ -234,11 +264,17 @@ void ACowboynoutCharacter::FireSkillTwo(int teleport) {
 		explodeNade = false;
 		ACowboynoutPlayerController* playerCtrl = Cast<ACowboynoutPlayerController>(GetController());
 		if (playerCtrl) {
-			//if (hasTarget || PC->isStationairy) {
-			FRotator rot = GetActorRotation();
 			FActorSpawnParameters spawnInfo;
-			nade = GetWorld()->SpawnActor<AGrenade>(GrenadeClass, muzzleLocation->GetComponentLocation(), rot, spawnInfo);
-			//}
+			if (skillLvlTwo == 1) {
+				nade = GetWorld()->SpawnActor<AGrenade>(GrenadeClassT1, muzzleLocation->GetComponentLocation(), muzzleLocation->GetComponentRotation(), spawnInfo);
+			}
+			else if (skillLvlTwo == 2) {
+				nade = GetWorld()->SpawnActor<AGrenade>(GrenadeClassT2, muzzleLocation->GetComponentLocation(), muzzleLocation->GetComponentRotation(), spawnInfo);
+			}
+			else if (skillLvlTwo == 3) {
+				nade = GetWorld()->SpawnActor<AGrenade>(GrenadeClassT3, muzzleLocation->GetComponentLocation(), muzzleLocation->GetComponentRotation(), spawnInfo);
+			}
+			PlaySound(2);
 		}
 	}
 	else if (teleport == 1) {
@@ -248,5 +284,36 @@ void ACowboynoutCharacter::FireSkillTwo(int teleport) {
 			explodeNade = true;
 		}
 	}
-	
+}
+
+// 0: been hit; 1: skill one; 2: skill two fired; 3: skill two explosion sound; 4: low life warning; 5: death 
+void ACowboynoutCharacter::PlaySound(int sound) {
+	float volumeMultiplier = 1.f;
+	float pitchMultiplier = 1.f;
+	float startTime = 0.f;
+
+	UObject* worldContextObject = GetWorld();
+	/*
+	if (sound == 0)
+		UGameplayStatics::PlaySound2D(worldContextObject, soundSkill1, volumeMultiplier, pitchMultiplier, startTime);
+	/**/
+	if (sound == 1)
+		UGameplayStatics::PlaySound2D(worldContextObject, soundSkill1, volumeMultiplier, pitchMultiplier, startTime);
+	else if (sound == 2)
+		UGameplayStatics::PlaySound2D(worldContextObject, soundSkill2shot, volumeMultiplier, pitchMultiplier, startTime);
+	else if (sound == 3)
+		UGameplayStatics::PlaySound2D(worldContextObject, soundSkill2explosion, volumeMultiplier, pitchMultiplier, startTime);
+	else if (sound == 4)
+		UGameplayStatics::PlaySound2D(worldContextObject, soundLowLife, volumeMultiplier, pitchMultiplier, startTime);
+	else if (sound == 5)
+		UGameplayStatics::PlaySound2D(worldContextObject, soundDead, volumeMultiplier, pitchMultiplier, startTime);
+
+}
+
+void ACowboynoutCharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) {
+	//GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "FU!");
+	if (OtherComp != NULL && OtherComp->ComponentHasTag("dmgArea")) {
+		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "AE DOMAGE!");
+		Damage(30);
+	}
 }

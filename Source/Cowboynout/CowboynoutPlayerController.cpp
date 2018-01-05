@@ -46,111 +46,120 @@ ACowboynoutPlayerController::ACowboynoutPlayerController() {
 }
 
 void ACowboynoutPlayerController::SetupInputComponent() {
-	// set up gameplay key bindings
-	Super::SetupInputComponent();
+	if (GetWorld()->GetMapName() == "UEDPIE_0_MapSpaceGanzesLV" || GetWorld()->GetMapName() == "MapSpaceGanzesLV") {
+		// set up gameplay key bindings
+		Super::SetupInputComponent();
 
-	//InputComponent->BindAction("SetDestination", IE_Pressed, this, &ACowboynoutPlayerController::OnSetDestinationPressed);
-	//InputComponent->BindAction("SetDestination", IE_Released, this, &ACowboynoutPlayerController::OnSetDestinationReleased);
+		//InputComponent->BindAction("SetDestination", IE_Pressed, this, &ACowboynoutPlayerController::OnSetDestinationPressed);
+		//InputComponent->BindAction("SetDestination", IE_Released, this, &ACowboynoutPlayerController::OnSetDestinationReleased);
 
-	// movement modes
-	InputComponent->BindAction("MovementMode", IE_Pressed, this, &ACowboynoutPlayerController::OnMovementModePressed);
-	InputComponent->BindAction("MovementMode", IE_Released, this, &ACowboynoutPlayerController::OnMovementModeReleased);
-	InputComponent->BindAction("StationairyMode", IE_Pressed, this, &ACowboynoutPlayerController::OnSetStationairyPressed);
-	InputComponent->BindAction("StationairyMode", IE_Released, this, &ACowboynoutPlayerController::OnSetStationairyReleased);
+		// movement modes
+		InputComponent->BindAction("MovementMode", IE_Pressed, this, &ACowboynoutPlayerController::OnMovementModePressed);
+		InputComponent->BindAction("MovementMode", IE_Released, this, &ACowboynoutPlayerController::OnMovementModeReleased);
+		InputComponent->BindAction("StationairyMode", IE_Pressed, this, &ACowboynoutPlayerController::OnSetStationairyPressed);
+		InputComponent->BindAction("StationairyMode", IE_Released, this, &ACowboynoutPlayerController::OnSetStationairyReleased);
 
-	// skills
-	InputComponent->BindAction("SkillOne", IE_Pressed, this, &ACowboynoutPlayerController::OnSkillOnePressed);
-	InputComponent->BindAction("SkillOne", IE_Released, this, &ACowboynoutPlayerController::OnSkillOneReleased);
-	InputComponent->BindAction("SkillTwo", IE_Pressed, this, &ACowboynoutPlayerController::OnSkillTwoPressed);
-	InputComponent->BindAction("SkillTwo", IE_Released, this, &ACowboynoutPlayerController::OnSkillTwoReleased);
-	InputComponent->BindAction("SkillThree", IE_Pressed, this, &ACowboynoutPlayerController::OnSkillThreePressed);
-	InputComponent->BindAction("SkillThree", IE_Released, this, &ACowboynoutPlayerController::OnSkillThreeReleased);
+		// skills
+		InputComponent->BindAction("SkillOne", IE_Pressed, this, &ACowboynoutPlayerController::OnSkillOnePressed);
+		InputComponent->BindAction("SkillOne", IE_Released, this, &ACowboynoutPlayerController::OnSkillOneReleased);
+		InputComponent->BindAction("SkillTwo", IE_Pressed, this, &ACowboynoutPlayerController::OnSkillTwoPressed);
+		InputComponent->BindAction("SkillTwo", IE_Released, this, &ACowboynoutPlayerController::OnSkillTwoReleased);
+		InputComponent->BindAction("SkillThree", IE_Pressed, this, &ACowboynoutPlayerController::OnSkillThreePressed);
+		InputComponent->BindAction("SkillThree", IE_Released, this, &ACowboynoutPlayerController::OnSkillThreeReleased);
 
-	// mouse
-	InputComponent->BindAction("LeftClick", IE_Pressed, this, &ACowboynoutPlayerController::OnLeftMousePressed);
-	InputComponent->BindAction("LeftClick", IE_Released, this, &ACowboynoutPlayerController::OnLeftMouseReleased);
-	InputComponent->BindAction("RightClick", IE_Pressed, this, &ACowboynoutPlayerController::OnRightMousePressed);
-	InputComponent->BindAction("RightClick", IE_Released, this, &ACowboynoutPlayerController::OnRightMouseReleased);
+		// mouse
+		InputComponent->BindAction("LeftClick", IE_Pressed, this, &ACowboynoutPlayerController::OnLeftMousePressed);
+		InputComponent->BindAction("LeftClick", IE_Released, this, &ACowboynoutPlayerController::OnLeftMouseReleased);
+		InputComponent->BindAction("RightClick", IE_Pressed, this, &ACowboynoutPlayerController::OnRightMousePressed);
+		InputComponent->BindAction("RightClick", IE_Released, this, &ACowboynoutPlayerController::OnRightMouseReleased);
 
-	// simulate damage
-	InputComponent->BindAction("SimulateDamage", IE_Pressed, this, &ACowboynoutPlayerController::OnSimulateDamagePressed);
-	InputComponent->BindAction("SimulateDamage", IE_Released, this, &ACowboynoutPlayerController::OnSimulateDamageReleased);
+		// simulate damage
+		InputComponent->BindAction("SimulateDamage", IE_Pressed, this, &ACowboynoutPlayerController::OnSimulateDamagePressed);
+		InputComponent->BindAction("SimulateDamage", IE_Released, this, &ACowboynoutPlayerController::OnSimulateDamageReleased);
 
-	//UAIPerceptionSystem::RegisterPerceptionStimuliSource(this, sightConfig->GetSenseImplementation(), GetControlledPawn());
+		//UAIPerceptionSystem::RegisterPerceptionStimuliSource(this, sightConfig->GetSenseImplementation(), GetControlledPawn());
+
+		InputComponent->BindAction("SkillOneLvlUp", IE_Pressed, this, &ACowboynoutPlayerController::OnSkillOneLevelUp);
+		InputComponent->BindAction("SkillTwoLvlUp", IE_Pressed, this, &ACowboynoutPlayerController::OnSkillTwoLevelUp);
+	}
+	else {
+		//DebugMsg("no movement!" + GetWorld()->GetMapName(), 2, FColor::White);
+	}
 }
 
 void ACowboynoutPlayerController::PlayerTick(float deltaTime) {
 	Super::PlayerTick(deltaTime);
 	
 	// end cd timer 
-
-	if (endGame) {
-		deathTimer += deltaTime;
-		if (endCD == 0 && !deathTimerNotSet) {
-			deathTimerFull = deathTimer;
-			deathTimerNotSet = true;
-		}
-		countDown = deathTimerFull - deathTimer;
-		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Cyan, FString::SanitizeFloat(countDown));
+	if (GetWorld()->GetMapName() == "UEDPIE_0_MapSpaceGanzesLV" || GetWorld()->GetMapName() == "MapSpaceGanzesLV") {
+		if (endGame) {
+			deathTimer += deltaTime;
+			if (endCD == 0 && !deathTimerNotSet) {
+				deathTimerFull = deathTimer;
+				deathTimerNotSet = true;
+			}
+			countDown = deathTimerFull - deathTimer;
+			GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Cyan, FString::SanitizeFloat(countDown));
 		
-		if (deathTimer >= deathTimerFull) {
-			UGameplayStatics::OpenLevel(this, TEXT("/Game/Maps/WinScreen"), false);
-			deathTimer = 0;
+			if (deathTimer >= deathTimerFull) {
+				UGameplayStatics::OpenLevel(this, TEXT("/Game/Maps/WinScreen"), false);
+				deathTimer = 0;
+			}
 		}
-	}
 
-	cowboy = Cast<ACowboynoutCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
-	if (cowboy && cowboy->dead) return;
+		cowboy = Cast<ACowboynoutCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+		if (cowboy && cowboy->dead) return;
 
-	if (MyPawn) {
-		FVector velo = MyPawn->GetVelocity();
-		if (velo.X != 0 || velo.Y != 0)
-			isMoving = true;
-		else
-			isMoving = false;
-	}
+		if (MyPawn) {
+			FVector velo = MyPawn->GetVelocity();
+			if (velo.X != 0 || velo.Y != 0)
+				isMoving = true;
+			else
+				isMoving = false;
+		}
 
-	cowboy = Cast<ACowboynoutCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
-	if (cowboy) {
-		// keep updating the destination every tick while presed
-		if (bMoveToMouseCursor && !cowboy->dead)	{
-			MoveToMouseCursor();
+		cowboy = Cast<ACowboynoutCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+		if (cowboy) {
+			// keep updating the destination every tick while presed
+			if (bMoveToMouseCursor && !cowboy->dead)	{
+				MoveToMouseCursor();
+			}
+			if (!isMoving && !cowboy->dead) {
+				RotatePlayer();
+			}
 		}
-		if (!isMoving && !cowboy->dead) {
-			RotatePlayer();
-		}
-	}
 
-	// reset skill CDs if time passed
-	if (skillOneCD) {
-		activeTimerSkillOne += deltaTime;
-		if (activeTimerSkillOne >= breakSkillOne) {		// enable movement again after break time
-			canMove = true;
+		// reset skill CDs if time passed
+		if (skillOneCD) {
+			activeTimerSkillOne += deltaTime;
+			if (activeTimerSkillOne >= breakSkillOne) {		// enable movement again after break time
+				canMove = true;
+			}
+			if (activeTimerSkillOne >= timerSkillOne) {
+				skillOneCD = false;
+				activeTimerSkillOne = 0;
+			}
 		}
-		if (activeTimerSkillOne >= timerSkillOne) {
-			skillOneCD = false;
-			activeTimerSkillOne = 0;
+		if (skillTwoCD) {
+			activeTimerSkillTwo += deltaTime;
+			if (activeTimerSkillTwo >= breakSkillTwo) {		// enable movement again after break time
+				canMove = true;	
+			}
+			if (activeTimerSkillTwo >= timerSkillTwo) {
+				skillTwoCD = false;
+				skillTwoTPCD = false;
+				activeTimerSkillTwo = 0;
+			}
 		}
-	}
-	if (skillTwoCD) {
-		activeTimerSkillTwo += deltaTime;
-		if (activeTimerSkillTwo >= breakSkillTwo) {		// enable movement again after break time
-			canMove = true;	
-		}
-		if (activeTimerSkillTwo >= timerSkillTwo) {
-			skillTwoCD = false;
-			skillTwoTPCD = false;
-			activeTimerSkillTwo = 0;
-		}
-	}
-	if (skillThreeCD) {
-		activeTimerSkillThree += deltaTime;
-		if (activeTimerSkillThree >= breakSkillThree) {	// enable movement again after break time
-			canMove = true;	
-		}
-		if (activeTimerSkillThree >= timerSkillThree) {
-			skillThreeCD = false;
-			activeTimerSkillThree = 0;
+		if (skillThreeCD) {
+			activeTimerSkillThree += deltaTime;
+			if (activeTimerSkillThree >= breakSkillThree) {	// enable movement again after break time
+				canMove = true;	
+			}
+			if (activeTimerSkillThree >= timerSkillThree) {
+				skillThreeCD = false;
+				activeTimerSkillThree = 0;
+			}
 		}
 	}
 }
@@ -176,6 +185,20 @@ void ACowboynoutPlayerController::SetNewMoveDestination(const FVector DestLocati
 				NavSys->SimpleMoveToLocation(this, DestLocation);
 			}
 		}
+	}
+}
+
+void ACowboynoutPlayerController::OnSkillOneLevelUp() {
+	cowboy = Cast<ACowboynoutCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+	if (cowboy) {
+		cowboy->skillLvlOne++;
+	}
+}
+
+void ACowboynoutPlayerController::OnSkillTwoLevelUp() {
+	cowboy = Cast<ACowboynoutCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+	if (cowboy) {
+		cowboy->skillLvlTwo++;
 	}
 }
 
@@ -258,19 +281,17 @@ void ACowboynoutPlayerController::OnRightMouseReleased() {
 }
 
 void ACowboynoutPlayerController::OnSkillOnePressed() {
-		if (!moveOnly ){
-			AController::StopMovement();
+	if (!moveOnly ){
+		AController::StopMovement();
 
-			if (skillOneCD || (activeTimerSkillTwo != 0 && activeTimerSkillTwo < breakSkillTwo)) {
-				// do something if you can't shot
-			}
-			else {
-				RotatePlayer();
-				SkillOne();
-			}
-			
+		if (skillOneCD || (activeTimerSkillTwo != 0 && activeTimerSkillTwo < breakSkillTwo)) {
+			// do something if you can't shot
 		}
-
+		else {
+			RotatePlayer();
+			SkillOne();
+		}
+	}
 }
 
 void ACowboynoutPlayerController::OnSkillOneReleased() {
@@ -285,7 +306,6 @@ void ACowboynoutPlayerController::OnSkillTwoPressed() {
 		if (!skillTwoTPCD) SkillTwoTP();
 	}
 	else {
-		
 		// use skill two
 		if (!moveOnly) {
 			RotatePlayer();
@@ -372,7 +392,7 @@ void ACowboynoutPlayerController::SkillOne() {
 }
 
 void ACowboynoutPlayerController::SkillTwo() {
-	//DebugMsg("pewpew²", displayTime, FColor::Green);
+	//DebugMsg("pewpewÂ²", displayTime, FColor::Green);
 	if (!skillTwoCD) {
 		cowboy = Cast<ACowboynoutCharacter>(GetCharacter());
 		if (cowboy) cowboy->FireSkillTwo(0);
@@ -404,6 +424,7 @@ void ACowboynoutPlayerController::SkillTwoTP() {
 	} 
 	else {
 		DebugMsg("skill two TP on CD or something else, who cares, no TP FOR YOU!", displayTime, FColor::Red);
+		canTP = false;
 	}
 }
 
