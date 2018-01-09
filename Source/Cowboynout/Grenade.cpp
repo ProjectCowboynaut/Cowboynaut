@@ -29,10 +29,11 @@ AGrenade::AGrenade() {
 
 	cnt = 0;
 
-	APlayerController* pCtrl = UGameplayStatics::GetPlayerController(GetWorld(), 0);
+	ACowboynoutPlayerController* pCtrl = Cast<ACowboynoutPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 	if (pCtrl) {
 		pCtrl->GetHitResultUnderCursor(ECC_Visibility, false, cursorHit);
 		cursorLoc = cursorHit.Location;
+		
 	}
 
 }
@@ -53,6 +54,8 @@ void AGrenade::Tick(float DeltaTime) {
 		// spawn sploding actor 
 		ASplosion* boomSphere = GetWorld()->SpawnActor<ASplosion>(SploderClass, SpawnLocation, SpawnRotation, spawnInfo);
 		// aaaaaand it's gone
+		ACowboynoutPlayerController* pCtrl = Cast<ACowboynoutPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+		pCtrl->canTP = true;
 		Destroy();
 	}
 

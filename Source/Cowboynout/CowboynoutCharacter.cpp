@@ -99,7 +99,15 @@ ACowboynoutCharacter::ACowboynoutCharacter() {
 	attackGainPerLevel = 10;
 
 	explodeNade = false;
+	
+	enemiesTotal = 0;
+	bossBarrikades = 0;
+	enemiesSet = false;
+	barriersDisabled = 0;
+	enemiesToDisableBarrier = 0;
 
+	lifeWarningTimer = 3.11f;
+	lifeWarningTimerFull = 3.11f;
 }
 
 // set if the player has a target
@@ -116,9 +124,33 @@ void ACowboynoutCharacter::SetTarget(int targetStatus) {			/// 0: no target; 1: 
 	else hasTarget = 0;
 }
 
-void ACowboynoutCharacter::Tick(float DeltaSeconds)
-{
+void ACowboynoutCharacter::Tick(float DeltaSeconds) {
     Super::Tick(DeltaSeconds);
+
+	if (!enemiesSet) {
+		// set total number of enemies
+		UGameplayStatics::GetAllActorsOfClass(GetWorld(), AEnemy::StaticClass(), foundActors);
+		enemiesTotal = foundActors.Num();
+		// find all level barrikades
+		UGameplayStatics::GetAllActorsOfClass(GetWorld(), BarrierBPClass, foundActorsBarr);
+		bossBarrikades = foundActorsBarr.Num();
+		// set enemies needed to disable ONE barrier
+		enemiesSet = true;
+	}
+	else {
+		// set actual number of enemies
+		UGameplayStatics::GetAllActorsOfClass(GetWorld(), AEnemy::StaticClass(), foundActors);
+		enemiesActual = foundActors.Num();
+		// check if enough enemies are down to disable barriers
+		if (enemiesActual < enemiesTotal - (enemiesToDisableBarrier * (barriersDisabled+1))) {
+			barriersDisabled++;
+			foundActorsBarr[barriersDisabled]->Destroy();
+			//GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "FU");
+		}
+	}
+
+	if (enemiesTotal != 0 && bossBarrikades != 0)
+		enemiesToDisableBarrier = enemiesTotal / bossBarrikades;
 
 	if (CursorToWorld != nullptr)
 	{
@@ -135,10 +167,15 @@ void ACowboynoutCharacter::Tick(float DeltaSeconds)
 	}
 
 	// play low life sound warning
-	if (life < lifeWarningValue) {
-		PlaySound(4);
+	if (life <= lifeWarningValue) {
+		if (lifeWarningTimer > lifeWarningTimerFull) {
+			PlaySound(4);
+			lifeWarningTimer = 0;
+		}
+		else {
+			lifeWarningTimer += DeltaSeconds;
+		}
 	}
-	
 
 	if (dead) {
 		if (deathTimer > 0) {
@@ -150,6 +187,8 @@ void ACowboynoutCharacter::Tick(float DeltaSeconds)
 			UGameplayStatics::OpenLevel(this, TEXT("/Game/Maps/DeathScreen"), false);
 	}
 }
+
+
 
 void ACowboynoutCharacter::Damage(int dmg) {
 	life -= dmg;
@@ -260,18 +299,22 @@ void ACowboynoutCharacter::FireSkillOne() {
 
 void ACowboynoutCharacter::FireSkillTwo(int teleport) {
 	if (teleport == 0) {
+		nadeLoc = GetActorLocation();
 		animShooting = true;
 		explodeNade = false;
 		ACowboynoutPlayerController* playerCtrl = Cast<ACowboynoutPlayerController>(GetController());
 		if (playerCtrl) {
 			FActorSpawnParameters spawnInfo;
 			if (skillLvlTwo == 1) {
+				playerCtrl->canTP = false;
 				nade = GetWorld()->SpawnActor<AGrenade>(GrenadeClassT1, muzzleLocation->GetComponentLocation(), muzzleLocation->GetComponentRotation(), spawnInfo);
 			}
 			else if (skillLvlTwo == 2) {
+				playerCtrl->canTP = false;
 				nade = GetWorld()->SpawnActor<AGrenade>(GrenadeClassT2, muzzleLocation->GetComponentLocation(), muzzleLocation->GetComponentRotation(), spawnInfo);
 			}
 			else if (skillLvlTwo == 3) {
+				playerCtrl->canTP = false;
 				nade = GetWorld()->SpawnActor<AGrenade>(GrenadeClassT3, muzzleLocation->GetComponentLocation(), muzzleLocation->GetComponentRotation(), spawnInfo);
 			}
 			PlaySound(2);
@@ -312,8 +355,9 @@ void ACowboynoutCharacter::PlaySound(int sound) {
 
 void ACowboynoutCharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) {
 	//GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "FU!");
+	// AE DMG 
 	if (OtherComp != NULL && OtherComp->ComponentHasTag("dmgArea")) {
 		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "AE DOMAGE!");
-		Damage(30);
+		Damage(10);
 	}
 }

@@ -1,6 +1,8 @@
 // Copyright 1998-2017 Epic Games, Inc. All Rights Reserved.
 
+
 #include "CowboynoutPlayerController.h"
+#include "Enemy.h"
 #include "AI/Navigation/NavigationSystem.h"
 #include "Perception/AISense.h"
 #include "Perception/AISenseConfig_Sight.h"
@@ -21,7 +23,8 @@ ACowboynoutPlayerController::ACowboynoutPlayerController() {
 	displayTime = .5f;
 	isStationairy = false;
 	deathTimerNotSet = false;
-	deathTimer = 10.f;
+	deathTimerFull = 10.f;
+	deathTimer = 0;
 
 	// break == "no movement time"; timer == cd on skill
 	timerSkillOne = .6f;
@@ -43,6 +46,7 @@ ACowboynoutPlayerController::ACowboynoutPlayerController() {
 	isMoving = false;
 
 	canTP = false;
+
 }
 
 void ACowboynoutPlayerController::SetupInputComponent() {
@@ -89,15 +93,17 @@ void ACowboynoutPlayerController::SetupInputComponent() {
 
 void ACowboynoutPlayerController::PlayerTick(float deltaTime) {
 	Super::PlayerTick(deltaTime);
-	
+
 	// end cd timer 
+	//GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::White, GetWorld()->GetMapName());
 	if (GetWorld()->GetMapName() == "UEDPIE_0_MapSpaceGanzesLV" || GetWorld()->GetMapName() == "MapSpaceGanzesLV") {
 		if (endGame) {
 			deathTimer += deltaTime;
-			if (endCD == 0 && !deathTimerNotSet) {
+			if (!deathTimerNotSet) {
 				deathTimerFull = deathTimer;
 				deathTimerNotSet = true;
 			}
+
 			countDown = deathTimerFull - deathTimer;
 			GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Cyan, FString::SanitizeFloat(countDown));
 		

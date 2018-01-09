@@ -45,11 +45,30 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void DestroyShield();
 
+	UPROPERTY(EditDefaultsOnly, BluePrintReadWrite)
+	bool bossFight;
+
+	UPROPERTY()
+	float bossEffectTimer;
+
+	UPROPERTY()
+	float bossEffectTimerActive;
+
 	UFUNCTION(BlueprintCallable)
 	void Attack();
 
 	UPROPERTY()
 	float attackCD;
+
+	// find all Pillars
+	UPROPERTY(EditDefaultsOnly, Category = "BossFight")
+	TSubclassOf<AActor> PillarBPClass; // Needs to be populated somehow (e.g. by exposing to blueprints as uproperty and setting it there
+
+	UPROPERTY(VisibleAnywhere, Category = "BossFight")
+	TArray<AActor*> foundPillars;
+
+	UPROPERTY()
+	int pillars;
 
 	/** Location on gun mesh where projectiles should spawn. */
 	UPROPERTY(VisibleDefaultsOnly, Category = "Character")
@@ -59,8 +78,42 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Projectile")
 	TSubclassOf<class AProjectile> ProjectileClass;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY()
+	int lastRnd;
+
+	// base stats for enemy types
+	UPROPERTY(EditAnywhere, Category = "EnemyType Stats")
+	float attackRatioBase;
+
+	UPROPERTY(EditAnywhere, Category = "EnemyType Stats")
+	float attackRatioElite;
+
+	UPROPERTY(EditAnywhere, Category = "EnemyType Stats")
+	float attackRatioBoss;
+
+	UPROPERTY(EditAnywhere, Category = "EnemyType Stats")
+	float damageBase;
+
+	UPROPERTY(EditAnywhere, Category = "EnemyType Stats")
+	float damageElite;
+
+	UPROPERTY(EditAnywhere, Category = "EnemyType Stats")
+	float damageBoss;
+
+	UPROPERTY(EditAnywhere, Category = "EnemyType Stats")
+	float healthBase;
+
+	UPROPERTY(EditAnywhere, Category = "EnemyType Stats")
+	float healthElite;
+
+	UPROPERTY(EditAnywhere, Category = "EnemyType Stats")
+	float healthBoss;
+
+	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "EnemyStats")
 	float attackRatio;
+
+	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "EnemyStats")
+	int health;
 
 	UPROPERTY(EditAnywhere)
 	float loopTime;
@@ -94,9 +147,6 @@ public:
 	
 	UPROPERTY(EditAnywhere, BluePrintReadWrite, Category = "EnemyStats")
 	float shieldFour;
-
-	UPROPERTY(VisibleAnywhere, BluePrintReadWrite, Category = "EnemyStats")
-	int health;
 
 	//behaviour variables
 	UPROPERTY(EditAnywhere, BluePrintReadWrite, Category = "EnemyStats")

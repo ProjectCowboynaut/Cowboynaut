@@ -24,8 +24,10 @@ AEnemy::AEnemy()
 	muzzleLocation->SetupAttachment(RootComponent);
 
 	canSeePlayer = false;
+	bossEffectTimer = 4.f;
+	bossEffectTimerActive = 0.f;
+	bossFight = false;
 }
-
 
 
 void AEnemy::BeginPlay() {
@@ -33,9 +35,22 @@ void AEnemy::BeginPlay() {
 	// trash mob stats
 	if (type == 1) {
 		health = 110;
-		//attackRatio = 3.f;					// faster attacks, less dmg
+		attackRatio = attackRatioBase;					// faster attacks, less dmg
 		shieldOneActive = false;
 		shieldOne = 0.f;
+		shieldTwoActive = false;
+		shieldTwo = 0.f;
+		shieldThreeActive = false;
+		shieldThree = 0.f;
+		shieldFourActive = false;
+		shieldFour = 0.f;
+	}
+	// elite mob stats
+	else if (type == 2) {
+		health = 250;
+		attackRatio = attackRatioElite;					// faster attacks, less dmg
+		shieldOneActive = true;
+		shieldOne = 50.f;
 		shieldTwoActive = false;
 		shieldTwo = 0.f;
 		shieldThreeActive = false;
@@ -46,7 +61,7 @@ void AEnemy::BeginPlay() {
 	// boss mob stats
 	else if (type == 666) {
 		health = 510;
-		//attackRatio = 5.f;					// lower ratio, more dmg per shot
+		attackRatio = attackRatioBoss;					// lower ratio, more dmg per shot
 		shieldOneActive = true;
 		shieldOne = 200.f;
 		shieldTwoActive = true;
@@ -58,7 +73,7 @@ void AEnemy::BeginPlay() {
 	}
 	else {
 		health = 110;
-		//attackRatio = 3.f;
+		attackRatio = attackRatioBase;
 		shieldOneActive = false;
 		shieldOne = 0.f;
 		shieldTwoActive = false;
@@ -69,20 +84,29 @@ void AEnemy::BeginPlay() {
 		shieldFour = 0.f;
 	}
 
-	//Timer handler
-	FTimerHandle TimerHandle;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), PillarBPClass, foundPillars);
+	TArray<UActorComponent*> children;
+	if (foundPillars.Num() > 0) foundPillars[0]->GetComponents(children);
 
-	//Activate the Timer
-	//1st Parameter: TimerHandle
-	//2nd Parameter: The Object related to this timer
-	//3rd Parameter: The function that is going to be fired
-	//4th Parameter: The loop time
-	//5th Parameter: True - if you want this timer to loop, false otherwise
-	// GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AEnemy::DoAPeriodicCheck, loopTime, true);
+	for (int i = 0; i < children.Num(); i++) {
+		if (children[i]) {
+			UActorComponent* child = children[i];
+			FString name = child->GetName();
+			if (child->GetName() == "bossAreaDamage") {
+				child->Deactivate();
+				GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, "-d");
+			}
+			else if (child->GetName() == "bossAreaWarning") {
+				child->Deactivate();
+				GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, "-w");
+			}
+		}
+	}
 }
 
 void AEnemy::Tick(float deltaTime) {
 	Super::Tick(deltaTime);
+
 	if (timerActive)
 		timer += deltaTime;
 	if (timer > attackRatio) {
@@ -95,10 +119,62 @@ void AEnemy::Tick(float deltaTime) {
 	}
 
 	if (deathTimerActive) {
-		ACowboynoutPlayerController* Ctrl = Cast<ACowboynoutPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+		ACowboynoutPlayerController* pCtrl = Cast<ACowboynoutPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 		if (playerChar) {
-			Ctrl->endGame = true;
-			Ctrl->deathTimerFull = Ctrl->endCD;
+			pCtrl->endGame = true;
+			pCtrl->deathTimerFull = pCtrl->endCD;
+		}
+	}
+
+	if (bossFight) {
+		// boss room effect
+		// random timer
+		bossEffectTimerActive += deltaTime;
+		if (bossEffectTimerActive >= bossEffectTimer) {
+			// > enable 2 plates
+			bossEffectTimerActive = 0;
+			bossEffectTimer = FMath::RandRange(1.f,6.f);
+
+			UGameplayStatics::GetAllActorsOfClass(GetWorld(), PillarBPClass, foundPillars);
+			pillars = foundPillars.Num();
+
+			TArray<UActorComponent*> children;
+			foundPillars[0]->GetComponents(children);
+
+			for (int i = 0; i < children.Num(); i++) {
+				if (children[i]) {
+					UActorComponent* child = children[i];
+					FString name = child->GetName();
+					if (child->GetName() == "bossAreaDamage") {
+						if (child->IsActive()) {
+							child->Deactivate();
+							USceneComponent* node = Cast<USceneComponent>(child);
+							node->ToggleVisibility(true);
+							GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, "+");
+						}
+						else {
+							child->Activate();
+							USceneComponent* node = Cast<USceneComponent>(child);
+							node->ToggleVisibility(true);
+							GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "-");
+						}
+					}
+					else if (child->GetName() == "bossAreaWarning") {
+						if (child->IsActive()) {
+							child->Deactivate();
+							USceneComponent* node = Cast<USceneComponent>(child);
+							node->ToggleVisibility(true);
+							GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, "+");
+						}
+						else {
+							child->Activate();
+							USceneComponent* node = Cast<USceneComponent>(child);
+							node->ToggleVisibility(true);
+							GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "-");
+						}
+					}
+				}
+			}
 		}
 	}
 }
@@ -189,6 +265,19 @@ void AEnemy::DestroyShield() {
 void AEnemy::Damage(int dmg) {
 	if (type == 1) {
 		health -= dmg;
+	}
+	else if (type == 2) {
+		if (shieldOneActive) {
+			if (shieldOne > dmg) {
+				shieldOne -= dmg;
+			}
+			else {
+				shieldOne = 0;
+				shieldOneActive = false;
+			}
+		}
+		else
+			health -= dmg;
 	}
 	else if (type == 666) {
 		if (shieldFourActive) {

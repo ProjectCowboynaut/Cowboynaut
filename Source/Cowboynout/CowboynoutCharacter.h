@@ -16,6 +16,34 @@ class ACowboynoutCharacter : public ACharacter
 public:
 	ACowboynoutCharacter();
 
+	UPROPERTY(VisibleAnywhere, Category = "Level Stuff")
+	TArray<AActor*> foundActors;
+
+	// find all level barrikades
+	UPROPERTY(EditDefaultsOnly, Category = "Level Stuff")
+	TSubclassOf<AActor> BarrierBPClass; // Needs to be populated somehow (e.g. by exposing to blueprints as uproperty and setting it there
+
+	UPROPERTY(VisibleAnywhere, Category = "Level Stuff")
+	TArray<AActor*> foundActorsBarr;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Level Stuff")
+	int bossBarrikades;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Level Stuff")
+	int enemiesTotal;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Level Stuff")
+	int enemiesActual;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Level Stuff")
+	bool enemiesSet;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Level Stuff")
+	int enemiesToDisableBarrier;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category ="Level Stuff")
+	int barriersDisabled;
+
 	/** Returns CollisionComp subobject **/
 	FORCEINLINE USphereComponent* GetCollisionComp() const { return CollisionComp; }
 
@@ -41,7 +69,7 @@ public:
 	FORCEINLINE 
 	class UDecalComponent* GetCursorToWorld() { return CursorToWorld; }
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void Damage(int dmg);
 
 	// SkillBlueprints (Tier 1-3 each)
@@ -145,12 +173,6 @@ public:
 	USceneComponent* muzzleLocationR;
 
 	UPROPERTY()
-	float deathTimer;
-
-	UPROPERTY()
-	float deathTimerFull;
-
-	UPROPERTY()
 	bool dead;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "PlayerStats")
@@ -213,6 +235,18 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = "SFX")
 	float lifeWarningValue;
+
+	UPROPERTY()
+	float deathTimer;
+
+	UPROPERTY()
+	float deathTimerFull;
+
+	UPROPERTY()
+	float lifeWarningTimer;
+
+	UPROPERTY()
+	float lifeWarningTimerFull;
 
 private:
 

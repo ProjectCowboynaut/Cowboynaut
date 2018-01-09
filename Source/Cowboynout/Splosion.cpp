@@ -45,17 +45,18 @@ void ASplosion::Tick(float DeltaTime) {
 	// > start timer
 	nadeTimer += DeltaTime;
 	ACowboynoutCharacter* playerChar = Cast<ACowboynoutCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+	ACowboynoutPlayerController* playerCtrl = Cast<ACowboynoutPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 	if (playerChar) {
 		playerChar->nadeLoc = GetActorLocation();
 		theEnd = playerChar->explodeNade;
+		playerCtrl->canTP = true;
 	}
 	// > timer end:
 	if (nadeTimer >= nadeTimerFull) {
 		// spawn splosion actor
-		ACowboynoutPlayerController* pCtrl = Cast<ACowboynoutPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-		if (pCtrl) {
+		if (playerCtrl) {
 			//	TP not possible anymore
-			pCtrl->canTP = false;
+			playerCtrl->canTP = false;
 		}
 		theEnd = true;
 	}

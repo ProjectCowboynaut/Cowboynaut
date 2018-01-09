@@ -13,6 +13,7 @@ class ACowboynoutGameMode : public AGameModeBase
 
 public:
 	ACowboynoutGameMode();
+
 };
 
 

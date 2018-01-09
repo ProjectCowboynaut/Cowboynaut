@@ -49,20 +49,32 @@ AProjectile::AProjectile() {
 	FVector SpawnLocation = this->GetActorLocation();
 	FRotator SpawnRotation = GetActorRotation();;
 
-	// set projectile base stats depending on skill T
-	if (playerChar) {
-		if (playerChar->skillLvlOne == 1) {
-			projectileDamage = 50 + (playerChar->attack * playerChar->attackGainPerLevel);
-			penetration = 1;
+	//DebugMsg(GetClass()->GetName(), 1.5f, FColor::White);
+
+
+	// set PLAYER projectile base stats depending on skill T
+	if (GetClass()->GetName() == "BP_SkillOne_T01_C" || GetClass()->GetName() == "BP_SkillOne_T02_C" || GetClass()->GetName() == "BP_SkillOne_T03_C"){
+		playerProjectile = true;
+		enemyProjectile = false;
+		if (playerChar) {
+			if (playerChar->skillLvlOne == 1) {
+				projectileDamage = 50 + (playerChar->attack * playerChar->attackGainPerLevel);
+				penetration = 1;
+			}
+			else if (playerChar->skillLvlOne == 2) {
+				projectileDamage = 60 + (playerChar->attack * playerChar->attackGainPerLevel);
+				penetration = 2;
+			}
+			else if (playerChar->skillLvlOne == 3) {
+				projectileDamage = 70 + (playerChar->attack * playerChar->attackGainPerLevel);
+				penetration = 3;
+			}
 		}
-		else if (playerChar->skillLvlOne == 2) {
-			projectileDamage = 60 + (playerChar->attack * playerChar->attackGainPerLevel);
-			penetration = 2;
-		}
-		else if (playerChar->skillLvlOne == 3) {
-			projectileDamage = 70 + (playerChar->attack * playerChar->attackGainPerLevel);
-			penetration = 3;
-		}
+	}
+	// set ENEMY projectile base stats
+	else if (GetClass()->GetName() == "BP_Enemy_SkillOne_00_C") {
+		enemyProjectile = true;
+		playerProjectile = false;
 	}
 }
 
@@ -74,6 +86,7 @@ void AProjectile::Initialize(int damage) {
 	projectileDamage = damage;
 }
 
+
 void AProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit) {
 	if (OtherActor != NULL && OtherActor->GetFName().ToString() == "Box") {
 		DebugMsg(OtherActor->GetFName().ToString(), 1.5f, FColor::Yellow);
@@ -83,7 +96,7 @@ void AProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimi
 	if (OtherActor != NULL && !OtherActor->ActorHasTag("Player")) {
 		ACowboynoutCharacter* hittedPlayer = Cast<ACowboynoutCharacter>(OtherActor);
 		
-		if (OtherActor->ActorHasTag("Enemy")) {
+		if (OtherActor->ActorHasTag("Enemy") && playerProjectile) {
 			// set dmg on enemy
 			AEnemy* hitEnemy = Cast<AEnemy>(OtherActor);
 			ACowboynoutCharacter* playerChar = Cast<ACowboynoutCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
