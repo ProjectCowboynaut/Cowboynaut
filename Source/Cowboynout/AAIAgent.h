@@ -8,15 +8,23 @@
 #include "Curves/CurveFloat.h"
 #include "AAIAgent.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FActionDelegate);
-
-USTRUCT()
-struct FEntry
+UENUM(Blueprintable)
+enum class FActionType : uint8
 {
-	GENERATED_BODY()
-	
-	UPROPERTY() UCurveFloat* curve;
-	FActionDelegate action;
+	FATFollowPlayer UMETA(DisplayName = "Follow Player"),
+	FATTakeCover UMETA(DisplayName = "Take Cover"),
+	FATRoaming UMETA(DisplayName = "Roam Around")
+};
+
+USTRUCT(Blueprintable)
+struct FAction
+{
+	GENERATED_USTRUCT_BODY()
+
+public:
+
+	UPROPERTY(EditAnywhere, Category = "AI") FActionType actionType;
+	UPROPERTY(EditAnywhere, Category = "AI") UCurveFloat* considerationCurve;
 };
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
@@ -24,23 +32,18 @@ class COWBOYNOUT_API UAAIAgent : public UActorComponent
 {
 	GENERATED_BODY()
 
-public:	
+public:
+
 	UAAIAgent();
 
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
-	//UFUNCTION()
-	//void AddAction(UCurveFloat* curve, FActionDelegate action);
+	UFUNCTION(BlueprintCallable, Category = "AI") void AddAction(const FAction& action);
+	UFUNCTION(BlueprintCallable, Category = "AI") FActionType EvaluateActions();
+	
+	// UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI") TArray actionList;
 
 protected:
-	// Called when the game starts
+
 	virtual void BeginPlay() override;
-
-private:
-
-	TArray<FEntry *> entries;
-
-	float currentNeed;
-	FActionDelegate currentAction;
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 };

@@ -5,6 +5,16 @@ UAAIAgent::UAAIAgent()
 	PrimaryComponentTick.bCanEverTick = true;
 }
 
+void UAAIAgent::AddAction(const FAction& action)
+{
+
+}
+
+FActionType UAAIAgent::EvaluateActions()
+{
+	return FActionType::FATFollowPlayer;
+}
+
 void UAAIAgent::BeginPlay()
 {
 	Super::BeginPlay();
@@ -16,7 +26,7 @@ void UAAIAgent::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 
 	// MAYBE LIMIT THE TICK RATE FOR AI UPDATES (ELSE MAY EXPLODE)
 
-	for (auto entry : entries)
+	/*for (auto entry : entries)
 	{
 		// poll value from curve (appropriate input)
 		auto potentialNeed = entry->curve->GetFloatValue(0);
@@ -30,10 +40,5 @@ void UAAIAgent::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 	}
 
 	// found most urgent action; process it!
-	currentAction.Broadcast();
+	currentAction.Broadcast();*/
 }
-
-//void UAAIAgent::AddAction(UCurveFloat* curve, FActionDelegate action)
-//{
-//	entries.Push(new Entry{ curve, action });
-//}
