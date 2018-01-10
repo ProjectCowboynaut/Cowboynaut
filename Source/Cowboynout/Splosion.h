@@ -3,7 +3,6 @@
 #pragma once
 
 #include "GameFramework/Actor.h"
-
 #include "Splosion.generated.h"
 
 UCLASS()
@@ -26,6 +25,28 @@ public:
 
 	UPROPERTY()
 	bool theEnd;
+
+	UPROPERTY()
+	bool doHit;
+
+	UPROPERTY(VisibleAnywhere)
+	TArray<AActor*> hitEnemies;
+
+	/** Sphere collision component */
+	UPROPERTY(VisibleDefaultsOnly)
+	class USphereComponent* CollisionComp;
+
+	UFUNCTION(BlueprintCallable)
+	void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+
+	UFUNCTION(BlueprintCallable)
+	void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	UFUNCTION(BlueprintCallable)
+	void OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+	UFUNCTION()
+	void DoDmg(int damage, bool terminal);
 
 protected:
 	// Called when the game starts or when spawned

@@ -4,16 +4,15 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
-#include "CowboynoutGameMode.generated.h"
+#include "CowboynoutGameModeUI.generated.h"
 
 UCLASS(minimalapi)
-class ACowboynoutGameMode : public AGameModeBase
+class ACowboynoutGameModeUI : public AGameModeBase
 {
 	GENERATED_BODY()
 
 public:
-	ACowboynoutGameMode();
-
+	ACowboynoutGameModeUI();
 };
 
 

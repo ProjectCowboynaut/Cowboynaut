@@ -7,6 +7,7 @@
 
 ACowboynoutGameMode::ACowboynoutGameMode()
 {
+
 	// use our custom PlayerController class
 	PlayerControllerClass = ACowboynoutPlayerController::StaticClass();
 

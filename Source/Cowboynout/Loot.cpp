@@ -3,22 +3,21 @@
 #include "Loot.h"
 
 
-// Sets default values for this component's properties
 ULoot::ULoot() {
 	PrimaryComponentTick.bCanEverTick = true;
 
+	// set base loot chances
 	dropChanceA = .7f;
 	dropChanceB = .8f;
 	dropChanceC = .7f;
+	dropChanceH = .3f;
 }
 
-// Called when the game starts
 void ULoot::BeginPlay() {
 	Super::BeginPlay();
 	this->Activate();							// auto activation == true;
 }
 
-// Called every frame
 void ULoot::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 }
@@ -26,7 +25,6 @@ void ULoot::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentT
 void ULoot::DropChance(FVector spawnLoc, AEnemy* enemyChar) {
 
 	// temp fix
-
 	if (enemyChar) enemyType = enemyChar->type;
 	else enemyType = 1;
 	
@@ -46,7 +44,6 @@ void ULoot::DropChance(FVector spawnLoc, AEnemy* enemyChar) {
 	rnd = FMath::RandRange(.0f, 1.0f);
 	for (int i = 0; i < lootMass; i++){
 		if (rnd < dropChanceA) {
-			
 			LootDropA(spawnLoc);
 		}
 	}
@@ -66,6 +63,14 @@ void ULoot::DropChance(FVector spawnLoc, AEnemy* enemyChar) {
 			LootDropC(spawnLoc);
 		}
 	}
+
+	// dropchance health
+	rnd = FMath::RandRange(.0f, 1.0f);
+	for (int i = 0; i < lootMass; i++) {
+		if (rnd < dropChanceH) {
+			LootDropH(spawnLoc);
+		}
+	}
 }
 
 void ULoot::LootDropA(FVector spawnLoc) {
@@ -74,7 +79,7 @@ void ULoot::LootDropA(FVector spawnLoc) {
 	if (droppedItemA) {
 		AActor* theDrop = GetWorld()->SpawnActor<AActor>(droppedItemA, spawnLoc, rot, spawnInfo);
 	}
-	else GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "404: no dropped item found!");
+	else GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "404: no dropped item found! [A]");
 }
 
 void ULoot::LootDropB(FVector spawnLoc) {
@@ -83,9 +88,8 @@ void ULoot::LootDropB(FVector spawnLoc) {
 	if (droppedItemB) {
 		AActor* theDrop = GetWorld()->SpawnActor<AActor>(droppedItemB, spawnLoc, rot, spawnInfo);
 	}
-	else GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "404: no dropped item found!");
+	else GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "404: no dropped item found! [B]");
 }
-
 
 void ULoot::LootDropC(FVector spawnLoc) {
 	FRotator rot;
@@ -93,5 +97,14 @@ void ULoot::LootDropC(FVector spawnLoc) {
 	if (droppedItemC) {
 		AActor* theDrop = GetWorld()->SpawnActor<AActor>(droppedItemC, spawnLoc, rot, spawnInfo);
 	}
-	else GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "404: no dropped item found!");
+	else GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "404: no dropped item found! [C]");
+}
+
+void ULoot::LootDropH(FVector spawnLoc) {
+	FRotator rot;
+	FActorSpawnParameters spawnInfo;
+	if (droppedItemH) {
+		AActor* theDrop = GetWorld()->SpawnActor<AActor>(droppedItemH, spawnLoc, rot, spawnInfo);
+	}
+	else GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "404: no dropped item found! [H]");
 }

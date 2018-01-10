@@ -14,7 +14,7 @@ class AProjectile : public AActor
 
 public:
 	AProjectile();
-	
+
 	UFUNCTION()
 	void DebugMsg(FString msg, float dTime, FColor clr);
 
@@ -29,6 +29,15 @@ public:
 	FORCEINLINE USphereComponent* GetCollisionComp() const {
 		return CollisionComp;
 	}
+
+	UPROPERTY(VisibleAnywhere)
+	bool playerProjectile;
+
+	UPROPERTY(VisibleAnywhere)
+	bool enemyProjectile;
+
+	UPROPERTY(VisibleAnywhere)
+	TArray<AActor*> hitEnemies;
 
 	/** Returns ProjectileMovement subobject **/
 	FORCEINLINE UProjectileMovementComponent* GetProjectileMovement() const {
@@ -49,4 +58,8 @@ public:
 	/** Projectile Damage */
 	UPROPERTY(EditAnywhere, Category = "Projectile")
 	int projectileDamage;
+
+	UPROPERTY(EditAnywhere, Category = "Projectile")
+	int penetration;
+
 };

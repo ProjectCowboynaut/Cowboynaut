@@ -2,7 +2,7 @@
 
 #include "Enemy.h"
 #include "Loot.h"
-#include "Perception/AIPerceptionComponent.h"
+//#include "Perception/AIPerceptionComponent.h"
 #include "CowboynoutPlayerController.h"
 
 
@@ -17,50 +17,105 @@ AEnemy::AEnemy()
 	chipsC = 0;
 	behaviour = 0;							// 0 = go combat range, attack on sight; 1 = alert others; 2 = go close range, explode
 	state = 0;								// 0 = passiv; 1 = allerted, 2 = attacking/triggered
-	armor = 0;
-
+	armor = 1;
 	loopTime = 2.f;
 
 	muzzleLocation = CreateDefaultSubobject<USceneComponent>(TEXT("MuzzleLocation"));
 	muzzleLocation->SetupAttachment(RootComponent);
 
 	canSeePlayer = false;
-}
+	bossEffectTimer = 4.f;
+	bossEffectTimerActive = 0.f;
+	bossFightActive = false;				// set over BP
 
+	pillarsToActivate = 0;
+	pillarsActive = 0;
+}
 
 
 void AEnemy::BeginPlay() {
 	Super::BeginPlay();
 	// trash mob stats
 	if (type == 1) {
-		health = 100;
-		//attackRatio = 3.f;					// faster attacks, less dmg
+		health = 110;
+		attackRatio = attackRatioBase;					// faster attacks, less dmg
+		shieldOneActive = false;
+		shieldOne = 0.f;
+		shieldTwoActive = false;
+		shieldTwo = 0.f;
+		shieldThreeActive = false;
+		shieldThree = 0.f;
+		shieldFourActive = false;
+		shieldFour = 0.f;
+	}
+	// elite mob stats
+	else if (type == 2) {
+		health = 250;
+		attackRatio = attackRatioElite;					// faster attacks, less dmg
+		shieldOneActive = true;
+		shieldOne = 50.f;
+		shieldTwoActive = false;
+		shieldTwo = 0.f;
+		shieldThreeActive = false;
+		shieldThree = 0.f;
+		shieldFourActive = false;
+		shieldFour = 0.f;
 	}
 	// boss mob stats
 	else if (type == 666) {
-		health = 500;
-		//attackRatio = 5.f;					// lower ratio, more dmg per shot
+		health = 510;
+		attackRatio = attackRatioBoss;					// lower ratio, more dmg per shot
+		shieldOneActive = true;
+		shieldOne = 200.f;
+		shieldTwoActive = true;
+		shieldTwo = 200.f;
+		shieldThreeActive = true;
+		shieldThree = 200.f;
+		shieldFourActive = true;
+		shieldFour = 200.f;
 	}
 	else {
-		health = 100;
-		//attackRatio = 3.f;
+		health = 110;
+		attackRatio = attackRatioBase;
+		shieldOneActive = false;
+		shieldOne = 0.f;
+		shieldTwoActive = false;
+		shieldTwo = 0.f;
+		shieldThreeActive = false;
+		shieldThree = 0.f;
+		shieldFourActive = false;
+		shieldFour = 0.f;
 	}
 
-
-	//Timer handler
-	FTimerHandle TimerHandle;
-
-	//Activate the Timer
-	//1st Parameter: TimerHandle
-	//2nd Parameter: The Object related to this timer
-	//3rd Parameter: The function that is going to be fired
-	//4th Parameter: The loop time
-	//5th Parameter: True - if you want this timer to loop, false otherwise
-	// GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AEnemy::DoAPeriodicCheck, loopTime, true);
+	// disable boss dmg area on start
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), PillarBPClass, foundPillars);
+	TArray<UActorComponent*> children;
+	for (int z = 0; z < foundPillars.Num(); z++) {
+		if (foundPillars.IsValidIndex(z))
+			foundPillars[z]->GetComponents(children);
+		for (int i = 0; i < children.Num(); i++) {
+			if (children.IsValidIndex(i)) {
+				UActorComponent* child = children[i];
+				FString name = child->GetName();
+				USceneComponent* node = Cast<USceneComponent>(children[i]);
+				if (child->GetName() == "BossAreaDamage") {
+					child->Deactivate();
+					node->ToggleVisibility(true);
+					//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, "-d");
+				}
+				else if (child->GetName() == "BossAreaWarning") {
+					child->Deactivate();
+					node->ToggleVisibility(true);
+					//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, "-w");
+				}
+			}
+		}
+	}
 }
 
 void AEnemy::Tick(float deltaTime) {
 	Super::Tick(deltaTime);
+
 	if (timerActive)
 		timer += deltaTime;
 	if (timer > attackRatio) {
@@ -73,18 +128,101 @@ void AEnemy::Tick(float deltaTime) {
 	}
 
 	if (deathTimerActive) {
-		ACowboynoutPlayerController* Ctrl = Cast<ACowboynoutPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+		ACowboynoutPlayerController* pCtrl = Cast<ACowboynoutPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 		if (playerChar) {
-			Ctrl->endGame = true;
-			Ctrl->deathTimerFull = Ctrl->endCD;
+			pCtrl->endGame = true;
+			pCtrl->deathTimerFull = pCtrl->endCD;
 		}
-
 	}
-	
+
+	if (bossFightActive) {
+		BossFight(deltaTime);
+	}
 }
 
-void AEnemy::SenseStuff(TArray<AActor*> testActors)
-{
+void AEnemy::BossFight(float deltaTime) {
+	// pillars
+	bossEffectTimerActive += deltaTime;
+	if (bossEffectTimerActive >= bossEffectTimer) {
+		// > enable 2 plates
+		bossEffectTimerActive = 0;
+		bossEffectTimer = FMath::RandRange(1.f, 6.f);
+
+		UGameplayStatics::GetAllActorsOfClass(GetWorld(), PillarBPClass, foundPillars);
+		pillars = foundPillars.Num();
+
+#pragma region de-/activate half the pillars
+
+		pillarsToActivate = pillars / 2;
+		pillarsActive = 0;
+		FString msg = "# of pillars to activate: ";
+		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::White, msg + FString::FromInt(pillarsToActivate));
+		pa = -1;
+		pillarsLastActive = -1;
+
+		while (pillarsActive < pillarsToActivate) {
+			while (pa == pillarsLastActive)
+				pa = FMath::RandRange(0, foundPillars.Num()-1);
+
+			FString msg = "activating pillar: ";
+			GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::White, msg + FString::FromInt(pa));
+			// -----
+			TArray<UActorComponent*> childComp;
+			//for (int p = 0; p < pillars; p++) {
+				// check if pillar is to activate or not
+				
+				foundPillars[pa]->GetComponents(childComp);
+				if (childComp.IsValidIndex(pa)) {
+					UActorComponent* child = childComp[pa];
+						
+					for (UActorComponent* c : childComp) {
+
+						FString name = c->GetName();
+						if (c->GetName() == "BossAreaDamage") {
+							USceneComponent* node = Cast<USceneComponent>(c);
+							if (c->IsActive()) {
+								c->Deactivate();
+								node->ToggleVisibility(true);
+								FString msg = c->GetName() + " + " + FString::FromInt(pa) + "+";
+								GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, msg);
+							}
+							else {
+								c->Activate();
+								node->ToggleVisibility(true);
+								FString msg = c->GetName() + " + " + FString::FromInt(pa) + "-";
+								GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, msg);
+							}
+						}
+						else if (c->GetName() == "BossAreaWarning") {
+							USceneComponent* node = Cast<USceneComponent>(c);
+							if (c->IsActive()) {
+								c->Deactivate();
+								node->ToggleVisibility(true);
+								FString msg = c->GetName() + " + " + FString::FromInt(pa) + "+";
+								GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, msg);
+							}
+							else {
+								c->Activate();	
+								node->ToggleVisibility(true);
+								FString msg = c->GetName() + " + " + FString::FromInt(pa) + "-";
+								GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, msg);
+							}
+						}
+						
+					}
+
+				}
+			//}
+			// -----
+			pillarsLastActive = pa;
+			pillarsActive++;
+		}	
+#pragma endregion
+
+	}
+}
+
+void AEnemy::SenseStuff(TArray<AActor*> testActors) {
 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "I see you!");
 }
 
@@ -112,15 +250,12 @@ void AEnemy::Die() {
 
 	if (type == 666) {
 		deathTimerActive = true;
-
 	}
 
 	Destroy();
-
 }
 
-void AEnemy::DoAPeriodicCheck()
-{
+void AEnemy::DoAPeriodicCheck() {
 	FString msg = this->GetName();
 	GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::White, msg + ": Periodic Check has fired!");
 	//GLog->Log("Periodic Check has fired!");
@@ -128,12 +263,10 @@ void AEnemy::DoAPeriodicCheck()
 
 void AEnemy::Attack() {
 	timerActive = true;
-	//GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::White, ": pewpew");
-	//if (AEnemy* eChar = Cast<AEnemy>(GetController())) {
 	FRotator rot = GetActorRotation();
 	FActorSpawnParameters spawnInfo;
 	AProjectile* bullet = GetWorld()->SpawnActor<AProjectile>(ProjectileClass, muzzleLocation->GetComponentLocation(), rot, spawnInfo);
-	//}
+	if (bullet) PlaySound(1);
 }
 
 void AEnemy::MouseOverBegin(UPrimitiveComponent* TouchedComponent) {
@@ -153,7 +286,105 @@ void AEnemy::MouseOverEnd() {
 	}
 }
 
-void AEnemy::Damage(int dmg) {
-	health -= dmg;
+void AEnemy::DestroyShield() {
+	if (shieldFourActive) {
+		shieldFour = 0;
+		shieldFourActive = false;
+	}
+	else if (shieldThreeActive) {
+		shieldThree = 0;
+		shieldThreeActive = false;
+	}
+	else if (shieldTwoActive) {
+		shieldTwo = 0;
+		shieldTwoActive = false;
+	}
+	else if (shieldOneActive) {
+		shieldOne = 0;
+		shieldOneActive = false;
+	}
 }
 
+void AEnemy::Damage(int dmg) {
+	if (type == 1) {
+		health -= dmg;
+	}
+	else if (type == 2) {
+		if (shieldOneActive) {
+			if (shieldOne > dmg) {
+				shieldOne -= dmg;
+			}
+			else {
+				shieldOne = 0;
+				shieldOneActive = false;
+			}
+		}
+		else
+			health -= dmg;
+	}
+	else if (type == 666) {
+		if (shieldFourActive) {
+			if (shieldFour > dmg) {
+				shieldFour -= dmg;
+			}
+			else {
+				shieldFour = 0;
+				shieldFourActive = false;
+			}
+		}
+		else if (shieldThreeActive) {
+			if (shieldThree > dmg) {
+				shieldThree -= dmg;
+			}
+			else {
+				shieldThree = 0;
+				shieldThreeActive = false;
+			}
+		}
+		else if (shieldTwoActive) {
+			if (shieldTwo > dmg) {
+				shieldTwo -= dmg;
+			}
+			else {
+				shieldTwo = 0;
+				shieldTwoActive = false;
+			}
+		}
+		else if (shieldOneActive) {
+			if (shieldOne > dmg) {
+				shieldOne -= dmg;
+			}
+			else {
+				shieldOne = 0;
+				shieldOneActive = false;
+			}
+		}
+		else {
+			health -= dmg;
+		}
+		
+	}
+	else{
+		health -= dmg;
+	}
+}
+
+
+// 0: been hit; 1: attack; 
+void AEnemy::PlaySound(int sound) {
+	float volumeMultiplier = 1.f;
+	float pitchMultiplier = 1.f;
+	float startTime = 0.f;
+
+	UObject* worldContextObject = GetWorld();
+	if (sound == 1) {
+		int rnd = FMath::RandRange(0, 3);
+		if (rnd == 1)
+			UGameplayStatics::PlaySound2D(worldContextObject, soundSkill1a, volumeMultiplier, pitchMultiplier, startTime);
+		else if (rnd == 2)
+			UGameplayStatics::PlaySound2D(worldContextObject, soundSkill1b, volumeMultiplier, pitchMultiplier, startTime);
+		else if (rnd == 3)
+			UGameplayStatics::PlaySound2D(worldContextObject, soundSkill1c, volumeMultiplier, pitchMultiplier, startTime);
+	}
+		
+}

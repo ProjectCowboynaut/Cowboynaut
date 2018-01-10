@@ -14,8 +14,45 @@ class ACowboynoutCharacter : public ACharacter
 	GENERATED_BODY()
 
 public:
-
 	ACowboynoutCharacter();
+
+	UPROPERTY(VisibleAnywhere, Category = "Level Stuff")
+	TArray<AActor*> foundActors;
+
+	// find all level barrikades
+	UPROPERTY(EditDefaultsOnly, Category = "Level Stuff")
+	TSubclassOf<AActor> BarrierBPClass; // Needs to be populated somehow (e.g. by exposing to blueprints as uproperty and setting it there
+
+	UPROPERTY(VisibleAnywhere, Category = "Level Stuff")
+	TArray<AActor*> foundActorsBarr;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Level Stuff")
+	int bossBarrikades;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Level Stuff")
+	int enemiesTotal;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Level Stuff")
+	int enemiesActual;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Level Stuff")
+	bool enemiesSet;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Level Stuff")
+	int enemiesToDisableBarrier;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category ="Level Stuff")
+	int barriersDisabled;
+
+	/** Returns CollisionComp subobject **/
+	FORCEINLINE USphereComponent* GetCollisionComp() const { return CollisionComp; }
+
+	/** Sphere collision component */
+	UPROPERTY(VisibleDefaultsOnly, Category = "Character")
+	USphereComponent* CollisionComp;
+
+	UFUNCTION(BlueprintCallable)
+	void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 	// Called every frame.
 	virtual void Tick(float DeltaSeconds) override;
@@ -32,18 +69,43 @@ public:
 	FORCEINLINE 
 	class UDecalComponent* GetCursorToWorld() { return CursorToWorld; }
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void Damage(int dmg);
 
-	/** Projectile class to spawn */
+	// SkillBlueprints (Tier 1-3 each)
 	UPROPERTY(EditDefaultsOnly, Category = "Projectile")
-	TSubclassOf<class AProjectile> ProjectileClass;
+	TSubclassOf<class AProjectile> ProjectileClassT1;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Projectile")
+	TSubclassOf<class AProjectile> ProjectileClassT2;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Projectile")
+	TSubclassOf<class AProjectile> ProjectileClassT3;
 
 	UPROPERTY()
 	AGrenade* nade;
 
 	UPROPERTY()
 	FVector nadeLoc;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Projectile")
+	TSubclassOf<class AGrenade> GrenadeClassT1;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Projectile")
+	TSubclassOf<class AGrenade> GrenadeClassT2;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Projectile")
+	TSubclassOf<class AGrenade> GrenadeClassT3;
+
+	UPROPERTY()
+	bool explodeNade;
+
+	// Skills Levels
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "PlayerStats")
+	int skillLvlOne;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "PlayerStats")
+	int skillLvlTwo;
 
 	UFUNCTION()
 	void FireSkillOne();
@@ -100,22 +162,18 @@ public:
 	UPROPERTY(VisibleAnywhere, BluePrintReadWrite, Category = "Animations")
 	bool animDying = false;
 	
-	/** Location on gun mesh where projectiles should spawn. */
+	//  projectiles spawn
 	UPROPERTY(VisibleDefaultsOnly, Category = "Character")
 	USceneComponent* muzzleLocation;
 
-	UPROPERTY()
-	float deathTimer;
+	UPROPERTY(VisibleDefaultsOnly, Category = "Character")
+	USceneComponent* muzzleLocationL;
 
-	UPROPERTY()
-	float deathTimerFull;
+	UPROPERTY(VisibleDefaultsOnly, Category = "Character")
+	USceneComponent* muzzleLocationR;
 
 	UPROPERTY()
 	bool dead;
-
-	/** nade class to spawn */
-	UPROPERTY(EditDefaultsOnly, Category = "Projectile")
-	TSubclassOf<class AGrenade> GrenadeClass;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "PlayerStats")
 	int hasTarget;
@@ -123,6 +181,7 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "PlayerStats")			// 0: no target; 1: enemy target; 2: usable
 	FString targetString;
 
+	// "Inventory"
 	UPROPERTY(EditAnywhere, Category= "Loot")
 	int chipsA;
 
@@ -132,7 +191,7 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Loot")
 	int chipsC;
 
-	// stats
+	// player stats
 	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "PlayerStats")
 	float life;
 
@@ -145,12 +204,49 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "PlayerStats")
 	int attack;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "PlayerStats")
-	int skillLvlTwo;
-	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "PlayerStats")
-	int skillLvlOne;
+	// player stat gains
+	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "PlayerStats")
+	float lifeGainPerLevel;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "PlayerStats")
+	int speedGainPerLevel;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "PlayerStats")
+	int attackGainPerLevel;
+
+	// Soundstuff
+	UFUNCTION()
+	void PlaySound(int sound);
+
+	UPROPERTY(EditDefaultsOnly, Category = "SFX")
+	USoundBase* soundSkill1;
+
+	UPROPERTY(EditDefaultsOnly, Category = "SFX")
+	USoundBase* soundSkill2shot;
+
+	UPROPERTY(EditDefaultsOnly, Category = "SFX")
+	USoundBase* soundSkill2explosion;
+
+	UPROPERTY(EditDefaultsOnly, Category = "SFX")
+	USoundBase* soundLowLife;
+
+	UPROPERTY(EditDefaultsOnly, Category = "SFX")
+	USoundBase* soundDead;
+
+	UPROPERTY(EditDefaultsOnly, Category = "SFX")
+	float lifeWarningValue;
+
+	UPROPERTY()
+	float deathTimer;
+
+	UPROPERTY()
+	float deathTimerFull;
+
+	UPROPERTY()
+	float lifeWarningTimer;
+
+	UPROPERTY()
+	float lifeWarningTimerFull;
 
 private:
 

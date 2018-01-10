@@ -82,7 +82,7 @@ protected:
 	void MoveToMouseCursor();
 	
 	/** Navigate player to the given world location. */
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void SetNewMoveDestination(const FVector DestLocation);
 
 	/** Input handlers for SetDestination action. */
@@ -103,6 +103,12 @@ protected:
 
 	UFUNCTION()
 	void OnSetStationairyReleased();
+
+	UFUNCTION()
+	void OnSkillOneLevelUp();
+	
+	UFUNCTION()
+	void OnSkillTwoLevelUp();
 
 	// Rotation
 	UFUNCTION()
