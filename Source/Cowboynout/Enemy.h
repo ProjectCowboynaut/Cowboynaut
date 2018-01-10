@@ -46,7 +46,7 @@ public:
 	void DestroyShield();
 
 	UPROPERTY(EditDefaultsOnly, BluePrintReadWrite)
-	bool bossFight;
+	bool bossFightActive;
 
 	UPROPERTY()
 	float bossEffectTimer;
@@ -69,6 +69,30 @@ public:
 
 	UPROPERTY()
 	int pillars;
+
+	UPROPERTY()
+	int pillarsToActivate;
+
+	UPROPERTY()
+	int pillarsActive;
+
+	UPROPERTY()
+	int pillarsLastActive;
+
+	UPROPERTY()
+	int pa;
+
+	UPROPERTY()
+	int pa2;
+
+	UPROPERTY()
+	int pa_;
+
+	UPROPERTY()
+	int pa2_;
+
+	UFUNCTION()
+	void BossFight(float deltaTime);
 
 	/** Location on gun mesh where projectiles should spawn. */
 	UPROPERTY(VisibleDefaultsOnly, Category = "Character")

@@ -26,7 +26,10 @@ AEnemy::AEnemy()
 	canSeePlayer = false;
 	bossEffectTimer = 4.f;
 	bossEffectTimerActive = 0.f;
-	bossFight = false;
+	bossFightActive = false;				// set over BP
+
+	pillarsToActivate = 0;
+	pillarsActive = 0;
 }
 
 
@@ -84,21 +87,27 @@ void AEnemy::BeginPlay() {
 		shieldFour = 0.f;
 	}
 
+	// disable boss dmg area on start
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), PillarBPClass, foundPillars);
 	TArray<UActorComponent*> children;
-	if (foundPillars.Num() > 0) foundPillars[0]->GetComponents(children);
-
-	for (int i = 0; i < children.Num(); i++) {
-		if (children[i]) {
-			UActorComponent* child = children[i];
-			FString name = child->GetName();
-			if (child->GetName() == "bossAreaDamage") {
-				child->Deactivate();
-				GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, "-d");
-			}
-			else if (child->GetName() == "bossAreaWarning") {
-				child->Deactivate();
-				GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, "-w");
+	for (int z = 0; z < foundPillars.Num(); z++) {
+		if (foundPillars.IsValidIndex(z))
+			foundPillars[z]->GetComponents(children);
+		for (int i = 0; i < children.Num(); i++) {
+			if (children.IsValidIndex(i)) {
+				UActorComponent* child = children[i];
+				FString name = child->GetName();
+				USceneComponent* node = Cast<USceneComponent>(children[i]);
+				if (child->GetName() == "BossAreaDamage") {
+					child->Deactivate();
+					node->ToggleVisibility(true);
+					//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, "-d");
+				}
+				else if (child->GetName() == "BossAreaWarning") {
+					child->Deactivate();
+					node->ToggleVisibility(true);
+					//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, "-w");
+				}
 			}
 		}
 	}
@@ -126,56 +135,90 @@ void AEnemy::Tick(float deltaTime) {
 		}
 	}
 
-	if (bossFight) {
-		// boss room effect
-		// random timer
-		bossEffectTimerActive += deltaTime;
-		if (bossEffectTimerActive >= bossEffectTimer) {
-			// > enable 2 plates
-			bossEffectTimerActive = 0;
-			bossEffectTimer = FMath::RandRange(1.f,6.f);
+	if (bossFightActive) {
+		BossFight(deltaTime);
+	}
+}
 
-			UGameplayStatics::GetAllActorsOfClass(GetWorld(), PillarBPClass, foundPillars);
-			pillars = foundPillars.Num();
+void AEnemy::BossFight(float deltaTime) {
+	// pillars
+	bossEffectTimerActive += deltaTime;
+	if (bossEffectTimerActive >= bossEffectTimer) {
+		// > enable 2 plates
+		bossEffectTimerActive = 0;
+		bossEffectTimer = FMath::RandRange(1.f, 6.f);
 
-			TArray<UActorComponent*> children;
-			foundPillars[0]->GetComponents(children);
+		UGameplayStatics::GetAllActorsOfClass(GetWorld(), PillarBPClass, foundPillars);
+		pillars = foundPillars.Num();
 
-			for (int i = 0; i < children.Num(); i++) {
-				if (children[i]) {
-					UActorComponent* child = children[i];
-					FString name = child->GetName();
-					if (child->GetName() == "bossAreaDamage") {
-						if (child->IsActive()) {
-							child->Deactivate();
-							USceneComponent* node = Cast<USceneComponent>(child);
-							node->ToggleVisibility(true);
-							GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, "+");
+#pragma region de-/activate half the pillars
+
+		pillarsToActivate = pillars / 2;
+		pillarsActive = 0;
+		FString msg = "# of pillars to activate: ";
+		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::White, msg + FString::FromInt(pillarsToActivate));
+		pa = -1;
+		pillarsLastActive = -1;
+
+		while (pillarsActive < pillarsToActivate) {
+			while (pa == pillarsLastActive)
+				pa = FMath::RandRange(0, foundPillars.Num()-1);
+
+			FString msg = "activating pillar: ";
+			GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::White, msg + FString::FromInt(pa));
+			// -----
+			TArray<UActorComponent*> childComp;
+			//for (int p = 0; p < pillars; p++) {
+				// check if pillar is to activate or not
+				
+				foundPillars[pa]->GetComponents(childComp);
+				if (childComp.IsValidIndex(pa)) {
+					UActorComponent* child = childComp[pa];
+						
+					for (UActorComponent* c : childComp) {
+
+						FString name = c->GetName();
+						if (c->GetName() == "BossAreaDamage") {
+							USceneComponent* node = Cast<USceneComponent>(c);
+							if (c->IsActive()) {
+								c->Deactivate();
+								node->ToggleVisibility(true);
+								FString msg = c->GetName() + " + " + FString::FromInt(pa) + "+";
+								GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, msg);
+							}
+							else {
+								c->Activate();
+								node->ToggleVisibility(true);
+								FString msg = c->GetName() + " + " + FString::FromInt(pa) + "-";
+								GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, msg);
+							}
 						}
-						else {
-							child->Activate();
-							USceneComponent* node = Cast<USceneComponent>(child);
-							node->ToggleVisibility(true);
-							GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "-");
+						else if (c->GetName() == "BossAreaWarning") {
+							USceneComponent* node = Cast<USceneComponent>(c);
+							if (c->IsActive()) {
+								c->Deactivate();
+								node->ToggleVisibility(true);
+								FString msg = c->GetName() + " + " + FString::FromInt(pa) + "+";
+								GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, msg);
+							}
+							else {
+								c->Activate();	
+								node->ToggleVisibility(true);
+								FString msg = c->GetName() + " + " + FString::FromInt(pa) + "-";
+								GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, msg);
+							}
 						}
+						
 					}
-					else if (child->GetName() == "bossAreaWarning") {
-						if (child->IsActive()) {
-							child->Deactivate();
-							USceneComponent* node = Cast<USceneComponent>(child);
-							node->ToggleVisibility(true);
-							GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Green, "+");
-						}
-						else {
-							child->Activate();
-							USceneComponent* node = Cast<USceneComponent>(child);
-							node->ToggleVisibility(true);
-							GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "-");
-						}
-					}
+
 				}
-			}
-		}
+			//}
+			// -----
+			pillarsLastActive = pa;
+			pillarsActive++;
+		}	
+#pragma endregion
+
 	}
 }
 
