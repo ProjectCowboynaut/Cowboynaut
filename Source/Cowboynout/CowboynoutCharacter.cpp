@@ -92,6 +92,7 @@ ACowboynoutCharacter::ACowboynoutCharacter() {
 	chipsA = 0;
 	chipsB = 0;
 	chipsC = 0;
+	medPacks = 0;
 
 	// base level up gains in percent
 	lifeGainPerLevel = 10;

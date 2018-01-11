@@ -106,17 +106,17 @@ void AProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimi
 				// check for penetration and sub enemy armor
 				if (penetration - hitEnemy->armor <= 0) {
 					Destroy();
-					DebugMsg("*", 1.5f, FColor::Yellow);
+					//DebugMsg("*", 1.5f, FColor::Yellow);
 				}
 				else {
 					penetration = penetration - hitEnemy->armor;
-					DebugMsg("-1p", 1.5f, FColor::Yellow);
+					//DebugMsg("-1p", 1.5f, FColor::Yellow);
 				}
 			}
 		}
 
 		if (OtherActor->ActorHasTag("Destructible")) {
-			DebugMsg("!", 1.5f, FColor::Red);
+			//DebugMsg("!", 1.5f, FColor::Red);
 		}
 		
 		//// Only add impulse and destroy projectile if we hit a physics
@@ -147,17 +147,17 @@ void AProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimi
 		AActor* hitActor = Cast<AActor>(OtherActor);
 		if (hitEnemy != NULL) {
 			if (hitEnemies.Contains(hitActor)) {
-				DebugMsg("schon getroffen", 1.5f, FColor::Yellow);
+				//DebugMsg("schon getroffen", 1.5f, FColor::Yellow);
 			}
 			else {
 				hitEnemies.AddUnique(hitActor);
 				if (penetration - hitEnemy->armor <= 0) {
 					Destroy();
-					DebugMsg("*", 1.5f, FColor::Yellow);
+					//DebugMsg("*", 1.5f, FColor::Yellow);
 				}
 				else {
 					penetration = penetration - hitEnemy->armor;
-					DebugMsg("-1p", 1.5f, FColor::Yellow);
+					//DebugMsg("-1p", 1.5f, FColor::Yellow);
 				}
 			}
 		}

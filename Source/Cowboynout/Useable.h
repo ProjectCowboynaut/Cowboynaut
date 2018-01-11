@@ -29,6 +29,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BluePrintReadOnly)
 	bool isMouseOver;
 
+	UFUNCTION(BlueprintCallable)
+	void AllowUpgrade(int state);
+
 protected:
 
 	virtual void BeginPlay() override;

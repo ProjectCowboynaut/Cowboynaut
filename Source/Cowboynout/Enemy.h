@@ -5,6 +5,7 @@
 #include "Cowboynout.h"
 #include "CowboynoutCharacter.h"
 #include "AIController.h"
+#include "AAIAgent.h"
 #include "Perception/AISense.h"
 #include "GameFramework/Character.h"
 #include "Projectile.h"

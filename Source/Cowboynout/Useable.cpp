@@ -15,11 +15,22 @@ void AUseable::Tick(float DeltaTime) {
 	Super::Tick(DeltaTime);
 }
 
+void AUseable::AllowUpgrade(int state) {
+	if (state == 0) {
+		ACowboynoutPlayerController* pCtrl = Cast<ACowboynoutPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+		pCtrl->canUpgrade = true;
+	}
+	else if (state == 1) {
+		ACowboynoutPlayerController* pCtrl = Cast<ACowboynoutPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+		pCtrl->canUpgrade = true;
+	}
+}
+
 void AUseable::MouseOverBegin(UPrimitiveComponent* TouchedComponent) {
 	isMouseOver = true;
 
 	playerChar = Cast<ACowboynoutCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
-	
+
 	//FString msg = "[mouse over begin]";
 	FString hitObjectName = this->GetFName().ToString();
 
@@ -34,7 +45,7 @@ void AUseable::MouseOverBegin(UPrimitiveComponent* TouchedComponent) {
 
 void AUseable::MouseOverEnd() {
 	isMouseOver = false;
-
+	
 	playerChar = Cast<ACowboynoutCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
 	if (playerChar) {
 		playerChar->SetTarget(0);

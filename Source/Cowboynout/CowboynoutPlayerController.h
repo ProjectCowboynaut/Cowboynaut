@@ -26,6 +26,7 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widgets")
 	TSubclassOf<class UUserWidget> wInfoW;
+
 	UPROPERTY()
 	UUserWidget* myInfoW;
 
@@ -65,10 +66,8 @@ public:
 	UPROPERTY()
 	ACowboynoutCharacter* cowboy;
 
-protected:
 	/** True if the controlled character should navigate to the mouse cursor. */
 	uint32 bMoveToMouseCursor : 1;
-	
 
 	// Begin PlayerController interface
 	UFUNCTION()
@@ -143,6 +142,9 @@ protected:
 	void OnSkillThreePressed();
 
 	UFUNCTION()
+	void OnUseMedPack();
+
+	UFUNCTION()
 	void OnSkillThreeReleased();
 
 	UFUNCTION()
@@ -158,6 +160,9 @@ protected:
 	void SkillThree();
 
 	UFUNCTION()
+	void MedPack();
+
+	UFUNCTION()
 	void OnSimulateDamagePressed();
 
 	UFUNCTION()
@@ -165,6 +170,15 @@ protected:
 	
 	UFUNCTION()
 	void SimulateDamage();
+
+	UFUNCTION()
+	void PlusStatA();
+
+	UFUNCTION()
+	void PlusStatB();
+
+	UFUNCTION()
+	void PlusStatC();
 
 	UPROPERTY(VisibleAnywhere, BluePrintReadWrite, Category = "Character")
 	AProjectile* projectile;
@@ -184,6 +198,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Info") 
 	bool isAttacking;
+
+	UPROPERTY(EditAnywhere, BluePrintReadWrite, Category = "Info")
+	bool canUpgrade;
 
 	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Info") 
 	bool combat;

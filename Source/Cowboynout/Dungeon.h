@@ -4,6 +4,7 @@
 
 #include "Cowboynout.h"
 #include "GameFramework/Actor.h"
+#include "Enemy.h"
 #include "Dungeon.generated.h"
 
 UENUM(BlueprintType)
@@ -11,7 +12,14 @@ enum class ETileEnum : uint8
 {
 	TE_Void 	UMETA(DisplayName = "Void"),
 	TE_Floor	UMETA(DisplayName = "Floor"),
-	TE_Wall		UMETA(DisplayName = "Wall"),
+	TE_WallLL	UMETA(DisplayName = "WallLL"),
+	TE_WallUU	UMETA(DisplayName = "WallUU"),
+	TE_WallRR	UMETA(DisplayName = "WallRR"),
+	TE_WallDD	UMETA(DisplayName = "WallDD"),
+	TE_WallUL	UMETA(DisplayName = "WallUL"),
+	TE_WallUR	UMETA(DisplayName = "WallUR"),
+	TE_WallDL	UMETA(DisplayName = "WallDL"),
+	TE_WallDR	UMETA(DisplayName = "WallDR"),
 	TE_Max		UMETA(DisplayName = "Max (dont use)")
 };
 
@@ -20,14 +28,14 @@ struct FTileStruct
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditDefaultsOnly)
-	ETileEnum type;
+		UPROPERTY(EditDefaultsOnly)
+		ETileEnum type;
 
 	UPROPERTY(EditDefaultsOnly)
-	UStaticMesh* mesh;
+		UStaticMesh* mesh;
 
 	UPROPERTY()
-	UInstancedStaticMeshComponent* iscm;
+		UInstancedStaticMeshComponent* iscm;
 
 };
 
@@ -36,8 +44,8 @@ struct FTileArrayStruct
 {
 	GENERATED_BODY()
 
-	UPROPERTY()
-	TArray<UInstancedStaticMeshComponent*> tiles;
+		UPROPERTY()
+		TArray<UInstancedStaticMeshComponent*> tiles;
 };
 
 USTRUCT(BlueprintType)
@@ -45,36 +53,86 @@ struct FRoom
 {
 	GENERATED_BODY()
 
-	UPROPERTY()
-	int positionX;
-
-	UPROPERTY()
-	int positionY;
-
-	UPROPERTY()
-	int sizeX;
-
-	UPROPERTY()
-	int sizeY;
-
-	int GetCenterX()
+		FRoom()
 	{
-		return sizeX / 2 + positionX;
+		location = FVector2D(0, 0);
+		extends = FVector2D(1, 1);
 	}
 
-	int GetCenterY()
+	FRoom(FVector2D loc, FVector2D ext)
 	{
-		return sizeY / 2 + positionY;
+		location = loc;
+		extends = ext;
 	}
 
-	bool CollidesWithRoom(FRoom room)
+	FVector2D getMin()
 	{
-		if (positionX + sizeX < room.positionX) return false; // a is left of b
-		if (positionX > room.positionX + room.sizeX) return false; // a is right of b
-		if (positionY + sizeY < room.positionY) return false; // a is above b
-		if (positionY > room.positionY + room.sizeY) return false; // a is below b
-		return true; // boxes overlap
+		return FVector2D(location.X - extends.X, location.Y - extends.Y);
 	}
+
+	FVector2D getMax()
+	{
+		return FVector2D(location.X + extends.X, location.Y + extends.Y);
+	}
+
+	FVector2D getSize()
+	{
+		return FVector2D(2 * extends.X + 1, 2 * extends.Y + 1);
+	}
+
+	FRoom minkowskiDifference(FRoom other)
+	{
+		FVector2D topLeft = getMin() - other.getMin();
+		FVector2D fullSize = getSize() + other.getSize();
+		return FRoom(topLeft + (fullSize / 2), fullSize / 2);
+	}
+
+	bool isCollidingWith(FRoom other)
+	{
+		return (FMath::Abs(getMin().X - 1 - other.getMin().X - 1) * 2 < (getSize().X + 1 + other.getSize().X + 1) &&
+			FMath::Abs(getMin().Y - 1 - other.getMin().Y - 1) * 2 < (getSize().Y + 1 + other.getSize().Y + 1));
+		/*
+		FRoom md = minkowskiDifference(other);
+		return (md.getMin().Y <= 0 &&
+		md.getMax().X >= 0 &&
+		md.getMin().Y <= 0 &&
+		md.getMax().Y >= 0);
+		*/
+	}
+
+	FVector2D closestPointOnBoundsToPoint(FVector2D point)
+	{
+		float minDist = FMath::Abs(point.X - getMin().X);
+		FVector2D boundsPoint = FVector2D(getMin().X, point.Y);
+		if (FMath::Abs(getMax().X - point.X) < minDist)
+		{
+			minDist = FMath::Abs(getMax().X - point.X);
+			boundsPoint = FVector2D(getMax().X, point.Y);
+		}
+		if (FMath::Abs(getMax().Y - point.Y) < minDist)
+		{
+			minDist = FMath::Abs(getMax().Y - point.Y);
+			boundsPoint = FVector2D(point.X, getMax().Y);
+		}
+		if (FMath::Abs(getMin().Y - point.Y) < minDist)
+		{
+			minDist = FMath::Abs(getMin().Y - point.Y);
+			boundsPoint = FVector2D(point.X, getMin().Y);
+		}
+		return boundsPoint;
+	}
+
+	FVector2D getPenetrationVector(FRoom other)
+	{
+		FRoom minkowski = minkowskiDifference(other);
+		return minkowski.closestPointOnBoundsToPoint(FVector2D::ZeroVector);
+	}
+
+	UPROPERTY()
+		FVector2D location;
+
+	UPROPERTY()
+		FVector2D extends;
 };
 
 UCLASS()
@@ -100,18 +158,32 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	UPROPERTY(EditDefaultsOnly, Category = Level)
-	float tileSize;
+		float tileSize;
 
 	UPROPERTY(EditDefaultsOnly, Category = Level)
-	int gridSize;
+		int gridSize;
 
 	UPROPERTY(EditDefaultsOnly, Category = Level)
-	int roomSize;
+		int roomSize;
 
 	UPROPERTY(EditDefaultsOnly, Category = Level)
-	TArray<FTileStruct> tiles;
+		int amountEnemies;
+
+	UPROPERTY(EditDefaultsOnly, Category = Level)
+		TArray<FTileStruct> tiles;
 
 	UPROPERTY()
-	TArray<FTileArrayStruct> tilesArray;
+		TArray<FTileArrayStruct> tilesArray;
+
+	UPROPERTY(EditDefaultsOnly, Category = Level)
+		TSubclassOf<class AEnemy> enemyBP;
+
+	UPROPERTY(EditDefaultsOnly, Category = Level)
+		TSubclassOf<class AActor> TPEnter;
+
+	UPROPERTY(EditDefaultsOnly, Category = Level)
+		TSubclassOf<class AActor> TPExit;
+
+	static FVector2D getRandomPointInCircle(float radius);
 
 };

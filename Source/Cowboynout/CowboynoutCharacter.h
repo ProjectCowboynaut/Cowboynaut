@@ -191,6 +191,9 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Loot")
 	int chipsC;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Loot")
+	int medPacks;
+
 	// player stats
 	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "PlayerStats")
 	float life;

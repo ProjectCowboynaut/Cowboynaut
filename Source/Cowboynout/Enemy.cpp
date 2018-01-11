@@ -1,8 +1,10 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "Enemy.h"
+#include <limits>
 #include "Loot.h"
 //#include "Perception/AIPerceptionComponent.h"
+#include "AAIAgent.h"
 #include "CowboynoutPlayerController.h"
 
 
@@ -15,7 +17,7 @@ AEnemy::AEnemy()
 	chipsA = 0;
 	chipsB = 0;
 	chipsC = 0;
-	behaviour = 0;							// 0 = go combat range, attack on sight; 1 = alert others; 2 = go close range, explode
+	behaviour = 0;							// 1 = go combat range, attack on sight; 2 = alert others; 3 = go close range, explode
 	state = 0;								// 0 = passiv; 1 = allerted, 2 = attacking/triggered
 	armor = 1;
 	loopTime = 2.f;
@@ -50,10 +52,10 @@ void AEnemy::BeginPlay() {
 	}
 	// elite mob stats
 	else if (type == 2) {
-		health = 250;
+		health = 200;
 		attackRatio = attackRatioElite;					// faster attacks, less dmg
-		shieldOneActive = true;
-		shieldOne = 50.f;
+		shieldOneActive = false;
+		shieldOne = 0;
 		shieldTwoActive = false;
 		shieldTwo = 0.f;
 		shieldThreeActive = false;
@@ -75,8 +77,9 @@ void AEnemy::BeginPlay() {
 		shieldFour = 200.f;
 	}
 	else {
+		type = 1;
 		health = 110;
-		attackRatio = attackRatioBase;
+		attackRatio = attackRatioBase;					// faster attacks, less dmg
 		shieldOneActive = false;
 		shieldOne = 0.f;
 		shieldTwoActive = false;
@@ -138,6 +141,31 @@ void AEnemy::Tick(float deltaTime) {
 	if (bossFightActive) {
 		BossFight(deltaTime);
 	}
+
+	// get action to do
+	/*UAAIAgent* ai = AActor::FindComponentByClass<UAAIAgent>();
+*/
+	//// .1 get own health
+	//evalInput.currentHealth = health;
+
+	//// .2 get range to heal
+	//TArray<AActor*> allEnemies;
+	//UGameplayStatics::GetAllActorsOfClass(GetWorld(), AEnemy::StaticClass(), allEnemies);
+
+	//AActor* selectedEnemy;
+	//float rangeToHealer = FLT_MAX;
+
+	//for (auto enemy : allEnemies) {
+	//	if (Cast<AEnemy>(enemy)->type == 2 && GetDistanceTo(enemy) < rangeToHealer)	{
+	//		this->evalInput.rangeToHealer = GetDistanceTo(enemy);
+	//		selectedEnemy = enemy;
+	//	}
+	//}
+
+	//// .3 get range to heal
+	//this->evalInput.rangeToPlayer = GetDistanceTo(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+
+	//this->action = ai->EvaluateActions(this->evalInput);
 }
 
 void AEnemy::BossFight(float deltaTime) {
@@ -155,8 +183,8 @@ void AEnemy::BossFight(float deltaTime) {
 
 		pillarsToActivate = pillars / 2;
 		pillarsActive = 0;
-		FString msg = "# of pillars to activate: ";
-		GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::White, msg + FString::FromInt(pillarsToActivate));
+		//FString msg = "# of pillars to activate: ";
+		//GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::White, msg + FString::FromInt(pillarsToActivate));
 		pa = -1;
 		pillarsLastActive = -1;
 
@@ -164,8 +192,8 @@ void AEnemy::BossFight(float deltaTime) {
 			while (pa == pillarsLastActive)
 				pa = FMath::RandRange(0, foundPillars.Num()-1);
 
-			FString msg = "activating pillar: ";
-			GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::White, msg + FString::FromInt(pa));
+			//FString msg = "activating pillar: ";
+			//GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::White, msg + FString::FromInt(pa));
 			// -----
 			TArray<UActorComponent*> childComp;
 			//for (int p = 0; p < pillars; p++) {
@@ -183,14 +211,14 @@ void AEnemy::BossFight(float deltaTime) {
 							if (c->IsActive()) {
 								c->Deactivate();
 								node->ToggleVisibility(true);
-								FString msg = c->GetName() + " + " + FString::FromInt(pa) + "+";
-								GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, msg);
+								//FString msg = c->GetName() + " + " + FString::FromInt(pa) + "+";
+								//GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, msg);
 							}
 							else {
 								c->Activate();
 								node->ToggleVisibility(true);
-								FString msg = c->GetName() + " + " + FString::FromInt(pa) + "-";
-								GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, msg);
+								//FString msg = c->GetName() + " + " + FString::FromInt(pa) + "-";
+								//GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, msg);
 							}
 						}
 						else if (c->GetName() == "BossAreaWarning") {
@@ -198,14 +226,14 @@ void AEnemy::BossFight(float deltaTime) {
 							if (c->IsActive()) {
 								c->Deactivate();
 								node->ToggleVisibility(true);
-								FString msg = c->GetName() + " + " + FString::FromInt(pa) + "+";
-								GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, msg);
+								//FString msg = c->GetName() + " + " + FString::FromInt(pa) + "+";
+								//GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, msg);
 							}
 							else {
 								c->Activate();	
 								node->ToggleVisibility(true);
-								FString msg = c->GetName() + " + " + FString::FromInt(pa) + "-";
-								GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, msg);
+								//FString msg = c->GetName() + " + " + FString::FromInt(pa) + "-";
+								//GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, msg);
 							}
 						}
 						

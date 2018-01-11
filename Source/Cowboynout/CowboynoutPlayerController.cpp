@@ -47,10 +47,14 @@ ACowboynoutPlayerController::ACowboynoutPlayerController() {
 
 	canTP = false;
 
+	canUpgrade = false;
 }
 
 void ACowboynoutPlayerController::SetupInputComponent() {
-	if (GetWorld()->GetMapName() == "UEDPIE_0_MapSpaceGanzesLV" || GetWorld()->GetMapName() == "MapSpaceGanzesLV") {
+
+	if (	GetWorld()->GetMapName() == "UEDPIE_0_MapSpaceGanzesLV" || GetWorld()->GetMapName() == "MapSpaceGanzesLV" ||
+			GetWorld()->GetMapName() == "UEDPIE_0_MapBossRoom"		|| GetWorld()->GetMapName() == "MapBossRoom") {
+
 		// set up gameplay key bindings
 		Super::SetupInputComponent();
 
@@ -70,6 +74,8 @@ void ACowboynoutPlayerController::SetupInputComponent() {
 		InputComponent->BindAction("SkillTwo", IE_Released, this, &ACowboynoutPlayerController::OnSkillTwoReleased);
 		InputComponent->BindAction("SkillThree", IE_Pressed, this, &ACowboynoutPlayerController::OnSkillThreePressed);
 		InputComponent->BindAction("SkillThree", IE_Released, this, &ACowboynoutPlayerController::OnSkillThreeReleased);
+		// use medpack
+		InputComponent->BindAction("UseMedPack", IE_Pressed, this, &ACowboynoutPlayerController::OnUseMedPack);
 
 		// mouse
 		InputComponent->BindAction("LeftClick", IE_Pressed, this, &ACowboynoutPlayerController::OnLeftMousePressed);
@@ -82,6 +88,13 @@ void ACowboynoutPlayerController::SetupInputComponent() {
 		InputComponent->BindAction("SimulateDamage", IE_Released, this, &ACowboynoutPlayerController::OnSimulateDamageReleased);
 
 		//UAIPerceptionSystem::RegisterPerceptionStimuliSource(this, sightConfig->GetSenseImplementation(), GetControlledPawn());
+
+		InputComponent->BindAction("LvlUpSkillOne", IE_Pressed, this, &ACowboynoutPlayerController::OnSkillOneLevelUp);
+		InputComponent->BindAction("LvlUpSkillTwo", IE_Pressed, this, &ACowboynoutPlayerController::OnSkillOneLevelUp);
+
+		InputComponent->BindAction("statDomage", IE_Pressed, this, &ACowboynoutPlayerController::PlusStatA);
+		InputComponent->BindAction("statLeSpeed", IE_Pressed, this, &ACowboynoutPlayerController::PlusStatB);
+		InputComponent->BindAction("statLaStamina", IE_Pressed, this, &ACowboynoutPlayerController::PlusStatC);
 
 		InputComponent->BindAction("SkillOneLvlUp", IE_Pressed, this, &ACowboynoutPlayerController::OnSkillOneLevelUp);
 		InputComponent->BindAction("SkillTwoLvlUp", IE_Pressed, this, &ACowboynoutPlayerController::OnSkillTwoLevelUp);
@@ -332,6 +345,10 @@ void ACowboynoutPlayerController::OnSkillThreeReleased() {
 
 }
 
+void ACowboynoutPlayerController::OnUseMedPack() {
+	MedPack();
+}
+
 void ACowboynoutPlayerController::OnSimulateDamagePressed() {
 	// increase chip ammount
 	SimulateDamage();
@@ -446,8 +463,42 @@ void ACowboynoutPlayerController::SkillThree() {
 	skillThreeCD = true;	// set CD
 }
 
+void ACowboynoutPlayerController::MedPack() {
+	cowboy = Cast<ACowboynoutCharacter>(GetCharacter());
+	if (cowboy) {
+		if (cowboy->medPacks > 0) {
+			if (cowboy->life + 50 <= cowboy->lifeMax) {
+				cowboy->life += 50;
+				cowboy->medPacks--;
+			}
+			else {
+				cowboy->life = cowboy->lifeMax;
+				cowboy->medPacks--;
+			}
+		}
+		else {
+			DebugMsg("you have no medpacks, fewl!!", displayTime, FColor::Red);
+		}
+	}
+}
+
 
 // bugs bunny
 void ACowboynoutPlayerController::DebugMsg(FString msg, float dTime, FColor clr) {
 	GEngine->AddOnScreenDebugMessage(-1, dTime, clr, msg);
+}
+
+void ACowboynoutPlayerController::PlusStatA() {
+	ACowboynoutCharacter* cowboy = Cast<ACowboynoutCharacter>(GetCharacter());
+	cowboy->ConvertChipStatA();
+}
+
+void ACowboynoutPlayerController::PlusStatB() {
+	ACowboynoutCharacter* cowboy = Cast<ACowboynoutCharacter>(GetCharacter());
+	cowboy->ConvertChipStatB();
+}
+
+void ACowboynoutPlayerController::PlusStatC() {
+	ACowboynoutCharacter* cowboy = Cast<ACowboynoutCharacter>(GetCharacter());
+	cowboy->ConvertChipStatC();
 }

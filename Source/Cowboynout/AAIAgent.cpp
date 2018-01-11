@@ -1,19 +1,61 @@
 #include "AAIAgent.h"
 
-UAAIAgent::UAAIAgent()
+UAAIAgent::UAAIAgent() :
+	perceptionRange(100.f)
 {
 	PrimaryComponentTick.bCanEverTick = true;
 }
 
 void UAAIAgent::AddAction(const FAction& action)
 {
-
+	this->actionList.Add(action);
 }
 
-FActionType UAAIAgent::EvaluateActions()
+FActionType UAAIAgent::EvaluateActions(const FEvaluationInput& evaluationInput)
 {
-	return FActionType::FATFollowPlayer;
+	FAction* currentAction = nullptr;
+	float currentPriority = 0.0f;
+
+	for (auto action : this->actionList)
+	{
+		float temp = 0.0f;
+		switch (action.actionType)
+		{
+		case FActionType::FATFollowPlayer:
+			temp = action.considerationCurve->GetFloatValue(
+				evaluationInput.rangeToPlayer / this->perceptionRange
+			);
+			break;
+		case FActionType::FATRoaming:
+			temp = action.considerationCurve->GetFloatValue(
+				evaluationInput.rangeToPlayer / this->perceptionRange
+			);
+			break;
+		case FActionType::FATTakeCover:
+			temp = action.considerationCurve->GetFloatValue(
+				evaluationInput.rangeToHealer / this->perceptionRange
+			);
+			break;
+		case FActionType::FATNeedHeal:
+			temp = action.considerationCurve->GetFloatValue(
+				evaluationInput.currentHealth
+			);
+			break;
+		}
+
+		if (temp > currentPriority)
+		{
+			currentPriority = temp;
+			currentAction = &action;
+		}
+	}
+
+	if (!currentAction)
+		return FActionType::FATRoaming;
+	else
+		return currentAction->actionType;
 }
+
 
 void UAAIAgent::BeginPlay()
 {
