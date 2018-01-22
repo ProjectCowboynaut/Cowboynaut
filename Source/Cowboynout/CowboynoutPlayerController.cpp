@@ -12,6 +12,9 @@
 #include "Slate.h"
 
 ACowboynoutPlayerController::ACowboynoutPlayerController() {
+	// set controle method : 0 d3, 1 twins, swedish twins!
+	controleMethod = 1;
+
 	bShowMouseCursor = true;
 	bEnableMouseOverEvents = true;
 	DefaultMouseCursor = EMouseCursor::Crosshairs;
@@ -52,8 +55,9 @@ ACowboynoutPlayerController::ACowboynoutPlayerController() {
 
 void ACowboynoutPlayerController::SetupInputComponent() {
 
-	if (	GetWorld()->GetMapName() == "UEDPIE_0_MapSpaceGanzesLV" || GetWorld()->GetMapName() == "MapSpaceGanzesLV" ||
-			GetWorld()->GetMapName() == "UEDPIE_0_MapBossRoom"		|| GetWorld()->GetMapName() == "MapBossRoom") {
+	if (	GetWorld()->GetMapName() == "UEDPIE_0_MapSpaceGanzesLV"		|| GetWorld()->GetMapName() == "MapSpaceGanzesLV" ||
+			GetWorld()->GetMapName() == "UEDPIE_0_MapBossRoom"			|| GetWorld()->GetMapName() == "MapBossRoom" ||
+			GetWorld()->GetMapName() == "UEDPIE_0_MapSpaceBjoerninger'" || GetWorld()->GetMapName() == "MapSpaceBjoerninger") {
 
 		// set up gameplay key bindings
 		Super::SetupInputComponent();
@@ -61,11 +65,20 @@ void ACowboynoutPlayerController::SetupInputComponent() {
 		//InputComponent->BindAction("SetDestination", IE_Pressed, this, &ACowboynoutPlayerController::OnSetDestinationPressed);
 		//InputComponent->BindAction("SetDestination", IE_Released, this, &ACowboynoutPlayerController::OnSetDestinationReleased);
 
-		// movement modes
-		InputComponent->BindAction("MovementMode", IE_Pressed, this, &ACowboynoutPlayerController::OnMovementModePressed);
-		InputComponent->BindAction("MovementMode", IE_Released, this, &ACowboynoutPlayerController::OnMovementModeReleased);
-		InputComponent->BindAction("StationairyMode", IE_Pressed, this, &ACowboynoutPlayerController::OnSetStationairyPressed);
-		InputComponent->BindAction("StationairyMode", IE_Released, this, &ACowboynoutPlayerController::OnSetStationairyReleased);
+		if (controleMethod == 0) {
+			// movement modes
+			InputComponent->BindAction("MovementMode", IE_Pressed, this, &ACowboynoutPlayerController::OnMovementModePressed);
+			InputComponent->BindAction("MovementMode", IE_Released, this, &ACowboynoutPlayerController::OnMovementModeReleased);
+			InputComponent->BindAction("StationairyMode", IE_Pressed, this, &ACowboynoutPlayerController::OnSetStationairyPressed);
+			InputComponent->BindAction("StationairyMode", IE_Released, this, &ACowboynoutPlayerController::OnSetStationairyReleased);
+			// use medpack
+			InputComponent->BindAction("UseMedPack", IE_Pressed, this, &ACowboynoutPlayerController::OnUseMedPack);
+		}
+		else if (controleMethod == 1) {
+			InputComponent->BindAxis("MoveForward", this, &ACowboynoutPlayerController::MoveForward);
+			InputComponent->BindAxis("MoveRight", this, &ACowboynoutPlayerController::MoveRight);
+		}
+
 
 		// skills
 		InputComponent->BindAction("SkillOne", IE_Pressed, this, &ACowboynoutPlayerController::OnSkillOnePressed);
@@ -74,8 +87,6 @@ void ACowboynoutPlayerController::SetupInputComponent() {
 		InputComponent->BindAction("SkillTwo", IE_Released, this, &ACowboynoutPlayerController::OnSkillTwoReleased);
 		InputComponent->BindAction("SkillThree", IE_Pressed, this, &ACowboynoutPlayerController::OnSkillThreePressed);
 		InputComponent->BindAction("SkillThree", IE_Released, this, &ACowboynoutPlayerController::OnSkillThreeReleased);
-		// use medpack
-		InputComponent->BindAction("UseMedPack", IE_Pressed, this, &ACowboynoutPlayerController::OnUseMedPack);
 
 		// mouse
 		InputComponent->BindAction("LeftClick", IE_Pressed, this, &ACowboynoutPlayerController::OnLeftMousePressed);
@@ -106,26 +117,12 @@ void ACowboynoutPlayerController::SetupInputComponent() {
 
 void ACowboynoutPlayerController::PlayerTick(float deltaTime) {
 	Super::PlayerTick(deltaTime);
-
-	// end cd timer 
-	//GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::White, GetWorld()->GetMapName());
-	if (GetWorld()->GetMapName() == "UEDPIE_0_MapSpaceGanzesLV" || GetWorld()->GetMapName() == "MapSpaceGanzesLV") {
-		if (endGame) {
-			deathTimer += deltaTime;
-			if (!deathTimerNotSet) {
-				deathTimerFull = deathTimer;
-				deathTimerNotSet = true;
-			}
-
-			countDown = deathTimerFull - deathTimer;
-			GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Cyan, FString::SanitizeFloat(countDown));
-		
-			if (deathTimer >= deathTimerFull) {
-				UGameplayStatics::OpenLevel(this, TEXT("/Game/Maps/WinScreen"), false);
-				deathTimer = 0;
-			}
+	
+	if (controleMethod == 1) {
+		// new movement
+		if (GetWorld()->GetMapName() == "UEDPIE_0_MapSpaceGanzesLV" || GetWorld()->GetMapName() == "MapSpaceGanzesLV" || GetWorld()->GetMapName() == "MapSpaceBjoerninger" || GetWorld()->GetMapName() == "UEDPIE_0_MapSpaceBjoerninger") {
+			RotatePlayer();
 		}
-
 		cowboy = Cast<ACowboynoutCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
 		if (cowboy && cowboy->dead) return;
 
@@ -136,18 +133,6 @@ void ACowboynoutPlayerController::PlayerTick(float deltaTime) {
 			else
 				isMoving = false;
 		}
-
-		cowboy = Cast<ACowboynoutCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
-		if (cowboy) {
-			// keep updating the destination every tick while presed
-			if (bMoveToMouseCursor && !cowboy->dead)	{
-				MoveToMouseCursor();
-			}
-			if (!isMoving && !cowboy->dead) {
-				RotatePlayer();
-			}
-		}
-
 		// reset skill CDs if time passed
 		if (skillOneCD) {
 			activeTimerSkillOne += deltaTime;
@@ -162,7 +147,7 @@ void ACowboynoutPlayerController::PlayerTick(float deltaTime) {
 		if (skillTwoCD) {
 			activeTimerSkillTwo += deltaTime;
 			if (activeTimerSkillTwo >= breakSkillTwo) {		// enable movement again after break time
-				canMove = true;	
+				canMove = true;
 			}
 			if (activeTimerSkillTwo >= timerSkillTwo) {
 				skillTwoCD = false;
@@ -173,7 +158,7 @@ void ACowboynoutPlayerController::PlayerTick(float deltaTime) {
 		if (skillThreeCD) {
 			activeTimerSkillThree += deltaTime;
 			if (activeTimerSkillThree >= breakSkillThree) {	// enable movement again after break time
-				canMove = true;	
+				canMove = true;
 			}
 			if (activeTimerSkillThree >= timerSkillThree) {
 				skillThreeCD = false;
@@ -181,6 +166,103 @@ void ACowboynoutPlayerController::PlayerTick(float deltaTime) {
 			}
 		}
 	}
+	else {
+		// end cd timer 
+		//GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::White, GetWorld()->GetMapName());
+		if (GetWorld()->GetMapName() == "UEDPIE_0_MapSpaceGanzesLV" || GetWorld()->GetMapName() == "MapSpaceGanzesLV" || GetWorld()->GetMapName() == "MapSpaceBjoerninger" || GetWorld()->GetMapName() == "UEDPIE_0_MapSpaceBjoerninger") {
+			if (endGame) {
+				deathTimer += deltaTime;
+				if (!deathTimerNotSet) {
+					deathTimerFull = deathTimer;
+					deathTimerNotSet = true;
+				}
+
+				countDown = deathTimerFull - deathTimer;
+				GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Cyan, FString::SanitizeFloat(countDown));
+
+				if (deathTimer >= deathTimerFull) {
+					UGameplayStatics::OpenLevel(this, TEXT("/Game/Maps/WinScreen"), false);
+					deathTimer = 0;
+				}
+			}
+
+			cowboy = Cast<ACowboynoutCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+			if (cowboy && cowboy->dead) return;
+
+			if (MyPawn) {
+				FVector velo = MyPawn->GetVelocity();
+				if (velo.X != 0 || velo.Y != 0)
+					isMoving = true;
+				else
+					isMoving = false;
+			}
+
+			cowboy = Cast<ACowboynoutCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+			if (cowboy) {
+				// keep updating the destination every tick while presed
+				if (bMoveToMouseCursor && !cowboy->dead) {
+					MoveToMouseCursor();
+				}
+				if (!isMoving && !cowboy->dead) {
+
+				}
+			}
+
+			// reset skill CDs if time passed
+			if (skillOneCD) {
+				activeTimerSkillOne += deltaTime;
+				if (activeTimerSkillOne >= breakSkillOne) {		// enable movement again after break time
+					canMove = true;
+				}
+				if (activeTimerSkillOne >= timerSkillOne) {
+					skillOneCD = false;
+					activeTimerSkillOne = 0;
+				}
+			}
+			if (skillTwoCD) {
+				activeTimerSkillTwo += deltaTime;
+				if (activeTimerSkillTwo >= breakSkillTwo) {		// enable movement again after break time
+					canMove = true;
+				}
+				if (activeTimerSkillTwo >= timerSkillTwo) {
+					skillTwoCD = false;
+					skillTwoTPCD = false;
+					activeTimerSkillTwo = 0;
+				}
+			}
+			if (skillThreeCD) {
+				activeTimerSkillThree += deltaTime;
+				if (activeTimerSkillThree >= breakSkillThree) {	// enable movement again after break time
+					canMove = true;
+				}
+				if (activeTimerSkillThree >= timerSkillThree) {
+					skillThreeCD = false;
+					activeTimerSkillThree = 0;
+				}
+			}
+		}
+	}
+
+}
+
+void ACowboynoutPlayerController::WASDMove(float deltaTime) {
+	if (!MovementInput.IsZero())
+	{
+		//Scale our movement input axis values by 100 units per second
+		MovementInput = MovementInput.GetSafeNormal() * 100.0f;
+		FVector NewLocation = MyPawn->GetActorLocation();
+		NewLocation += GetActorForwardVector() * MovementInput.X * deltaTime;
+		NewLocation += GetActorRightVector() * MovementInput.Y * deltaTime;
+		MyPawn->SetActorLocation(NewLocation);
+	}
+}
+
+void ACowboynoutPlayerController::MoveForward(float axisValue) {
+	MovementInput.X = FMath::Clamp<float>(axisValue, -1.0f, 1.0f);
+}
+
+void ACowboynoutPlayerController::MoveRight(float axisValue) {
+	MovementInput.Y = FMath::Clamp<float>(axisValue, -1.0f, 1.0f);
 }
 
 void ACowboynoutPlayerController::MoveToMouseCursor() {
@@ -260,7 +342,7 @@ void ACowboynoutPlayerController::OnLeftMousePressed() {
 		else if (playerChar->hasTarget == 2) {
 			//DebugMsg("you clicked an info itam!", 3.f, FColor::White);
 			if (!info) {
-				if (wInfoW) 				{
+				if (wInfoW)	{
 					info = true;
 					myInfoW = CreateWidget<UUserWidget>(this, wInfoW);
 					if (myInfoW) {

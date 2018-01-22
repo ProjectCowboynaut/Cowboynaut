@@ -17,6 +17,11 @@ class ACowboynoutPlayerController : public APlayerController
 public:
 	ACowboynoutPlayerController();
 
+	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Movement")
+	int controleMethod;
+
+
+
 	UFUNCTION()
 	void DebugMsg(FString msg, float dTime, FColor clr);
 
@@ -260,6 +265,19 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Movement") 
 	bool isMoving;					// durr, used to see if moving
+
+protected:
+	UFUNCTION()
+	void MoveForward(float axisValue);
+
+	UFUNCTION()
+	void MoveRight(float axisValue);
+
+	UFUNCTION()
+	void WASDMove(float DeltaTime);
+
+	UPROPERTY()
+	FVector2D MovementInput;
 };
 
 
