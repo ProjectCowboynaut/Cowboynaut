@@ -109,6 +109,20 @@ ACowboynoutCharacter::ACowboynoutCharacter() {
 
 	lifeWarningTimer = 3.11f;
 	lifeWarningTimerFull = 3.11f;
+
+	soundSkill1 = LoadObject<USoundBase>(NULL, TEXT("SoundWave'/Game/Assets/Audio/Player/Skill1fast.Skill1fast'"), NULL, LOAD_None, NULL);
+	soundSkill2shot = LoadObject<USoundBase>(NULL, TEXT("SoundWave'/Game/Assets/Audio/Player/Skill2LoadFinish.Skill2LoadFinish'"), NULL, LOAD_None, NULL);
+	soundSkill2explosion = LoadObject<USoundBase>(NULL, TEXT("SoundWave'/Game/Assets/Audio/Player/Skill2ExplodeFinish.Skill2ExplodeFinish'"), NULL, LOAD_None, NULL);
+	soundLowLife = LoadObject<USoundBase>(NULL, TEXT("SoundWave'/Game/Assets/Audio/Player/PlayerLowLife.PlayerLowLife'"), NULL, LOAD_None, NULL);
+	soundDead = LoadObject<USoundBase>(NULL, TEXT("SoundWave'/Game/Assets/Audio/Player/PlayerDeath.PlayerDeath'"), NULL, LOAD_None, NULL);
+
+	/*ProjectileClassT1 = LoadObject<AProjectile>(NULL, TEXT("Blueprint'/Game/Blueprints/Skills/BP_SkillOne_T01.BP_SkillOne_T01'"), NULL, LOAD_None, NULL);
+	ProjectileClassT2 = LoadObject<AProjectile>(NULL, TEXT("Blueprint'/Game/Blueprints/Skills/BP_SkillOne_T02.BP_SkillOne_T02'"), NULL, LOAD_None, NULL);
+	ProjectileClassT3 = LoadObject<AProjectile>(NULL, TEXT("Blueprint'/Game/Blueprints/Skills/BP_SkillOne_T03.BP_SkillOne_T03'"), NULL, LOAD_None, NULL);
+
+	GrenadeClassT1 = LoadObject<AGrenade>(NULL, TEXT("Blueprint'/Game/Blueprints/Skills/BP_SkillTwo_T01.BP_SkillTwo_T01'"), NULL, LOAD_None, NULL);
+	GrenadeClassT2 = LoadObject<AGrenade>(NULL, TEXT("Blueprint'/Game/Blueprints/Skills/BP_SkillTwo_T02.BP_SkillTwo_T02'"), NULL, LOAD_None, NULL);
+	GrenadeClassT3 = LoadObject<AGrenade>(NULL, TEXT("Blueprint'/Game/Blueprints/Skills/BP_SkillTwo_T03.BP_SkillTwo_T03'"), NULL, LOAD_None, NULL);*/
 }
 
 // set if the player has a target

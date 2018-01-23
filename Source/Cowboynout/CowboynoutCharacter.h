@@ -74,13 +74,13 @@ public:
 
 	// SkillBlueprints (Tier 1-3 each)
 	UPROPERTY(EditDefaultsOnly, Category = "Projectile")
-	TSubclassOf<class AProjectile> ProjectileClassT1;
+	TSubclassOf<AProjectile> ProjectileClassT1;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Projectile")
-	TSubclassOf<class AProjectile> ProjectileClassT2;
+	TSubclassOf<AProjectile> ProjectileClassT2;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Projectile")
-	TSubclassOf<class AProjectile> ProjectileClassT3;
+	TSubclassOf<AProjectile> ProjectileClassT3;
 
 	UPROPERTY()
 	AGrenade* nade;
@@ -89,13 +89,13 @@ public:
 	FVector nadeLoc;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Projectile")
-	TSubclassOf<class AGrenade> GrenadeClassT1;
+	TSubclassOf<AGrenade> GrenadeClassT1;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Projectile")
-	TSubclassOf<class AGrenade> GrenadeClassT2;
+	TSubclassOf<AGrenade> GrenadeClassT2;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Projectile")
-	TSubclassOf<class AGrenade> GrenadeClassT3;
+	TSubclassOf<AGrenade> GrenadeClassT3;
 
 	UPROPERTY()
 	bool explodeNade;

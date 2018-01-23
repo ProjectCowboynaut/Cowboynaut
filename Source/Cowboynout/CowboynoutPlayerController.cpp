@@ -54,6 +54,11 @@ ACowboynoutPlayerController::ACowboynoutPlayerController() {
 	canTP = false;
 
 	canUpgrade = false;
+
+	// init player vars & refs (overwritten if used in BP)
+	characterMovementSpeed = 15.f;
+
+
 }
 
 void ACowboynoutPlayerController::SetupInputComponent() {
@@ -264,7 +269,13 @@ void ACowboynoutPlayerController::OnSetStationairyReleased() {
 
 bool ACowboynoutPlayerController::CheckMap(FString mapName) {
 	bool r = false;
-	FString legitMapNames[] = {"UEDPIE_0_MapSpaceGanzesLV", "MapSpaceGanzesLV", "MapSpaceBjoerninger", "UEDPIE_0_MapSpaceBjoerninger" };
+	FString legitMapNames[] = { "MapSpaceGanzesLV", "UEDPIE_0_MapSpaceGanzesLV",
+								"MapSpaceBjoerninger", "UEDPIE_0_MapSpaceBjoerninger", 
+								"Test_Map_Ersin", "UEDPIE_0_Test_Map_Ersin", 
+								"Test_Map_Maddin", "UEDPIE_0_Test_Map_Maddin",
+								"BossMap", "UEDPIE_0_BossMap"
+									
+	};
 	for(FString mapName : legitMapNames) {
 		if (mapName == GetWorld()->GetMapName()) r = true;
 		else r = false;
