@@ -17,10 +17,11 @@ class ACowboynoutPlayerController : public APlayerController
 public:
 	ACowboynoutPlayerController();
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
+	float characterMovementSpeed;
+
 	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Movement")
 	int controleMethod;
-
-
 
 	UFUNCTION()
 	void DebugMsg(FString msg, float dTime, FColor clr);
@@ -76,31 +77,12 @@ public:
 
 	// Begin PlayerController interface
 	UFUNCTION()
-	virtual void PlayerTick(float DeltaTime) override;
+	virtual void Tick(float DeltaTime) override;
 
 	UFUNCTION()
 	virtual void SetupInputComponent() override;
 	// End PlayerController interface
 
-	UFUNCTION()
-	void MoveToMouseCursor();
-	
-	/** Navigate player to the given world location. */
-	UFUNCTION(BlueprintCallable)
-	void SetNewMoveDestination(const FVector DestLocation);
-
-	/** Input handlers for SetDestination action. */
-	UFUNCTION()
-	void OnSetDestinationPressed();
-
-	UFUNCTION()
-	void OnSetDestinationReleased();
-
-	UFUNCTION()
-	void OnMovementModePressed();
-
-	UFUNCTION()
-	void OnMovementModeReleased();
 
 	UFUNCTION()
 	void OnSetStationairyPressed();
@@ -147,9 +129,6 @@ public:
 	void OnSkillThreePressed();
 
 	UFUNCTION()
-	void OnUseMedPack();
-
-	UFUNCTION()
 	void OnSkillThreeReleased();
 
 	UFUNCTION()
@@ -192,7 +171,7 @@ public:
 	AActor* myActor;
 
 	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Character") 
-	APawn* MyPawn;
+	APawn* myLittlePawny;
 
 	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Character") 
 	UNavigationSystem* NavSys;
@@ -278,6 +257,10 @@ protected:
 
 	UPROPERTY()
 	FVector2D MovementInput;
+
+	UFUNCTION()
+	bool CheckMap(FString mapName);
+
 };
 
 

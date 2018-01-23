@@ -298,8 +298,7 @@ void ACowboynoutCharacter::FireSkillOne() {
 	}
 }
 
-void ACowboynoutCharacter::FireSkillTwo(int teleport) {
-	if (teleport == 0) {
+void ACowboynoutCharacter::FireSkillTwo() {
 		nadeLoc = GetActorLocation();
 		animShooting = true;
 		explodeNade = false;
@@ -320,14 +319,6 @@ void ACowboynoutCharacter::FireSkillTwo(int teleport) {
 			}
 			PlaySound(2);
 		}
-	}
-	else if (teleport == 1) {
-		ACowboynoutPlayerController* playerCtrl = Cast<ACowboynoutPlayerController>(GetController());
-		if (playerCtrl) {
-			SetActorLocation(nadeLoc);
-			explodeNade = true;
-		}
-	}
 }
 
 // 0: been hit; 1: skill one; 2: skill two fired; 3: skill two explosion sound; 4: low life warning; 5: death 

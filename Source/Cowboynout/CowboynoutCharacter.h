@@ -111,7 +111,7 @@ public:
 	void FireSkillOne();
 
 	UFUNCTION()
-	void FireSkillTwo(int teleport);
+	void FireSkillTwo();
 
 	UFUNCTION()
 	void SetTarget(int targetStatus);
