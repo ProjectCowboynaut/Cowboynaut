@@ -56,9 +56,6 @@ ACowboynoutPlayerController::ACowboynoutPlayerController() {
 	canUpgrade = false;
 
 	// init player vars & refs (overwritten if used in BP)
-	characterMovementSpeed = 15.f;
-
-
 }
 
 void ACowboynoutPlayerController::SetupInputComponent() {
@@ -85,6 +82,8 @@ void ACowboynoutPlayerController::SetupInputComponent() {
 		InputComponent->BindAction("LeftClick", IE_Released, this, &ACowboynoutPlayerController::OnLeftMouseReleased);
 		InputComponent->BindAction("RightClick", IE_Pressed, this, &ACowboynoutPlayerController::OnRightMousePressed);
 		InputComponent->BindAction("RightClick", IE_Released, this, &ACowboynoutPlayerController::OnRightMouseReleased);
+
+		InputComponent->BindAction("SpacePressed", IE_Pressed, this, &ACowboynoutPlayerController::OnSpacePressed);
 
 		// simulate damage
 		InputComponent->BindAction("SimulateDamage", IE_Pressed, this, &ACowboynoutPlayerController::OnSimulateDamagePressed);
@@ -222,16 +221,48 @@ void ACowboynoutPlayerController::Tick(float deltaTime) {
 void ACowboynoutPlayerController::WASDMove(float deltaTime) {
 	if (!MovementInput.IsZero()) {
 		//Scale our movement input axis values by 100 units per second
-		MovementInput = MovementInput.GetSafeNormal() * 100.0f;
+		MovementInput = MovementInput.GetSafeNormal() *100.f;
 
 		myLittlePawny = GetPawn();
 		if (myLittlePawny) {
-			FVector NewLocation = myLittlePawny->GetActorLocation();
+			FVector NewLocation;
 			NewLocation += GetActorForwardVector() * MovementInput.X * deltaTime * characterMovementSpeed;
 			NewLocation += GetActorRightVector() * MovementInput.Y * deltaTime * characterMovementSpeed;
-			myLittlePawny->SetActorLocation(NewLocation);
+			DebugMsg(FString::SanitizeFloat(NewLocation.X) + "," + FString::SanitizeFloat(NewLocation.Y), 2, FColor::White);
+			myLittlePawny->AddMovementInput(NewLocation);
 		}
 	}
+
+	//myLittlePawny = GetPawn();
+	//if (myLittlePawny) {
+	//	// Find movement direction
+	//	const float ForwardValue = MovementInput.X;
+	//	const float RightValue = MovementInput.Y;
+
+	//	// Clamp max size so that (X=1, Y=1) doesn't cause faster movement in diagonal directions
+	//	const FVector MoveDirection = FVector(ForwardValue, RightValue, 0.f).GetClampedToMaxSize(1.0f);
+
+	//	// Calculate  movement
+	//	const FVector Movement = MoveDirection * characterMovementSpeed * deltaTime;
+	//	DebugMsg(FString::SanitizeFloat(Movement.X) + "," + FString::SanitizeFloat(Movement.Y) + GetWorld()->GetMapName(), 2, FColor::White);
+
+	//	// If non-zero size, move this actor
+	//	if (Movement.SizeSquared() > 0.0f)
+	//	{
+	//		const FRotator NewRotation = Movement.Rotation();
+	//		FHitResult Hit(1.f);
+	//		RootComponent->MoveComponent(Movement, NewRotation, true, &Hit);
+
+	//		if (Hit.IsValidBlockingHit())
+	//		{
+	//			const FVector Normal2D = Hit.Normal.GetSafeNormal2D();
+	//			const FVector Deflection = FVector::VectorPlaneProject(Movement, Normal2D);
+	//			RootComponent->MoveComponent(Deflection, NewRotation, true);
+	//			//myLittlePawny->AddMovementInput()
+	//		}
+	//	}
+	//}
+
 }
 
 void ACowboynoutPlayerController::MoveForward(float axisValue) {
@@ -320,8 +351,12 @@ void ACowboynoutPlayerController::OnLeftMouseReleased() {
 void ACowboynoutPlayerController::OnRightMousePressed() {
 	ACowboynoutCharacter* playerChar = Cast<ACowboynoutCharacter>(GetCharacter());
 	if (playerChar) {
-		OnSkillTwoPressed();
+		OnSkillThreePressed();
 	}
+}
+
+void ACowboynoutPlayerController::OnSpacePressed() {
+	SkillTwo();
 }
 
 void ACowboynoutPlayerController::OnRightMouseReleased() {
@@ -452,7 +487,10 @@ void ACowboynoutPlayerController::SkillTwoTP() {
 }
 
 void ACowboynoutPlayerController::SkillThree() {
-	if (!skillThreeCD) DebugMsg("skill three fired", displayTime, FColor::Yellow);
+	if (!skillThreeCD) {
+		DebugMsg("skill three fired", displayTime, FColor::Yellow);
+
+	}
 	else {
 		DebugMsg("skill three on CD", displayTime, FColor::Red);
 		return;

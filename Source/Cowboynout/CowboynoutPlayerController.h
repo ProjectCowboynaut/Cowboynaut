@@ -112,6 +112,9 @@ public:
 	UFUNCTION()
 	void OnRightMouseReleased();
 
+	UFUNCTION()
+	void OnSpacePressed();
+
 	/** Input handlers for Skills */
 	UFUNCTION()
 	void OnSkillOnePressed();
