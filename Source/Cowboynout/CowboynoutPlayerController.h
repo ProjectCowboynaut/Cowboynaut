@@ -168,6 +168,9 @@ public:
 	void PlusStatC();
 
 	UPROPERTY(VisibleAnywhere, BluePrintReadWrite, Category = "Character")
+	UStaticMeshComponent* meshComp;
+
+	UPROPERTY(VisibleAnywhere, BluePrintReadWrite, Category = "Character")
 	AProjectile* projectile;
 
 	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Character") 

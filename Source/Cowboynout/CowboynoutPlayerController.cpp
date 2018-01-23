@@ -153,9 +153,6 @@ void ACowboynoutPlayerController::Tick(float deltaTime) {
 		}
 	}
 	
-	// end cd timer 
-	//GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::White, GetWorld()->GetMapName());
-	
 	if (endGame) {
 		deathTimer += deltaTime;
 		if (!deathTimerNotSet) {
@@ -228,40 +225,9 @@ void ACowboynoutPlayerController::WASDMove(float deltaTime) {
 			FVector NewLocation;
 			NewLocation += GetActorForwardVector() * MovementInput.X * deltaTime * characterMovementSpeed;
 			NewLocation += GetActorRightVector() * MovementInput.Y * deltaTime * characterMovementSpeed;
-			DebugMsg(FString::SanitizeFloat(NewLocation.X) + "," + FString::SanitizeFloat(NewLocation.Y), 2, FColor::White);
 			myLittlePawny->AddMovementInput(NewLocation);
 		}
 	}
-
-	//myLittlePawny = GetPawn();
-	//if (myLittlePawny) {
-	//	// Find movement direction
-	//	const float ForwardValue = MovementInput.X;
-	//	const float RightValue = MovementInput.Y;
-
-	//	// Clamp max size so that (X=1, Y=1) doesn't cause faster movement in diagonal directions
-	//	const FVector MoveDirection = FVector(ForwardValue, RightValue, 0.f).GetClampedToMaxSize(1.0f);
-
-	//	// Calculate  movement
-	//	const FVector Movement = MoveDirection * characterMovementSpeed * deltaTime;
-	//	DebugMsg(FString::SanitizeFloat(Movement.X) + "," + FString::SanitizeFloat(Movement.Y) + GetWorld()->GetMapName(), 2, FColor::White);
-
-	//	// If non-zero size, move this actor
-	//	if (Movement.SizeSquared() > 0.0f)
-	//	{
-	//		const FRotator NewRotation = Movement.Rotation();
-	//		FHitResult Hit(1.f);
-	//		RootComponent->MoveComponent(Movement, NewRotation, true, &Hit);
-
-	//		if (Hit.IsValidBlockingHit())
-	//		{
-	//			const FVector Normal2D = Hit.Normal.GetSafeNormal2D();
-	//			const FVector Deflection = FVector::VectorPlaneProject(Movement, Normal2D);
-	//			RootComponent->MoveComponent(Deflection, NewRotation, true);
-	//			//myLittlePawny->AddMovementInput()
-	//		}
-	//	}
-	//}
 
 }
 
@@ -489,6 +455,12 @@ void ACowboynoutPlayerController::SkillTwoTP() {
 void ACowboynoutPlayerController::SkillThree() {
 	if (!skillThreeCD) {
 		DebugMsg("skill three fired", displayTime, FColor::Yellow);
+		/*myLittlePawny = GetPawn();
+		if (myLittlePawny) {
+			FVector NewLocation;
+			NewLocation += GetActorForwardVector() * 200.f;
+			myLittlePawny->AddMovementInput(NewLocation);
+		}*/
 
 	}
 	else {
@@ -496,10 +468,9 @@ void ACowboynoutPlayerController::SkillThree() {
 		return;
 	}
 
-	// stop movement
-	AController::StopMovement();
 	skillThreeCD = true;	// set CD
 }
+
 
 void ACowboynoutPlayerController::MedPack() {
 	cowboy = Cast<ACowboynoutCharacter>(GetCharacter());

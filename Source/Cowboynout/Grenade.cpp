@@ -44,21 +44,17 @@ void AGrenade::Tick(float DeltaTime) {
 	cursorLoc.Z = 0;
 	locDistance = FVector::Distance(actorLoc, cursorLoc);
 	FString msg = "";
-	if (locDistance < 100) {
-		UObject* WorldContextObject = GetWorld();
-		FVector SpawnLocation = GetActorLocation();
-		FRotator SpawnRotation = GetActorRotation();
-		// spawn fx emitt0r
-		UGameplayStatics::SpawnEmitterAtLocation(WorldContextObject, EmitterTemplate, SpawnLocation, SpawnRotation, true);
-		FActorSpawnParameters spawnInfo;
-		// spawn sploding actor 
-		ASplosion* boomSphere = GetWorld()->SpawnActor<ASplosion>(SploderClass, SpawnLocation, SpawnRotation, spawnInfo);
-		// aaaaaand it's gone
-		ACowboynoutPlayerController* pCtrl = Cast<ACowboynoutPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-		pCtrl->canTP = true;
-		Destroy();
-	}
 
+	UObject* WorldContextObject = GetWorld();
+	FVector SpawnLocation = GetActorLocation();
+	FRotator SpawnRotation = GetActorRotation();
+	// spawn fx emitt0r
+	UGameplayStatics::SpawnEmitterAtLocation(WorldContextObject, EmitterTemplate, SpawnLocation, SpawnRotation, true);
+	FActorSpawnParameters spawnInfo;
+	// spawn sploding actor 
+	ASplosion* boomSphere = GetWorld()->SpawnActor<ASplosion>(SploderClass, SpawnLocation, SpawnRotation, spawnInfo);
+
+	Destroy();
 }
 
 void AGrenade::DebugMsg(FString msg, float dTime, FColor clr) {

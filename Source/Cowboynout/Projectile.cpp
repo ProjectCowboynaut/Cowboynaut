@@ -19,8 +19,8 @@ AProjectile::AProjectile() {
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileComp"));
 	ProjectileMovement->UpdatedComponent = CollisionComp;
 	if (playerChar) {
-		ProjectileMovement->InitialSpeed = 3000.f * playerChar->speed;
-		ProjectileMovement->MaxSpeed = 3000.f * playerChar->speed;
+		ProjectileMovement->InitialSpeed = 4000.f * playerChar->speed;
+		ProjectileMovement->MaxSpeed = 4000.f * playerChar->speed;
 	}
 	else {
 		ProjectileMovement->InitialSpeed = 3000.f;

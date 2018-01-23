@@ -58,20 +58,6 @@ ACowboynoutCharacter::ACowboynoutCharacter() {
 	TopDownCameraComponent->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 	TopDownCameraComponent->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
-	/*
-
-	// Create a decal in the world to show the cursor's location
-	CursorToWorld = CreateDefaultSubobject<UDecalComponent>("CursorToWorld");
-	CursorToWorld->SetupAttachment(RootComponent);
-	static ConstructorHelpers::FObjectFinder<UMaterial> DecalMaterialAsset(TEXT("Material'/Game/Blueprints/M_Cursor_Decal.M_Cursor_Decal'"));
-	if (DecalMaterialAsset.Succeeded())	{
-		CursorToWorld->SetDecalMaterial(DecalMaterialAsset.Object);
-	}
-	CursorToWorld->DecalSize = FVector(16.0f, 32.0f, 32.0f);
-	CursorToWorld->SetRelativeRotation(FRotator(90.0f, 0.0f, 0.0f).Quaternion());
-
-	/**/
-
 	// Activate ticking in order to update the cursor every frame.
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.bStartWithTickEnabled = true;
@@ -321,15 +307,15 @@ void ACowboynoutCharacter::FireSkillTwo() {
 			FActorSpawnParameters spawnInfo;
 			if (skillLvlTwo == 1) {
 				playerCtrl->canTP = false;
-				nade = GetWorld()->SpawnActor<AGrenade>(GrenadeClassT1, muzzleLocation->GetComponentLocation(), muzzleLocation->GetComponentRotation(), spawnInfo);
+				nade = GetWorld()->SpawnActor<AGrenade>(GrenadeClassT1, GetActorLocation(), muzzleLocation->GetComponentRotation(), spawnInfo);
 			}
 			else if (skillLvlTwo == 2) {
 				playerCtrl->canTP = false;
-				nade = GetWorld()->SpawnActor<AGrenade>(GrenadeClassT2, muzzleLocation->GetComponentLocation(), muzzleLocation->GetComponentRotation(), spawnInfo);
+				nade = GetWorld()->SpawnActor<AGrenade>(GrenadeClassT2, GetActorLocation(), muzzleLocation->GetComponentRotation(), spawnInfo);
 			}
 			else if (skillLvlTwo == 3) {
 				playerCtrl->canTP = false;
-				nade = GetWorld()->SpawnActor<AGrenade>(GrenadeClassT3, muzzleLocation->GetComponentLocation(), muzzleLocation->GetComponentRotation(), spawnInfo);
+				nade = GetWorld()->SpawnActor<AGrenade>(GrenadeClassT3, GetActorLocation(), muzzleLocation->GetComponentRotation(), spawnInfo);
 			}
 			PlaySound(2);
 		}
