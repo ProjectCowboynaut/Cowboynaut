@@ -273,12 +273,11 @@ bool ACowboynoutPlayerController::CheckMap(FString mapName) {
 								"MapSpaceBjoerninger", "UEDPIE_0_MapSpaceBjoerninger", 
 								"Test_Map_Ersin", "UEDPIE_0_Test_Map_Ersin", 
 								"Test_Map_Maddin", "UEDPIE_0_Test_Map_Maddin",
-								"BossMap", "UEDPIE_0_BossMap"
-									
+								"BossMap", "UEDPIE_0_BossMap",		
+								"MapSpaceMaxwell", "UEDPIE_0_MapSpaceMaxwell"
 	};
 	for(FString mapName : legitMapNames) {
 		if (mapName == GetWorld()->GetMapName()) r = true;
-		else r = false;
 	}
 		
 	return r;
