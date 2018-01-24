@@ -1,7 +1,12 @@
+#include <EngineGlobals.h>
+#include <Runtime/Engine/Classes/Engine/Engine.h>
+
 #include "AAIAgent.h"
 
+#define print(text) if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Red, text)
+
 UAAIAgent::UAAIAgent() :
-	perceptionRange(100.f)
+	perceptionRange(3000.f)
 {
 	PrimaryComponentTick.bCanEverTick = true;
 }
@@ -16,36 +21,37 @@ FActionType UAAIAgent::EvaluateActions(const FEvaluationInput& evaluationInput)
 	FAction* currentAction = nullptr;
 	float currentPriority = 0.0f;
 
-	for (auto action : this->actionList)
+	for (auto& action : this->actionList)
 	{
-		float temp = 0.0f;
+		float priority = 0.0f;
+
 		switch (action.actionType)
 		{
 		case FActionType::FATFollowPlayer:
-			temp = action.considerationCurve->GetFloatValue(
+			priority = action.considerationCurve->GetFloatValue(
 				evaluationInput.rangeToPlayer / this->perceptionRange
 			);
 			break;
 		case FActionType::FATRoaming:
-			temp = action.considerationCurve->GetFloatValue(
+			priority = action.considerationCurve->GetFloatValue(
 				evaluationInput.rangeToPlayer / this->perceptionRange
 			);
 			break;
 		case FActionType::FATTakeCover:
-			temp = action.considerationCurve->GetFloatValue(
-				evaluationInput.rangeToHealer / this->perceptionRange
+			priority = action.considerationCurve->GetFloatValue(
+				evaluationInput.rangeToPlayer / this->perceptionRange
 			);
 			break;
 		case FActionType::FATNeedHeal:
-			temp = action.considerationCurve->GetFloatValue(
+			priority = action.considerationCurve->GetFloatValue(
 				evaluationInput.currentHealth
 			);
 			break;
 		}
 
-		if (temp > currentPriority)
+		if (priority > currentPriority)
 		{
-			currentPriority = temp;
+			currentPriority = priority;
 			currentAction = &action;
 		}
 	}
