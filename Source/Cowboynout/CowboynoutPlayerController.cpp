@@ -8,6 +8,7 @@
 #include "Perception/AISenseConfig_Sight.h"
 #include "Runtime/Engine/Classes/Components/DecalComponent.h"
 #include "CowboynoutCharacter.h"
+#include "Runtime/CoreUObject/Public/UObject/UObjectGlobals.h"
 #include "Runtime/UMG/Public/UMG.h"
 #include "Slate.h"
 
@@ -312,6 +313,7 @@ void ACowboynoutPlayerController::OnLeftMousePressed() {
 		ACowboynoutCharacter* playerChar = Cast<ACowboynoutCharacter>(GetCharacter());
 		if (playerChar) {
 			OnSkillOnePressed();
+			
 			// click on usable item
 			if (playerChar->hasTarget == 2) {
 				//DebugMsg("you clicked an info itam!", 3.f, FColor::White);
@@ -357,7 +359,7 @@ void ACowboynoutPlayerController::OnRightMouseReleased() {
 }
 
 void ACowboynoutPlayerController::OnSkillOnePressed() {
-	AController::StopMovement();
+	// AController::StopMovement();
 	SkillOne();
 }
 
@@ -442,7 +444,7 @@ void ACowboynoutPlayerController::SkillOne() {
 		DebugMsg("skill one on CD", displayTime, FColor::Red);
 		return;
 	}
-	AController::StopMovement();						// stop movement
+	//AController::StopMovement();						// stop movement
 	
 	
 	// play sound at player location
@@ -487,16 +489,37 @@ void ACowboynoutPlayerController::SkillThree() {
 		ACharacter* character = GetCharacter();
 		if (character != NULL) {
 			dashStartPoint = character->GetActorLocation();
+		
+		
+			dashDirection = FVector::ZeroVector;
+			dashTargetLocation = FVector::ZeroVector;
+
+			dashDirection = GetActorForwardVector() * MovementInput.X;
+			dashDirection += GetActorRightVector() * MovementInput.Y;
+		
+			// Get player forward and right
+			FRotator playerRotZeroPitch = character->GetActorRotation();
+			playerRotZeroPitch.Pitch = 0;
+			FVector playerRight = FRotationMatrix(playerRotZeroPitch).GetUnitAxis(EAxis::Y);
+			FVector playerForward = FRotationMatrix(playerRotZeroPitch).GetUnitAxis(EAxis::X);
+
+			MovementInput = MovementInput.GetSafeNormal() *100.f;
+			// Scale the forward and right vectors by movementInputDirection
+			dashDirection = playerForward * MovementInput.X + playerRight * MovementInput.Y;
+			// Normalize dodgeDir 
+			dashDirection.Normalize();
+			// Calculate dodge impulse
+			FVector dodgeImpulse = 500.0f * dashDirection;
+			// Apply impulse
+			UStaticMeshComponent* SM = Cast<UStaticMeshComponent>(character->GetRootComponent());
+			if (SM)	{
+				SM->AddImpulse(dodgeImpulse * SM->GetMass());
+			}
+
+			/*DebugMsg("char loc: " + FString::SanitizeFloat(character->GetActorLocation().X) + "," + FString::SanitizeFloat(character->GetActorLocation().Y), 10.f, FColor::Cyan);
+			DebugMsg("dash dir: " + FString::SanitizeFloat(dashDirection.X) + "," + FString::SanitizeFloat(dashDirection.Y), 10.f, FColor::Purple);
+			DebugMsg("dash loc: " + FString::SanitizeFloat(dashTargetLocation.X) + "," + FString::SanitizeFloat(dashTargetLocation.Y), 10.f, FColor::Red);*/
 		}
-		
-		dashDirection = FVector::ZeroVector;
-		dashTargetLocation = FVector::ZeroVector;
-		dashDirection = GetActorForwardVector() * MovementInput.X;
-		dashDirection += GetActorRightVector() * MovementInput.Y;
-		
-		
-		dashTargetLocation = (character->GetActorLocation() - dashDirection) * dashSpeed;
-		DebugMsg(FString::SanitizeFloat(dashTargetLocation.X) + "," + FString::SanitizeFloat(dashTargetLocation.X), displayTime, FColor::Purple);
 	}
 	else {
 		DebugMsg("skill three on CD", displayTime, FColor::Red);
