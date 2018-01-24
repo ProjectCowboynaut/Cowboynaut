@@ -11,6 +11,16 @@
 #include "Runtime/UMG/Public/UMG.h"
 #include "Slate.h"
 
+const FString legitMapNames[] = {	"MapSpaceGanzesLV", "UEDPIE_0_MapSpaceGanzesLV",
+									"MapSpaceBjoerninger", "UEDPIE_0_MapSpaceBjoerninger",
+									"Test_Map_Ersin", "UEDPIE_0_Test_Map_Ersin",
+									"Test_Map_Maddin", "UEDPIE_0_Test_Map_Maddin",
+									"BossMap", "UEDPIE_0_BossMap",
+									"MapSpaceMaxwell", "UEDPIE_0_MapSpaceMaxwell"
+};
+
+
+
 ACowboynoutPlayerController::ACowboynoutPlayerController() {
 	// set controle method : 0 d3, 1 twins, swedish twins!
 	controleMethod = 0;
@@ -54,14 +64,15 @@ ACowboynoutPlayerController::ACowboynoutPlayerController() {
 	canTP = false;
 
 	canUpgrade = false;
+	
+	isDashing = false;
+	dashDistanceActual = 0.f;
 
 	// init player vars & refs (overwritten if used in BP)
 }
 
 void ACowboynoutPlayerController::SetupInputComponent() {
-	
-	FString loadedMapName = GetWorld()->GetMapName();
-	if (CheckMap(loadedMapName)) {
+	if (CheckMap()) {
 
 		// set up gameplay key bindings
 		Super::SetupInputComponent();
@@ -109,12 +120,34 @@ void ACowboynoutPlayerController::SetupInputComponent() {
 void ACowboynoutPlayerController::Tick(float deltaTime) {
 	Super::Tick(deltaTime);
 
+
+
 	// new movement
-	FString loadedMapName = GetWorld()->GetMapName();
-	if (CheckMap(loadedMapName)) {
-		RotatePlayer();
-		WASDMove(deltaTime);
+	if (CheckMap()) {
+		ACharacter* character = GetCharacter();
+		if (character) {
+			if (!isDashing) {
+				RotatePlayer();
+				WASDMove(deltaTime);
+				//dashStartPoint = character->GetActorLocation();
+			}
+			else {
+				// check dist(playerPos, dashStartPos)
+				dashDistanceActual = FVector::Dist(dashStartPoint, character->GetActorLocation());
+				if (dashSpeed == 0) dashSpeed = 1000.f;
+				if (dashDirection == FVector::ZeroVector)
+					dashDirection = (dashStartPoint - GetActorForwardVector()) * dashSpeed;
+				
+				myLittlePawny->AddMovementInput(dashTargetLocation);
+				if (dashDistanceActual >= dashDistanceMax)
+					// if dist >= dashDistance, !isDashing
+					isDashing = false;
+			}
+			// else do dash
+
+		}
 	}
+	
 
 	cowboy = Cast<ACowboynoutCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
 	if (cowboy && cowboy->dead) return;
@@ -225,10 +258,10 @@ void ACowboynoutPlayerController::WASDMove(float deltaTime) {
 			FVector NewLocation;
 			NewLocation += GetActorForwardVector() * MovementInput.X * deltaTime * characterMovementSpeed;
 			NewLocation += GetActorRightVector() * MovementInput.Y * deltaTime * characterMovementSpeed;
+			//DebugMsg(FString::SanitizeFloat(NewLocation.X)+","+ FString::SanitizeFloat(NewLocation.Y), 3.f, FColor::White);
 			myLittlePawny->AddMovementInput(NewLocation);
 		}
 	}
-
 }
 
 void ACowboynoutPlayerController::MoveForward(float axisValue) {
@@ -264,16 +297,10 @@ void ACowboynoutPlayerController::OnSetStationairyReleased() {
 
 // ## mouse functions
 
-bool ACowboynoutPlayerController::CheckMap(FString mapName) {
+bool ACowboynoutPlayerController::CheckMap() {
 	bool r = false;
-	FString legitMapNames[] = { "MapSpaceGanzesLV", "UEDPIE_0_MapSpaceGanzesLV",
-								"MapSpaceBjoerninger", "UEDPIE_0_MapSpaceBjoerninger", 
-								"Test_Map_Ersin", "UEDPIE_0_Test_Map_Ersin", 
-								"Test_Map_Maddin", "UEDPIE_0_Test_Map_Maddin",
-								"BossMap", "UEDPIE_0_BossMap",		
-								"MapSpaceMaxwell", "UEDPIE_0_MapSpaceMaxwell"
-	};
-	for(FString mapName : legitMapNames) {
+
+	for(const FString& mapName : legitMapNames) {
 		if (mapName == GetWorld()->GetMapName()) r = true;
 	}
 		
@@ -455,13 +482,21 @@ void ACowboynoutPlayerController::SkillTwoTP() {
 void ACowboynoutPlayerController::SkillThree() {
 	if (!skillThreeCD) {
 		DebugMsg("skill three fired", displayTime, FColor::Yellow);
-		/*myLittlePawny = GetPawn();
-		if (myLittlePawny) {
-			FVector NewLocation;
-			NewLocation += GetActorForwardVector() * 200.f;
-			myLittlePawny->AddMovementInput(NewLocation);
-		}*/
-
+		isDashing = true;
+		
+		ACharacter* character = GetCharacter();
+		if (character != NULL) {
+			dashStartPoint = character->GetActorLocation();
+		}
+		
+		dashDirection = FVector::ZeroVector;
+		dashTargetLocation = FVector::ZeroVector;
+		dashDirection = GetActorForwardVector() * MovementInput.X;
+		dashDirection += GetActorRightVector() * MovementInput.Y;
+		
+		
+		dashTargetLocation = (character->GetActorLocation() - dashDirection) * dashSpeed;
+		DebugMsg(FString::SanitizeFloat(dashTargetLocation.X) + "," + FString::SanitizeFloat(dashTargetLocation.X), displayTime, FColor::Purple);
 	}
 	else {
 		DebugMsg("skill three on CD", displayTime, FColor::Red);
