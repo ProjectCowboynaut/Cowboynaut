@@ -213,52 +213,52 @@ void ACowboynoutCharacter::Die() {
 }
 
 void ACowboynoutCharacter::ConvertChipStatA() {
-	if (chipsA >= 5) {
-		chipsA -= 5;
+	/*if (chipsA >= 5) {
+		chipsA -= 5;*/
 		lifeMax += lifeGainPerLevel;
 		//life = lifeMax;
-	}
+	/*}
 	else
-		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "not enough chips to convert to stat A");
+		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "not enough chips to convert to stat A");*/
 }
 
 void ACowboynoutCharacter::ConvertChipStatB() {
-	if (chipsB >= 5) {
-		chipsB -= 5;
+	/*if (chipsB >= 5) {
+		chipsB -= 5;*/
 		speed++;
 		GetCharacterMovement()->MaxWalkSpeed += speedGainPerLevel;
-	}
+	/*}
 	else
-		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "not enough chips to convert to stat B");
+		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "not enough chips to convert to stat B");*/
 }
 
 void ACowboynoutCharacter::ConvertChipStatC() {
-	if (chipsC >= 5) {
-		chipsC -= 5;
+	/*if (chipsC >= 5) {
+		chipsC -= 5;*/
 		attack += 1;
-	}
+	/*}
 	else
-		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "not enough chips to convert to stat C");
+		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "not enough chips to convert to stat C");*/
 }
 
 void ACowboynoutCharacter::ConvertChipSkillA() {
-	if (chipsA >= 10 && chipsB >= 10) {
+	/*if (chipsA >= 10 && chipsB >= 10) {
 		chipsA -= 10;
-		chipsB -= 10;
+		chipsB -= 10;*/
 		skillLvlOne++;
-	}
+	/*}
 	else
-		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "not enough chips to convert to skill A");
+		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "not enough chips to convert to skill A");*/
 }
 
 void ACowboynoutCharacter::ConvertChipSkillB() {
-	if (chipsB >= 10 && chipsC >= 10) {
+	/*if (chipsB >= 10 && chipsC >= 10) {
 		chipsB -= 10;
-		chipsC -= 10;
+		chipsC -= 10;*/
 		skillLvlTwo++;
-	}
+	/*}
 	else
-		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "not enough chips to convert to skill B");
+		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "not enough chips to convert to skill B");*/
 }
 
 int ACowboynoutCharacter::GetChipsA() {

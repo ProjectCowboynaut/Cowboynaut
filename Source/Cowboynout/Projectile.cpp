@@ -93,6 +93,7 @@ void AProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimi
 		OtherComp->AddImpulseAtLocation(GetVelocity() * 5.0f, GetActorLocation());
 	}
 
+	// >> hit @ drone
 	if (OtherActor != NULL && !OtherActor->ActorHasTag("Player")) {
 		ACowboynoutCharacter* hittedPlayer = Cast<ACowboynoutCharacter>(OtherActor);
 		
@@ -106,7 +107,7 @@ void AProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimi
 				// check for penetration and sub enemy armor
 				if (penetration - hitEnemy->armor <= 0) {
 					Destroy();
-					//DebugMsg("*", 1.5f, FColor::Yellow);
+					DebugMsg("1", 1.5f, FColor::Yellow);
 				}
 				else {
 					penetration = penetration - hitEnemy->armor;
@@ -132,35 +133,49 @@ void AProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimi
 		//	Destroy();
 		//}
 	}
+	// >> hit @ the player
 	else if (OtherActor != NULL && OtherActor->ActorHasTag("Player")) {
-		//DebugMsg("<!> pwned", 1.5f, FColor::Red);
-		ACowboynoutCharacter* playerChar = Cast<ACowboynoutCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
-		if (playerChar) playerChar->Damage(projectileDamage);
+		if (!this->ActorHasTag("PlayerShot")) {
+			//DebugMsg("<!> pwned", 1.5f, FColor::Red);
+			ACowboynoutCharacter* playerChar = Cast<ACowboynoutCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+			if (playerChar) playerChar->Damage(projectileDamage);
+		}
 	}
 	else if (OtherActor != NULL) {
 		//DebugMsg("<...>", 1.5f, FColor::Red);
 	}
 
-
 	if (!ProjectileMovement->bShouldBounce && !OtherActor->ActorHasTag("PlayerShot") && !OtherActor->ActorHasTag("EnemyShot")) {
 		AEnemy* hitEnemy = Cast<AEnemy>(OtherActor);
 		AActor* hitActor = Cast<AActor>(OtherActor);
-		if (hitEnemy != NULL) {
-			if (hitEnemies.Contains(hitActor)) {
-				//DebugMsg("schon getroffen", 1.5f, FColor::Yellow);
-			}
-			else {
-				hitEnemies.AddUnique(hitActor);
-				if (penetration - hitEnemy->armor <= 0) {
-					Destroy();
-					//DebugMsg("*", 1.5f, FColor::Yellow);
+		
+		// player shot hitting player
+		if (this->ActorHasTag("PlayerShot") && hitActor->ActorHasTag("Player")) {
+			DebugMsg("PvP", 1.5f, FColor::Red);
+		}
+		// enemy shot hitting enemy
+		else if (this->ActorHasTag("EnemyShot") && hitActor->ActorHasTag("Enemy")) {
+			DebugMsg("EvE", 1.5f, FColor::Red);
+		}
+		else {
+			if (hitEnemy != NULL) {
+				if (hitEnemies.Contains(hitActor)) {
+					//DebugMsg("schon getroffen", 1.5f, FColor::Yellow);
 				}
 				else {
-					penetration = penetration - hitEnemy->armor;
-					//DebugMsg("-1p", 1.5f, FColor::Yellow);
+					hitEnemies.AddUnique(hitActor);
+					if (penetration - hitEnemy->armor <= 0) {
+						Destroy();
+						DebugMsg("0", 1.5f, FColor::Yellow);
+					}
+					else {
+						penetration = penetration - hitEnemy->armor;
+						//DebugMsg("-1p", 1.5f, FColor::Yellow);
+					}
 				}
 			}
+			else Destroy();
 		}
-		else Destroy();
+
 	}
 }

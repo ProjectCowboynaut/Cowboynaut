@@ -115,24 +115,9 @@ public:
 	UFUNCTION()
 	void OnSpacePressed();
 
-	/** Input handlers for Skills */
 	UFUNCTION()
-	void OnSkillOnePressed();
+	void OnShiftPressed();
 
-	UFUNCTION()
-	void OnSkillOneReleased();
-
-	UFUNCTION()
-	void OnSkillTwoPressed();
-
-	UFUNCTION()
-	void OnSkillTwoReleased();
-
-	UFUNCTION()
-	void OnSkillThreePressed();
-
-	UFUNCTION()
-	void OnSkillThreeReleased();
 
 	UFUNCTION()
 	void SkillOne();
@@ -199,10 +184,22 @@ public:
 	float shotsPerSecond;
 
 	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Skills")
+	bool autoFire;
+
+	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Skills")
+	float fireRate;
+
+	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Skills")
+	float fireTimer;
+
+	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Skills")
 	bool isDashing;
 
 	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Skills")
 	float dashDistanceActual;
+
+	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Skills")
+	float dashDistance;
 
 	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Skills")
 	FVector dashStartPoint;
@@ -215,6 +212,9 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Skills")
 	FVector dashDirection;
+
+	UPROPERTY(EditAnywhere, BluePrintReadWrite, Category = "Character")
+	UStaticMeshComponent* SM;
 
 	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Skills")
 	FVector dashTargetLocation;
@@ -280,7 +280,10 @@ protected:
 	void MoveRight(float axisValue);
 
 	UFUNCTION()
-	void WASDMove(float DeltaTime);
+	void WASDMove(float deltaTime);
+
+	UFUNCTION()
+	void DodgeMove();
 
 	UPROPERTY()
 	FVector2D MovementInput;

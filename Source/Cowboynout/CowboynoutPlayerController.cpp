@@ -12,6 +12,7 @@
 #include "Runtime/UMG/Public/UMG.h"
 #include "Slate.h"
 
+// movment will ONLY work in those levels!
 const FString legitMapNames[] = {	"MapSpaceGanzesLV", "UEDPIE_0_MapSpaceGanzesLV",
 									"MapSpaceBjoerninger", "UEDPIE_0_MapSpaceBjoerninger",
 									"Test_Map_Ersin", "UEDPIE_0_Test_Map_Ersin",
@@ -19,8 +20,6 @@ const FString legitMapNames[] = {	"MapSpaceGanzesLV", "UEDPIE_0_MapSpaceGanzesLV
 									"BossMap", "UEDPIE_0_BossMap",
 									"MapSpaceMaxwell", "UEDPIE_0_MapSpaceMaxwell"
 };
-
-
 
 ACowboynoutPlayerController::ACowboynoutPlayerController() {
 	// set controle method : 0 d3, 1 twins, swedish twins!
@@ -69,8 +68,16 @@ ACowboynoutPlayerController::ACowboynoutPlayerController() {
 	isDashing = false;
 	dashDistanceActual = 0.f;
 
+	characterMovementSpeed = 500.f;
+	dashSpeed = 50.f;
+	fireRate = .2f;
+	fireTimer = 0;
+	dashDistance = 50.f;
+
 	// init player vars & refs (overwritten if used in BP)
 }
+
+//Actor->GetRootComponent()->ComponentVelocity = Velocity;
 
 void ACowboynoutPlayerController::SetupInputComponent() {
 	if (CheckMap()) {
@@ -81,14 +88,6 @@ void ACowboynoutPlayerController::SetupInputComponent() {
 		InputComponent->BindAxis("MoveForward", this, &ACowboynoutPlayerController::MoveForward);
 		InputComponent->BindAxis("MoveRight", this, &ACowboynoutPlayerController::MoveRight);
 
-		// skills
-		InputComponent->BindAction("SkillOne", IE_Pressed, this, &ACowboynoutPlayerController::OnSkillOnePressed);
-		InputComponent->BindAction("SkillOne", IE_Released, this, &ACowboynoutPlayerController::OnSkillOneReleased);
-		InputComponent->BindAction("SkillTwo", IE_Pressed, this, &ACowboynoutPlayerController::OnSkillTwoPressed);
-		InputComponent->BindAction("SkillTwo", IE_Released, this, &ACowboynoutPlayerController::OnSkillTwoReleased);
-		InputComponent->BindAction("SkillThree", IE_Pressed, this, &ACowboynoutPlayerController::OnSkillThreePressed);
-		InputComponent->BindAction("SkillThree", IE_Released, this, &ACowboynoutPlayerController::OnSkillThreeReleased);
-
 		// mouse
 		InputComponent->BindAction("LeftClick", IE_Pressed, this, &ACowboynoutPlayerController::OnLeftMousePressed);
 		InputComponent->BindAction("LeftClick", IE_Released, this, &ACowboynoutPlayerController::OnLeftMouseReleased);
@@ -96,6 +95,10 @@ void ACowboynoutPlayerController::SetupInputComponent() {
 		InputComponent->BindAction("RightClick", IE_Released, this, &ACowboynoutPlayerController::OnRightMouseReleased);
 
 		InputComponent->BindAction("SpacePressed", IE_Pressed, this, &ACowboynoutPlayerController::OnSpacePressed);
+		//InputComponent->BindAction("SpaceReleased", IE_Pressed, this, &ACowboynoutPlayerController::OnSpaceReleased);
+		
+		InputComponent->BindAction("ShiftPressed", IE_Pressed, this, &ACowboynoutPlayerController::OnShiftPressed);
+		//InputComponent->BindAction("SpacePressed", IE_Pressed, this, &ACowboynoutPlayerController::OnSpacePressed);
 
 		// simulate damage
 		InputComponent->BindAction("SimulateDamage", IE_Pressed, this, &ACowboynoutPlayerController::OnSimulateDamagePressed);
@@ -121,31 +124,20 @@ void ACowboynoutPlayerController::SetupInputComponent() {
 void ACowboynoutPlayerController::Tick(float deltaTime) {
 	Super::Tick(deltaTime);
 
-
-
 	// new movement
 	if (CheckMap()) {
 		ACharacter* character = GetCharacter();
 		if (character) {
-			if (!isDashing) {
-				RotatePlayer();
-				WASDMove(deltaTime);
-				//dashStartPoint = character->GetActorLocation();
-			}
-			else {
-				// check dist(playerPos, dashStartPos)
-				dashDistanceActual = FVector::Dist(dashStartPoint, character->GetActorLocation());
-				if (dashSpeed == 0) dashSpeed = 1000.f;
-				if (dashDirection == FVector::ZeroVector)
-					dashDirection = (dashStartPoint - GetActorForwardVector()) * dashSpeed;
-				
-				myLittlePawny->AddMovementInput(dashTargetLocation);
-				if (dashDistanceActual >= dashDistanceMax)
-					// if dist >= dashDistance, !isDashing
-					isDashing = false;
-			}
-			// else do dash
+			RotatePlayer();
+			WASDMove(deltaTime);
+		}
 
+		if (autoFire) {
+			fireTimer += deltaTime;
+			if (fireTimer >= fireRate) {
+				SkillOne();
+				fireTimer = 0;
+			}
 		}
 	}
 	
@@ -265,6 +257,26 @@ void ACowboynoutPlayerController::WASDMove(float deltaTime) {
 	}
 }
 
+void ACowboynoutPlayerController::DodgeMove() {
+	cowboy = Cast<ACowboynoutCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+	FVector NewLocation ;
+	ACharacter* character = GetCharacter();
+
+	if (character != NULL) {
+		FVector charLoc = character->GetActorLocation();
+
+		if (cowboy) {
+			NewLocation = FVector(0, 0, 0);
+			if (MovementInput.X != 0 || MovementInput.Y != 0)
+				NewLocation += FVector((MovementInput.X * dashDistance), (MovementInput.Y * dashDistance),0);
+			else 
+				NewLocation += FVector(character->GetRootComponent()->GetForwardVector() * 100 * dashDistance);
+			cowboy->LaunchCharacter(NewLocation,false, false);
+			//DebugMsg("launch @" + FString::SanitizeFloat(NewLocation.X) + "," + FString::SanitizeFloat(NewLocation.Y), 3.f, FColor::White);
+		}
+	}
+}
+
 void ACowboynoutPlayerController::MoveForward(float axisValue) {
 	MovementInput.X = FMath::Clamp<float>(axisValue, -1.0f, 1.0f);
 }
@@ -309,44 +321,45 @@ bool ACowboynoutPlayerController::CheckMap() {
 }
 
 void ACowboynoutPlayerController::OnLeftMousePressed() {
-	
-		ACowboynoutCharacter* playerChar = Cast<ACowboynoutCharacter>(GetCharacter());
-		if (playerChar) {
-			OnSkillOnePressed();
-			
-			// click on usable item
-			if (playerChar->hasTarget == 2) {
-				//DebugMsg("you clicked an info itam!", 3.f, FColor::White);
-				if (!info) {
-					if (wInfoW)	{
-						info = true;
-						myInfoW = CreateWidget<UUserWidget>(this, wInfoW);
-						if (myInfoW) {
-							myInfoW->AddToViewport();
-						}
-						bShowMouseCursor = true;
-					}
-				}
-				else {
-					myInfoW->RemoveFromParent();
-					info = false;
-				}
-			}
-			// click on collectable item
-			else if (playerChar->hasTarget == 3) {
-				DebugMsg("you clicked a collectible itam!", 3.f, FColor::White);
-			}
-		}
+	this->autoFire = true;
 }
 
 void ACowboynoutPlayerController::OnLeftMouseReleased() {
+	this->autoFire = false;
 
+	ACowboynoutCharacter* playerChar = Cast<ACowboynoutCharacter>(GetCharacter());
+	if (playerChar) {
+		SkillOne();
+
+		// click on usable item
+		if (playerChar->hasTarget == 2) {
+			//DebugMsg("you clicked an info itam!", 3.f, FColor::White);
+			if (!info) {
+				if (wInfoW) {
+					info = true;
+					myInfoW = CreateWidget<UUserWidget>(this, wInfoW);
+					if (myInfoW) {
+						myInfoW->AddToViewport();
+					}
+					bShowMouseCursor = true;
+				}
+			}
+			else {
+				myInfoW->RemoveFromParent();
+				info = false;
+			}
+		}
+		// click on collectable item
+		else if (playerChar->hasTarget == 3) {
+			DebugMsg("you clicked a collectible itam!", 3.f, FColor::White);
+		}
+	}
 }
 
 void ACowboynoutPlayerController::OnRightMousePressed() {
 	ACowboynoutCharacter* playerChar = Cast<ACowboynoutCharacter>(GetCharacter());
 	if (playerChar) {
-		OnSkillThreePressed();
+		SkillThree();
 	}
 }
 
@@ -354,33 +367,11 @@ void ACowboynoutPlayerController::OnSpacePressed() {
 	SkillTwo();
 }
 
-void ACowboynoutPlayerController::OnRightMouseReleased() {
-
-}
-
-void ACowboynoutPlayerController::OnSkillOnePressed() {
-	// AController::StopMovement();
-	SkillOne();
-}
-
-void ACowboynoutPlayerController::OnSkillOneReleased() {
-
-}
-
-// WiP :: not good, fix later
-void ACowboynoutPlayerController::OnSkillTwoPressed() {
-	SkillTwo();
-}
-
-void ACowboynoutPlayerController::OnSkillTwoReleased() {
-
-}
-
-void ACowboynoutPlayerController::OnSkillThreePressed() {
+void ACowboynoutPlayerController::OnShiftPressed() {
 	SkillThree();
 }
 
-void ACowboynoutPlayerController::OnSkillThreeReleased() {
+void ACowboynoutPlayerController::OnRightMouseReleased() {
 
 }
 
@@ -485,41 +476,7 @@ void ACowboynoutPlayerController::SkillThree() {
 	if (!skillThreeCD) {
 		DebugMsg("skill three fired", displayTime, FColor::Yellow);
 		isDashing = true;
-		
-		ACharacter* character = GetCharacter();
-		if (character != NULL) {
-			dashStartPoint = character->GetActorLocation();
-		
-		
-			dashDirection = FVector::ZeroVector;
-			dashTargetLocation = FVector::ZeroVector;
-
-			dashDirection = GetActorForwardVector() * MovementInput.X;
-			dashDirection += GetActorRightVector() * MovementInput.Y;
-		
-			// Get player forward and right
-			FRotator playerRotZeroPitch = character->GetActorRotation();
-			playerRotZeroPitch.Pitch = 0;
-			FVector playerRight = FRotationMatrix(playerRotZeroPitch).GetUnitAxis(EAxis::Y);
-			FVector playerForward = FRotationMatrix(playerRotZeroPitch).GetUnitAxis(EAxis::X);
-
-			MovementInput = MovementInput.GetSafeNormal() *100.f;
-			// Scale the forward and right vectors by movementInputDirection
-			dashDirection = playerForward * MovementInput.X + playerRight * MovementInput.Y;
-			// Normalize dodgeDir 
-			dashDirection.Normalize();
-			// Calculate dodge impulse
-			FVector dodgeImpulse = 500.0f * dashDirection;
-			// Apply impulse
-			UStaticMeshComponent* SM = Cast<UStaticMeshComponent>(character->GetRootComponent());
-			if (SM)	{
-				SM->AddImpulse(dodgeImpulse * SM->GetMass());
-			}
-
-			/*DebugMsg("char loc: " + FString::SanitizeFloat(character->GetActorLocation().X) + "," + FString::SanitizeFloat(character->GetActorLocation().Y), 10.f, FColor::Cyan);
-			DebugMsg("dash dir: " + FString::SanitizeFloat(dashDirection.X) + "," + FString::SanitizeFloat(dashDirection.Y), 10.f, FColor::Purple);
-			DebugMsg("dash loc: " + FString::SanitizeFloat(dashTargetLocation.X) + "," + FString::SanitizeFloat(dashTargetLocation.Y), 10.f, FColor::Red);*/
-		}
+		DodgeMove();
 	}
 	else {
 		DebugMsg("skill three on CD", displayTime, FColor::Red);
