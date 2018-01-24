@@ -265,6 +265,18 @@ void ACowboynoutPlayerController::WASDMove(float deltaTime) {
 	}
 }
 
+void ACowboynoutPlayerController::BeginPlay()
+{
+	if (wTextbox) {
+		info = true;
+		myTextbox = CreateWidget<UTextboxUserWidget>(this, wTextbox);
+		if (myTextbox) {
+			myTextbox->AddToViewport();
+			myTextbox->SetTextbox(TEXT("This is an on screen message!"), false);
+		}
+	}
+}
+
 void ACowboynoutPlayerController::MoveForward(float axisValue) {
 	MovementInput.X = FMath::Clamp<float>(axisValue, -1.0f, 1.0f);
 }
