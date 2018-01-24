@@ -1,7 +1,5 @@
 #include "AAIAgent.h"
 
-#define print(text) if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Red, text)
-
 UAAIAgent::UAAIAgent() :
 	perceptionRange(3000.f)
 {
