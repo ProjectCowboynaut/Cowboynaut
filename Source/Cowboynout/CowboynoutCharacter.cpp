@@ -102,9 +102,9 @@ ACowboynoutCharacter::ACowboynoutCharacter() {
 	soundLowLife = LoadObject<USoundBase>(NULL, TEXT("SoundWave'/Game/Assets/Audio/Player/PlayerLowLife.PlayerLowLife'"), NULL, LOAD_None, NULL);
 	soundDead = LoadObject<USoundBase>(NULL, TEXT("SoundWave'/Game/Assets/Audio/Player/PlayerDeath.PlayerDeath'"), NULL, LOAD_None, NULL);
 
-	//ProjectileClassT1 = LoadObject<TSubclassOf<AProjectile>>(NULL, TEXT("Blueprint'/Game/Blueprints/Skills/BP_SkillOne_T01.BP_SkillOne_T01'"), NULL, LOAD_None, NULL);
-	//ProjectileClassT2 = LoadObject<TSubclassOf<AProjectile>>(NULL, TEXT("Blueprint'/Game/Blueprints/Skills/BP_SkillOne_T02.BP_SkillOne_T02'"), NULL, LOAD_None, NULL);
-	//ProjectileClassT3 = LoadObject<TSubclassOf<AProjectile>>(NULL, TEXT("Blueprint'/Game/Blueprints/Skills/BP_SkillOne_T03.BP_SkillOne_T03'"), NULL, LOAD_None, NULL);
+	//ProjectileClassT1 = *LoadObject<TSubclassOf<AProjectile>>(NULL, TEXT("Blueprint'/Game/Blueprints/Skills/BP_SkillOne_T01.BP_SkillOne_T01'"), NULL, LOAD_None, NULL);
+	//ProjectileClassT2 = *LoadObject<TSubclassOf<AProjectile>>(NULL, TEXT("Blueprint'/Game/Blueprints/Skills/BP_SkillOne_T02.BP_SkillOne_T02'"), NULL, LOAD_None, NULL);
+	//ProjectileClassT3 = *LoadObject<TSubclassOf<AProjectile>>(NULL, TEXT("Blueprint'/Game/Blueprints/Skills/BP_SkillOne_T03.BP_SkillOne_T03'"), NULL, LOAD_None, NULL);
 
 	//GrenadeClassT1 = LoadObject<TSubclassOf<AGrenade>>(NULL, TEXT("Blueprint'/Game/Blueprints/Skills/BP_SkillTwo_T01.BP_SkillTwo_T01'"), NULL, LOAD_None, NULL);
 	//GrenadeClassT2 = LoadObject<TSubclassOf<AGrenade>>(NULL, TEXT("Blueprint'/Game/Blueprints/Skills/BP_SkillTwo_T02.BP_SkillTwo_T02'"), NULL, LOAD_None, NULL);
@@ -143,11 +143,12 @@ void ACowboynoutCharacter::Tick(float DeltaSeconds) {
 		UGameplayStatics::GetAllActorsOfClass(GetWorld(), AEnemy::StaticClass(), foundActors);
 		enemiesActual = foundActors.Num();
 		// check if enough enemies are down to disable barriers
-		if (enemiesActual < enemiesTotal - (enemiesToDisableBarrier * (barriersDisabled+1))) {
-			barriersDisabled++;
-			foundActorsBarr[barriersDisabled]->Destroy();
-			//GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "FU");
-		}
+		// the part formerly known as barrier function
+		//if (enemiesActual < enemiesTotal - (enemiesToDisableBarrier * (barriersDisabled+1))) {
+		//	barriersDisabled++;
+		//	foundActorsBarr[barriersDisabled]->Destroy();
+		//	//GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "FU");
+		//}
 	}
 
 	if (enemiesTotal != 0 && bossBarrikades != 0)
