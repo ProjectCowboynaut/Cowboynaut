@@ -16,7 +16,7 @@ FActionType UAAIAgent::EvaluateActions(const FEvaluationInput& evaluationInput)
 {
 	if (currentLockTime < currentAction.actionLockTime)
 	{
-		currentLockTime = GetWorld()->GetDeltaSeconds();
+		currentLockTime -= GetWorld()->GetDeltaSeconds();
 		return this->currentAction.actionType;
 	}
 
@@ -54,6 +54,7 @@ FActionType UAAIAgent::EvaluateActions(const FEvaluationInput& evaluationInput)
 		{
 			currentPriority = priority;
 			currentAction = action;
+			currentLockTime = currentAction.actionLockTime;
 		}
 	}
 
