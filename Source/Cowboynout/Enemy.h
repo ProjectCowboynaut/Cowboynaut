@@ -140,6 +140,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "EnemyStats")
 	int health;
 
+	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "EnemyStats")
+	int healthMax;
+
 	UPROPERTY(EditAnywhere)
 	float loopTime;
 

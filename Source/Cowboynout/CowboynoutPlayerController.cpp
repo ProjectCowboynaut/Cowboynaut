@@ -8,8 +8,19 @@
 #include "Perception/AISenseConfig_Sight.h"
 #include "Runtime/Engine/Classes/Components/DecalComponent.h"
 #include "CowboynoutCharacter.h"
+#include "Runtime/CoreUObject/Public/UObject/UObjectGlobals.h"
 #include "Runtime/UMG/Public/UMG.h"
 #include "Slate.h"
+
+const FString legitMapNames[] = {	"MapSpaceGanzesLV", "UEDPIE_0_MapSpaceGanzesLV",
+									"MapSpaceBjoerninger", "UEDPIE_0_MapSpaceBjoerninger",
+									"Test_Map_Ersin", "UEDPIE_0_Test_Map_Ersin",
+									"Test_Map_Maddin", "UEDPIE_0_Test_Map_Maddin",
+									"BossMap", "UEDPIE_0_BossMap",
+									"MapSpaceMaxwell", "UEDPIE_0_MapSpaceMaxwell"
+};
+
+
 
 ACowboynoutPlayerController::ACowboynoutPlayerController() {
 	// set controle method : 0 d3, 1 twins, swedish twins!
@@ -54,14 +65,15 @@ ACowboynoutPlayerController::ACowboynoutPlayerController() {
 	canTP = false;
 
 	canUpgrade = false;
+	
+	isDashing = false;
+	dashDistanceActual = 0.f;
 
 	// init player vars & refs (overwritten if used in BP)
 }
 
 void ACowboynoutPlayerController::SetupInputComponent() {
-	
-	FString loadedMapName = GetWorld()->GetMapName();
-	if (CheckMap(loadedMapName)) {
+	if (CheckMap()) {
 
 		// set up gameplay key bindings
 		Super::SetupInputComponent();
@@ -109,12 +121,34 @@ void ACowboynoutPlayerController::SetupInputComponent() {
 void ACowboynoutPlayerController::Tick(float deltaTime) {
 	Super::Tick(deltaTime);
 
+
+
 	// new movement
-	FString loadedMapName = GetWorld()->GetMapName();
-	if (CheckMap(loadedMapName)) {
-		RotatePlayer();
-		WASDMove(deltaTime);
+	if (CheckMap()) {
+		ACharacter* character = GetCharacter();
+		if (character) {
+			if (!isDashing) {
+				RotatePlayer();
+				WASDMove(deltaTime);
+				//dashStartPoint = character->GetActorLocation();
+			}
+			else {
+				// check dist(playerPos, dashStartPos)
+				dashDistanceActual = FVector::Dist(dashStartPoint, character->GetActorLocation());
+				if (dashSpeed == 0) dashSpeed = 1000.f;
+				if (dashDirection == FVector::ZeroVector)
+					dashDirection = (dashStartPoint - GetActorForwardVector()) * dashSpeed;
+				
+				myLittlePawny->AddMovementInput(dashTargetLocation);
+				if (dashDistanceActual >= dashDistanceMax)
+					// if dist >= dashDistance, !isDashing
+					isDashing = false;
+			}
+			// else do dash
+
+		}
 	}
+	
 
 	cowboy = Cast<ACowboynoutCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
 	if (cowboy && cowboy->dead) return;
@@ -225,10 +259,10 @@ void ACowboynoutPlayerController::WASDMove(float deltaTime) {
 			FVector NewLocation;
 			NewLocation += GetActorForwardVector() * MovementInput.X * deltaTime * characterMovementSpeed;
 			NewLocation += GetActorRightVector() * MovementInput.Y * deltaTime * characterMovementSpeed;
+			//DebugMsg(FString::SanitizeFloat(NewLocation.X)+","+ FString::SanitizeFloat(NewLocation.Y), 3.f, FColor::White);
 			myLittlePawny->AddMovementInput(NewLocation);
 		}
 	}
-
 }
 
 void ACowboynoutPlayerController::MoveForward(float axisValue) {
@@ -264,16 +298,10 @@ void ACowboynoutPlayerController::OnSetStationairyReleased() {
 
 // ## mouse functions
 
-bool ACowboynoutPlayerController::CheckMap(FString mapName) {
+bool ACowboynoutPlayerController::CheckMap() {
 	bool r = false;
-	FString legitMapNames[] = { "MapSpaceGanzesLV", "UEDPIE_0_MapSpaceGanzesLV",
-								"MapSpaceBjoerninger", "UEDPIE_0_MapSpaceBjoerninger", 
-								"Test_Map_Ersin", "UEDPIE_0_Test_Map_Ersin", 
-								"Test_Map_Maddin", "UEDPIE_0_Test_Map_Maddin",
-								"BossMap", "UEDPIE_0_BossMap",		
-								"MapSpaceMaxwell", "UEDPIE_0_MapSpaceMaxwell"
-	};
-	for(FString mapName : legitMapNames) {
+
+	for(const FString& mapName : legitMapNames) {
 		if (mapName == GetWorld()->GetMapName()) r = true;
 	}
 		
@@ -285,6 +313,7 @@ void ACowboynoutPlayerController::OnLeftMousePressed() {
 		ACowboynoutCharacter* playerChar = Cast<ACowboynoutCharacter>(GetCharacter());
 		if (playerChar) {
 			OnSkillOnePressed();
+			
 			// click on usable item
 			if (playerChar->hasTarget == 2) {
 				//DebugMsg("you clicked an info itam!", 3.f, FColor::White);
@@ -330,7 +359,7 @@ void ACowboynoutPlayerController::OnRightMouseReleased() {
 }
 
 void ACowboynoutPlayerController::OnSkillOnePressed() {
-	AController::StopMovement();
+	// AController::StopMovement();
 	SkillOne();
 }
 
@@ -415,7 +444,7 @@ void ACowboynoutPlayerController::SkillOne() {
 		DebugMsg("skill one on CD", displayTime, FColor::Red);
 		return;
 	}
-	AController::StopMovement();						// stop movement
+	//AController::StopMovement();						// stop movement
 	
 	
 	// play sound at player location
@@ -455,13 +484,42 @@ void ACowboynoutPlayerController::SkillTwoTP() {
 void ACowboynoutPlayerController::SkillThree() {
 	if (!skillThreeCD) {
 		DebugMsg("skill three fired", displayTime, FColor::Yellow);
-		/*myLittlePawny = GetPawn();
-		if (myLittlePawny) {
-			FVector NewLocation;
-			NewLocation += GetActorForwardVector() * 200.f;
-			myLittlePawny->AddMovementInput(NewLocation);
-		}*/
+		isDashing = true;
+		
+		ACharacter* character = GetCharacter();
+		if (character != NULL) {
+			dashStartPoint = character->GetActorLocation();
+		
+		
+			dashDirection = FVector::ZeroVector;
+			dashTargetLocation = FVector::ZeroVector;
 
+			dashDirection = GetActorForwardVector() * MovementInput.X;
+			dashDirection += GetActorRightVector() * MovementInput.Y;
+		
+			// Get player forward and right
+			FRotator playerRotZeroPitch = character->GetActorRotation();
+			playerRotZeroPitch.Pitch = 0;
+			FVector playerRight = FRotationMatrix(playerRotZeroPitch).GetUnitAxis(EAxis::Y);
+			FVector playerForward = FRotationMatrix(playerRotZeroPitch).GetUnitAxis(EAxis::X);
+
+			MovementInput = MovementInput.GetSafeNormal() *100.f;
+			// Scale the forward and right vectors by movementInputDirection
+			dashDirection = playerForward * MovementInput.X + playerRight * MovementInput.Y;
+			// Normalize dodgeDir 
+			dashDirection.Normalize();
+			// Calculate dodge impulse
+			FVector dodgeImpulse = 500.0f * dashDirection;
+			// Apply impulse
+			UStaticMeshComponent* SM = Cast<UStaticMeshComponent>(character->GetRootComponent());
+			if (SM)	{
+				SM->AddImpulse(dodgeImpulse * SM->GetMass());
+			}
+
+			/*DebugMsg("char loc: " + FString::SanitizeFloat(character->GetActorLocation().X) + "," + FString::SanitizeFloat(character->GetActorLocation().Y), 10.f, FColor::Cyan);
+			DebugMsg("dash dir: " + FString::SanitizeFloat(dashDirection.X) + "," + FString::SanitizeFloat(dashDirection.Y), 10.f, FColor::Purple);
+			DebugMsg("dash loc: " + FString::SanitizeFloat(dashTargetLocation.X) + "," + FString::SanitizeFloat(dashTargetLocation.Y), 10.f, FColor::Red);*/
+		}
 	}
 	else {
 		DebugMsg("skill three on CD", displayTime, FColor::Red);

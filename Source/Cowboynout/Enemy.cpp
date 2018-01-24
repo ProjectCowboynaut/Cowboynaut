@@ -90,6 +90,8 @@ void AEnemy::BeginPlay() {
 		shieldFour = 0.f;
 	}
 
+	healthMax = health;
+
 	// disable boss dmg area on start
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), PillarBPClass, foundPillars);
 	TArray<UActorComponent*> children;

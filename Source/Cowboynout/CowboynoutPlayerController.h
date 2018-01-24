@@ -198,6 +198,27 @@ public:
 	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Info") 
 	float shotsPerSecond;
 
+	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Skills")
+	bool isDashing;
+
+	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Skills")
+	float dashDistanceActual;
+
+	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Skills")
+	FVector dashStartPoint;
+
+	UPROPERTY(EditAnywhere, BluePrintReadWrite, Category = "Skills")
+	float dashDistanceMax;
+
+	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Skills")
+	float dashSpeed;
+
+	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Skills")
+	FVector dashDirection;
+
+	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Skills")
+	FVector dashTargetLocation;
+
 	// skill one
 	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Skills") 
 	float timerSkillOne; 
@@ -265,7 +286,7 @@ protected:
 	FVector2D MovementInput;
 
 	UFUNCTION()
-	bool CheckMap(FString mapName);
+	bool CheckMap();
 
 };
 
