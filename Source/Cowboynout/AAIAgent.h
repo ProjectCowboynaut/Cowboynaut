@@ -25,6 +25,7 @@ struct FEvaluationInput
 public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Input") float currentHealth;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Input") float maxHealth;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Input") float rangeToHealer;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Input") float rangeToPlayer;
 

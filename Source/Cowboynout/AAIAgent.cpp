@@ -1,6 +1,3 @@
-#include <EngineGlobals.h>
-#include <Runtime/Engine/Classes/Engine/Engine.h>
-
 #include "AAIAgent.h"
 
 #define print(text) if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 1.5, FColor::Red, text)
@@ -44,7 +41,7 @@ FActionType UAAIAgent::EvaluateActions(const FEvaluationInput& evaluationInput)
 			break;
 		case FActionType::FATNeedHeal:
 			priority = action.considerationCurve->GetFloatValue(
-				evaluationInput.currentHealth
+				evaluationInput.currentHealth / evaluationInput.maxHealth
 			);
 			break;
 		}
