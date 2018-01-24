@@ -1,4 +1,5 @@
 #include "AAIAgent.h"
+#include "Cowboynout.h"
 
 UAAIAgent::UAAIAgent() :
 	perceptionRange(3000.f)
@@ -13,7 +14,12 @@ void UAAIAgent::AddAction(const FAction& action)
 
 FActionType UAAIAgent::EvaluateActions(const FEvaluationInput& evaluationInput)
 {
-	FAction* currentAction = nullptr;
+	if (currentLockTime < currentAction.actionLockTime)
+	{
+		currentLockTime = GetWorld()->GetDeltaSeconds();
+		return this->currentAction.actionType;
+	}
+
 	float currentPriority = 0.0f;
 
 	for (auto& action : this->actionList)
@@ -47,14 +53,11 @@ FActionType UAAIAgent::EvaluateActions(const FEvaluationInput& evaluationInput)
 		if (priority > currentPriority)
 		{
 			currentPriority = priority;
-			currentAction = &action;
+			currentAction = action;
 		}
 	}
 
-	if (!currentAction)
-		return FActionType::FATRoaming;
-	else
-		return currentAction->actionType;
+	return currentAction.actionType;
 }
 
 

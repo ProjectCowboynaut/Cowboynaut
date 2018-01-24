@@ -40,6 +40,8 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "AI") FActionType actionType;
 	UPROPERTY(EditAnywhere, Category = "AI") UCurveFloat* considerationCurve;
+	UPROPERTY(EditAnywhere, Category = "AI") float actionLockTime;
+
 };
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
@@ -58,6 +60,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI") TArray<FAction> actionList;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI") float perceptionRange;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI") FAction currentAction;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI") float currentLockTime;
 
 protected:
 
