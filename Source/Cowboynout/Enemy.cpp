@@ -7,8 +7,6 @@
 #include "AAIAgent.h"
 #include "CowboynoutPlayerController.h"
 
-
-
 // Sets default values
 AEnemy::AEnemy()
 {
@@ -36,7 +34,6 @@ AEnemy::AEnemy()
 	pillarsToActivate = 0;
 	pillarsActive = 0;
 }
-
 
 void AEnemy::BeginPlay() 
 {
@@ -467,7 +464,6 @@ void AEnemy::Damage(int dmg) {
 	}
 }
 
-
 // 0: been hit; 1: attack; 
 void AEnemy::PlaySound(int sound) 
 {
@@ -487,4 +483,19 @@ void AEnemy::PlaySound(int sound)
 			UGameplayStatics::PlaySound2D(worldContextObject, soundSkill1c, volumeMultiplier, pitchMultiplier, startTime);
 	}
 		
+}
+
+void AEnemy::FollowActor(AActor* actor, float deltaTime)
+{
+	float speed = 250.0f;
+
+	auto lookAt = (actor->GetActorLocation() - this->GetActorLocation());
+	if (lookAt.Normalize())
+	{
+		auto rotation = lookAt.Rotation();
+		auto trafo = GetActorTransform();
+
+		this->SetActorRotation(rotation);
+		this->SetActorLocation(GetActorLocation() + (GetActorForwardVector() * speed * deltaTime));
+	}
 }

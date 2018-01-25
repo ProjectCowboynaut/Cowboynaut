@@ -232,19 +232,7 @@ public:
 	USoundBase* soundHit;
 
 	UFUNCTION(BlueprintCallable)
-	void FollowEntity(AActor* actor, float deltaTime)
-	{
-		float speed = 5.0f;
-		auto trafo = GetActorTransform();
-
-		auto location = this->GetActorLocation() + FVector(speed * deltaTime, 0, 0);
-		auto rotation = actor->GetActorLocation() * deltaTime;
-
-		trafo.SetLocation(location);
-
-		this->RotateCharacter(rotation);
-		this->SetActorTransform(trafo);
-	}
+	void FollowActor(AActor* actor, float deltaTime);
 
 protected:
 	
