@@ -493,3 +493,8 @@ void AEnemy::SetAIBehaviour(FActionType actionType)
 {
 	this->currentAIAction = actionType;
 }
+
+FActionType AEnemy::GetAIBehaviour()
+{
+	return this->currentAIAction;
+}

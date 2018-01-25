@@ -231,8 +231,11 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "SFX")
 	USoundBase* soundHit;
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void SetAIBehaviour(FActionType actionType);
+
+	UFUNCTION(BlueprintCallable)
+	FActionType GetAIBehaviour();
 
 	UPROPERTY(EditDefaultsOnly, Category = "AI")
 	FActionType currentAIAction;
