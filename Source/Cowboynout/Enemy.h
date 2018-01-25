@@ -232,13 +232,19 @@ public:
 	USoundBase* soundHit;
 
 	UFUNCTION(BlueprintCallable)
-	void SetAIBehaviour(FActionType actionType);
+	void FollowEntity(AActor* actor, float deltaTime)
+	{
+		float speed = 5.0f;
+		auto trafo = GetActorTransform();
 
-	UFUNCTION(BlueprintCallable)
-	FActionType GetAIBehaviour();
+		auto location = this->GetActorLocation() + FVector(speed * deltaTime, 0, 0);
+		auto rotation = actor->GetActorLocation() * deltaTime;
 
-	UPROPERTY(EditDefaultsOnly, Category = "AI")
-	FActionType currentAIAction;
+		trafo.SetLocation(location);
+
+		this->RotateCharacter(rotation);
+		this->SetActorTransform(trafo);
+	}
 
 protected:
 	
