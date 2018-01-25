@@ -206,6 +206,9 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BluePrintReadWrite)
 	bool timerActive;
+
+	UPROPERTY(EditAnywhere, BluePrintReadOnly, Category = "EnemyType Stats")
+	bool isFriendly;
 	
 	UFUNCTION()
 	void Die();

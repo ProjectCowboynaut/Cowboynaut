@@ -31,6 +31,8 @@ AEnemy::AEnemy()
 	bossEffectTimerActive = 0.f;
 	bossFightActive = false;				// set over BP
 
+	isFriendly = false;
+
 	pillarsToActivate = 0;
 	pillarsActive = 0;
 }
@@ -381,8 +383,9 @@ void AEnemy::DestroyShield()
 	}
 }
 
-void AEnemy::Damage(int dmg) 
-{
+void AEnemy::Damage(int dmg) {
+	if (isFriendly) return;
+
 	if (type == 1) {
 		health -= dmg;
 	}

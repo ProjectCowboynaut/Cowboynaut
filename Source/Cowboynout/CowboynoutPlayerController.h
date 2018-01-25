@@ -6,6 +6,7 @@
 #include "GameFramework/PlayerController.h"
 #include "Projectile.h"
 #include "CowboynoutCharacter.h"
+#include "TextboxUserWidget.h"
 #include "CowboynoutPlayerController.generated.h"
 
 
@@ -35,6 +36,14 @@ public:
 
 	UPROPERTY()
 	UUserWidget* myInfoW;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widgets")
+	TSubclassOf<class UUserWidget> wTextbox;
+
+	UPROPERTY(BlueprintReadWrite, Category = "Widgets")
+	UTextboxUserWidget* myTextbox;
+	//UUserWidget* 
+	
 
 	UPROPERTY()
 	bool info;
@@ -278,7 +287,11 @@ public:
 	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Movement") 
 	bool isMoving;					// durr, used to see if moving
 
+
 protected:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+
 	UFUNCTION()
 	void MoveForward(float axisValue);
 

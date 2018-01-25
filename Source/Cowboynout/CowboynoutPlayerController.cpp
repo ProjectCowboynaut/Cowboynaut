@@ -286,6 +286,14 @@ void ACowboynoutPlayerController::DodgeMove() {
 				NewLocation += FVector(character->GetRootComponent()->GetForwardVector() * 100 * dashDistance);
 			cowboy->LaunchCharacter(NewLocation,false, false);
 			//DebugMsg("launch @" + FString::SanitizeFloat(NewLocation.X) + "," + FString::SanitizeFloat(NewLocation.Y), 3.f, FColor::White);
+
+void ACowboynoutPlayerController::BeginPlay()
+{
+	if (wTextbox) {
+		info = true;
+		myTextbox = CreateWidget<UTextboxUserWidget>(this, wTextbox);
+		if (myTextbox) {
+			myTextbox->AddToViewport();
 		}
 	}
 }
