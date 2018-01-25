@@ -40,7 +40,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widgets")
 	TSubclassOf<class UUserWidget> wTextbox;
 
-	UPROPERTY()
+	UPROPERTY(BlueprintReadWrite, Category = "Widgets")
 	UTextboxUserWidget* myTextbox;
 	//UUserWidget* 
 	
