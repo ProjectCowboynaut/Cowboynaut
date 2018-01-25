@@ -33,6 +33,9 @@ public:
 		return CollisionComp;
 	}
 
+	UPROPERTY()
+	bool debugEnabled;
+
 	// Begin PlayerController interface
 	UFUNCTION()
 	virtual void Tick(float deltaTime) override;

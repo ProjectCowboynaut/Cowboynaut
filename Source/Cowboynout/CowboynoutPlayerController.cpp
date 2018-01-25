@@ -76,6 +76,8 @@ ACowboynoutPlayerController::ACowboynoutPlayerController() {
 	dashDistance = 50.f;
 	dashTimer = .1f;
 
+	debugEnabled = false;
+
 	// init player vars & refs (overwritten if used in BP)
 }
 
@@ -286,6 +288,9 @@ void ACowboynoutPlayerController::DodgeMove() {
 				NewLocation += FVector(character->GetRootComponent()->GetForwardVector() * 100 * dashDistance);
 			cowboy->LaunchCharacter(NewLocation,false, false);
 			//DebugMsg("launch @" + FString::SanitizeFloat(NewLocation.X) + "," + FString::SanitizeFloat(NewLocation.Y), 3.f, FColor::White);
+		}
+	}
+}
 
 void ACowboynoutPlayerController::BeginPlay()
 {
@@ -530,7 +535,8 @@ void ACowboynoutPlayerController::MedPack() {
 
 // bugs bunny
 void ACowboynoutPlayerController::DebugMsg(FString msg, float dTime, FColor clr) {
-	GEngine->AddOnScreenDebugMessage(-1, dTime, clr, msg);
+	if (debugEnabled)
+		GEngine->AddOnScreenDebugMessage(-1, dTime, clr, msg);
 }
 
 void ACowboynoutPlayerController::PlusStatA() {

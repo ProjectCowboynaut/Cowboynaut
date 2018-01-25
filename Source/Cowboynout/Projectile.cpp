@@ -9,6 +9,8 @@ AProjectile::AProjectile() {
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.bStartWithTickEnabled = true;
 
+	debugEnabled = false;
+
 	CollisionComp = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
 	CollisionComp->InitSphereRadius(5.0f);
 	CollisionComp->BodyInstance.SetCollisionProfileName("Projectile");
@@ -33,6 +35,8 @@ AProjectile::AProjectile() {
 	FRotator SpawnRotation = GetActorRotation();;
 
 	bulletType = GetClass()->GetName();
+
+	hitEnemies = {};
 
 	// set PLAYER projectile base stats depending on skill T
 	if (bulletType == "BP_SkillOne_T01_C" || bulletType == "BP_SkillOne_T02_C" || bulletType == "BP_SkillOne_T03_C"){
@@ -62,15 +66,15 @@ AProjectile::AProjectile() {
 		if (playerChar) {
 			if (playerChar->skillLvlOne == 1) {
 				projectileDamage = 50 + (playerChar->attack * playerChar->attackGainPerLevel);
-				penetration = 1;
+				penetration = 5;
 			}
 			else if (playerChar->skillLvlOne == 2) {
 				projectileDamage = 60 + (playerChar->attack * playerChar->attackGainPerLevel);
-				penetration = 2;
+				penetration = 10;
 			}
 			else if (playerChar->skillLvlOne == 3) {
 				projectileDamage = 70 + (playerChar->attack * playerChar->attackGainPerLevel);
-				penetration = 3;
+				penetration = 15;
 			}
 		}
 	}
@@ -85,13 +89,14 @@ AProjectile::AProjectile() {
 
 void AProjectile::Tick(float deltaTime) {
 	if (penetration <= 0) {
-		DebugMsg("xxx : pen", 1.5f, FColor::Red);
+		//DebugMsg("xxx : pen", 1.5f, FColor::Red);
 		Destroy();
 	}
 }
 
 void AProjectile::DebugMsg(FString msg, float dTime, FColor clr) {
-	GEngine->AddOnScreenDebugMessage(-1, dTime, clr, msg);
+	if (debugEnabled)
+		GEngine->AddOnScreenDebugMessage(-1, dTime, clr, msg);
 }
 
 void AProjectile::Initialize(int damage) {
@@ -101,31 +106,38 @@ void AProjectile::Initialize(int damage) {
 
 void AProjectile::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) {
 	if (OtherActor != NULL) {
-		DebugMsg(OtherActor->GetFName().ToString(), 1.5f, FColor::Yellow);
+		//DebugMsg(OtherActor->GetFName().ToString(), 1.5f, FColor::Yellow);
 		// push box
 		if (OtherActor != this && OtherActor->GetFName().ToString() == "Box") {
 			OtherComp->AddImpulseAtLocation(GetVelocity() * 5.0f, GetActorLocation());
 		}
 
 		// >> hit !player
-		if ((OtherActor->ActorHasTag("Enemy") || OverlappedComp->ComponentHasTag("Enemy")) && playerProjectile) {
-			DebugMsg("p hit: " + OtherActor->GetName(), 1.5f, FColor::Red);
-			// set dmg on enemy
-			AEnemy* hitEnemy = Cast<AEnemy>(OtherActor);
-			ACowboynoutCharacter* playerChar = Cast<ACowboynoutCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
-			if (playerChar && hitEnemy) {
-				hitEnemy->Damage(projectileDamage * (1 + (playerChar->attack / 10)));
-				hitEnemy->PlaySound(0);
-				// check for penetration and sub enemy armor
-				penetration -= hitEnemy->armor;
-			}
+		if (hitEnemies.Contains(OtherActor)) {
+			//DebugMsg("schon getroffen", 1.5f, FColor::Yellow);
 		}
-		// >> hit player
-		else if ((OtherActor->ActorHasTag("Player") || OverlappedComp->ComponentHasTag("Player")) && enemyProjectile) {
-			ACowboynoutCharacter* playerChar = Cast<ACowboynoutCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
-			if (playerChar) playerChar->Damage(projectileDamage);
-			DebugMsg("e hit: " + OtherActor->GetName(), 1.5f, FColor::Red);
-			Destroy();
+		else {
+			hitEnemies.AddUnique(OtherActor);
+			if ((OtherActor->ActorHasTag("Enemy") || OverlappedComp->ComponentHasTag("Enemy")) && playerProjectile) {
+				//DebugMsg("p hit: " + OtherActor->GetName(), 1.5f, FColor::Red);
+				// set dmg on enemy
+				AEnemy* hitEnemy = Cast<AEnemy>(OtherActor);
+				ACowboynoutCharacter* playerChar = Cast<ACowboynoutCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+				if (playerChar && hitEnemy) {
+					hitEnemy->Damage(projectileDamage * (1 + (playerChar->attack / 10)));
+					hitEnemy->PlaySound(0);
+					// check for penetration and sub enemy armor
+					penetration -= hitEnemy->armor;
+				}
+			}
+			// >> hit player
+			else if ((OtherActor->ActorHasTag("Player") || OverlappedComp->ComponentHasTag("Player")) && enemyProjectile) {
+				ACowboynoutCharacter* playerChar = Cast<ACowboynoutCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+				if (playerChar) playerChar->Damage(projectileDamage);
+				//DebugMsg("e hit: " + OtherActor->GetName(), 1.5f, FColor::Red);
+				Destroy();
+			}
+
 		}
 
 	}

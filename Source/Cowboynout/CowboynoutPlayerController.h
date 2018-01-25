@@ -287,6 +287,8 @@ public:
 	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Movement") 
 	bool isMoving;					// durr, used to see if moving
 
+	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Movement")
+	bool debugEnabled;
 
 protected:
 	// Called when the game starts or when spawned
