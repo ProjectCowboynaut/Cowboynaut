@@ -19,6 +19,12 @@ AProjectile::AProjectile() {
 	CollisionComp->SetWalkableSlopeOverride(FWalkableSlopeOverride(WalkableSlope_Unwalkable, 0.f));
 	CollisionComp->CanCharacterStepUpOn = ECB_No;
 
+	//CollisionComp->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+
+	//CollisionComp->BodyInstance.SetResponseToChannel(ECC_Pawn, ECR_Overlap);
+	//CollisionComp->BodyInstance.SetResponseToChannel(ECC_PhysicsBody, ECR_Overlap);
+	//CollisionComp->BodyInstance.SetResponseToChannel(ECC_Vehicle, ECR_Overlap);
+
 	RootComponent = CollisionComp;
 
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileComp"));
@@ -39,7 +45,7 @@ AProjectile::AProjectile() {
 	hitEnemies = {};
 
 	// set PLAYER projectile base stats depending on skill T
-	if (bulletType == "BP_SkillOne_T01_C" || bulletType == "BP_SkillOne_T02_C" || bulletType == "BP_SkillOne_T03_C"){
+	if (bulletType == "BP_PlayerShot_C"){
 		playerProjectile = true;
 		enemyProjectile = false;
 		
@@ -50,44 +56,42 @@ AProjectile::AProjectile() {
 			ProjectileMovement->MaxSpeed = 4000.f * playerChar->speed;
 			if (playerChar->skillLvlOne == 1) {
 				ProjectileMovement->bShouldBounce = false;
+				projectileDamage = 50 + (playerChar->attack * playerChar->attackGainPerLevel);
+				penetration = 5;
 			}
 			else if (playerChar->skillLvlOne == 2) {
 				ProjectileMovement->bShouldBounce = false;
+				projectileDamage = 60 + (playerChar->attack * playerChar->attackGainPerLevel);
+				penetration = 10;
 			}
 			else if (playerChar->skillLvlOne == 3) {
 				ProjectileMovement->bShouldBounce = false;
+				projectileDamage = 70 + (playerChar->attack * playerChar->attackGainPerLevel);
+				penetration = 15;
 			}
 		}
 		else {
 			ProjectileMovement->InitialSpeed = 3000.f;
 			ProjectileMovement->MaxSpeed = 3000.f;
 		}
-
-		if (playerChar) {
-			if (playerChar->skillLvlOne == 1) {
-				projectileDamage = 50 + (playerChar->attack * playerChar->attackGainPerLevel);
-				penetration = 5;
-			}
-			else if (playerChar->skillLvlOne == 2) {
-				projectileDamage = 60 + (playerChar->attack * playerChar->attackGainPerLevel);
-				penetration = 10;
-			}
-			else if (playerChar->skillLvlOne == 3) {
-				projectileDamage = 70 + (playerChar->attack * playerChar->attackGainPerLevel);
-				penetration = 15;
-			}
-		}
 	}
 
 	// set ENEMY projectile base stats
-	else if (bulletType == "BP_Ememy_SkillOne_00_C" || bulletType == "BP_Enemy_SkillOne_01_C" || bulletType == "BP_EnemyProjectile_C") {
+	else if (bulletType == "BP_EnemyShot_C") {
 		enemyProjectile = true;
 		playerProjectile = false;
+		ProjectileMovement->bShouldBounce = false;
 		penetration = 1;
+		ProjectileMovement->InitialSpeed = 2000.f;
+		ProjectileMovement->MaxSpeed = 2000.f;
+	}
+	else {
+		//DebugMsg("no bulletType found", 2.f, FColor::Red);
 	}
 }
 
 void AProjectile::Tick(float deltaTime) {
+	// (y) DebugMsg("<" + bulletType + ">", 5.f, FColor::Yellow);
 	if (penetration <= 0) {
 		//DebugMsg("xxx : pen", 1.5f, FColor::Red);
 		Destroy();
@@ -95,7 +99,7 @@ void AProjectile::Tick(float deltaTime) {
 }
 
 void AProjectile::DebugMsg(FString msg, float dTime, FColor clr) {
-	if (debugEnabled)
+	//if (debugEnabled)
 		GEngine->AddOnScreenDebugMessage(-1, dTime, clr, msg);
 }
 
@@ -105,19 +109,21 @@ void AProjectile::Initialize(int damage) {
 
 
 void AProjectile::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) {
-	if (OtherActor != NULL) {
-		//DebugMsg(OtherActor->GetFName().ToString(), 1.5f, FColor::Yellow);
-		// push box
+	//DebugMsg("::" + OtherActor->GetFName().ToString() + "->" + OverlappedComp->GetFName().ToString(), 5.f, FColor::Yellow);
+	if (OtherActor != nullptr){
+		
+		// push box on hit
 		if (OtherActor != this && OtherActor->GetFName().ToString() == "Box") {
 			OtherComp->AddImpulseAtLocation(GetVelocity() * 5.0f, GetActorLocation());
 		}
 
-		// >> hit !player
 		if (hitEnemies.Contains(OtherActor)) {
 			//DebugMsg("schon getroffen", 1.5f, FColor::Yellow);
 		}
 		else {
 			hitEnemies.AddUnique(OtherActor);
+
+			// >> hit enemy
 			if ((OtherActor->ActorHasTag("Enemy") || OverlappedComp->ComponentHasTag("Enemy")) && playerProjectile) {
 				//DebugMsg("p hit: " + OtherActor->GetName(), 1.5f, FColor::Red);
 				// set dmg on enemy
@@ -137,11 +143,10 @@ void AProjectile::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* Ot
 				//DebugMsg("e hit: " + OtherActor->GetName(), 1.5f, FColor::Red);
 				Destroy();
 			}
-
+			else DebugMsg("no actor", 1.5f, FColor::Red);
 		}
-
 	}
-	else DebugMsg("no actor" + OtherActor->GetName(), 1.5f, FColor::Red);
+	else DebugMsg("no actor", 1.5f, FColor::Red);
 
 }
 
