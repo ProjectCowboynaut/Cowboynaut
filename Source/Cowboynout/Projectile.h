@@ -25,15 +25,25 @@ public:
 	UFUNCTION()
 	void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
+	UFUNCTION()
+	void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
 	/** Returns CollisionComp subobject **/
 	FORCEINLINE USphereComponent* GetCollisionComp() const {
 		return CollisionComp;
 	}
 
-	UPROPERTY(VisibleAnywhere)
+	// Begin PlayerController interface
+	UFUNCTION()
+	virtual void Tick(float deltaTime) override;
+
+	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Projectile")
+	FString bulletType;
+
+	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category="Projectile")
 	bool playerProjectile;
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Projectile")
 	bool enemyProjectile;
 
 	UPROPERTY(VisibleAnywhere)

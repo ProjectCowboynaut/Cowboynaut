@@ -18,7 +18,8 @@ const FString legitMapNames[] = {	"MapSpaceGanzesLV", "UEDPIE_0_MapSpaceGanzesLV
 									"Test_Map_Ersin", "UEDPIE_0_Test_Map_Ersin",
 									"Test_Map_Maddin", "UEDPIE_0_Test_Map_Maddin",
 									"BossMap", "UEDPIE_0_BossMap",
-									"MapSpaceMaxwell", "UEDPIE_0_MapSpaceMaxwell"
+									"MapSpaceMaxwell", "UEDPIE_0_MapSpaceMaxwell",
+									"BossMap+Level", "UEDPIE_0_BossMap+Level"
 };
 
 ACowboynoutPlayerController::ACowboynoutPlayerController() {
@@ -68,11 +69,12 @@ ACowboynoutPlayerController::ACowboynoutPlayerController() {
 	isDashing = false;
 	dashDistanceActual = 0.f;
 
-	characterMovementSpeed = 500.f;
+	characterMovementSpeed = 0.f;
 	dashSpeed = 50.f;
 	fireRate = .2f;
 	fireTimer = 0;
 	dashDistance = 50.f;
+	dashTimer = .1f;
 
 	// init player vars & refs (overwritten if used in BP)
 }
@@ -126,6 +128,15 @@ void ACowboynoutPlayerController::Tick(float deltaTime) {
 
 	// new movement
 	if (CheckMap()) {
+		myLittlePawny = GetPawn();
+		if (myLittlePawny) {
+			characterMovementSpeed = myLittlePawny->GetVelocity().Size();
+		}
+
+		if (isDashing && characterMovementSpeed <= 1250.f) {
+			isDashing = false;
+		}
+
 		ACharacter* character = GetCharacter();
 		if (character) {
 			RotatePlayer();
@@ -140,7 +151,6 @@ void ACowboynoutPlayerController::Tick(float deltaTime) {
 			}
 		}
 	}
-	
 
 	cowboy = Cast<ACowboynoutCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
 	if (cowboy && cowboy->dead) return;
@@ -153,6 +163,9 @@ void ACowboynoutPlayerController::Tick(float deltaTime) {
 			isMoving = false;
 	}
 	// reset skill CDs if time passed
+	if (isDashing) {
+
+	}
 	if (skillOneCD) {
 		activeTimerSkillOne += deltaTime;
 

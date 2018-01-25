@@ -195,6 +195,12 @@ public:
 	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Skills")
 	bool isDashing;
 
+	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Movement")
+	FVector velo;
+
+	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Skills")
+	float dashTimer;
+
 	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Skills")
 	float dashDistanceActual;
 

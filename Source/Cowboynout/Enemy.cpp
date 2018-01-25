@@ -13,6 +13,7 @@
 AEnemy::AEnemy()
 {
 	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bStartWithTickEnabled = true;
 	// var init
 	chipsA = 0;
 	chipsB = 0;
@@ -35,10 +36,12 @@ AEnemy::AEnemy()
 }
 
 
-void AEnemy::BeginPlay() {
+void AEnemy::BeginPlay() 
+{
 	Super::BeginPlay();
 	// trash mob stats
-	if (type == 1) {
+	if (type == 1) 
+	{
 		health = 110;
 		attackRatio = attackRatioBase;					// faster attacks, less dmg
 		shieldOneActive = false;
@@ -49,9 +52,11 @@ void AEnemy::BeginPlay() {
 		shieldThree = 0.f;
 		shieldFourActive = false;
 		shieldFour = 0.f;
+		armor = 1.f;
 	}
 	// elite mob stats
-	else if (type == 2) {
+	else if (type == 2) 
+	{
 		health = 200;
 		attackRatio = attackRatioElite;					// faster attacks, less dmg
 		shieldOneActive = false;
@@ -62,21 +67,25 @@ void AEnemy::BeginPlay() {
 		shieldThree = 0.f;
 		shieldFourActive = false;
 		shieldFour = 0.f;
+		armor = 1.f;
 	}
 	// boss mob stats
-	else if (type == 666) {
+	else if (type == 666) 
+	{
 		health = 510;
 		attackRatio = attackRatioBoss;					// lower ratio, more dmg per shot
 		shieldOneActive = true;
-		shieldOne = 200.f;
+		shieldOne = 1200.f;
 		shieldTwoActive = true;
-		shieldTwo = 200.f;
+		shieldTwo = 1200.f;
 		shieldThreeActive = true;
-		shieldThree = 200.f;
+		shieldThree = 1200.f;
 		shieldFourActive = true;
-		shieldFour = 200.f;
+		shieldFour = 1200.f;
+		armor = 1.f;
 	}
-	else {
+	else 
+	{
 		type = 1;
 		health = 110;
 		attackRatio = attackRatioBase;					// faster attacks, less dmg
@@ -95,20 +104,25 @@ void AEnemy::BeginPlay() {
 	// disable boss dmg area on start
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), PillarBPClass, foundPillars);
 	TArray<UActorComponent*> children;
-	for (int z = 0; z < foundPillars.Num(); z++) {
+	for (int z = 0; z < foundPillars.Num(); z++) 
+	{
 		if (foundPillars.IsValidIndex(z))
 			foundPillars[z]->GetComponents(children);
-		for (int i = 0; i < children.Num(); i++) {
-			if (children.IsValidIndex(i)) {
+		for (int i = 0; i < children.Num(); i++) 
+		{
+			if (children.IsValidIndex(i)) 
+			{
 				UActorComponent* child = children[i];
 				FString name = child->GetName();
 				USceneComponent* node = Cast<USceneComponent>(children[i]);
-				if (child->GetName() == "BossAreaDamage") {
+				if (child->GetName() == "BossAreaDamage") 
+				{
 					child->Deactivate();
 					node->ToggleVisibility(true);
 					//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, "-d");
 				}
-				else if (child->GetName() == "BossAreaWarning") {
+				else if (child->GetName() == "BossAreaWarning") 
+				{
 					child->Deactivate();
 					node->ToggleVisibility(true);
 					//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, "-w");
@@ -118,29 +132,35 @@ void AEnemy::BeginPlay() {
 	}
 }
 
-void AEnemy::Tick(float deltaTime) {
+void AEnemy::Tick(float deltaTime) 
+{
 	Super::Tick(deltaTime);
 
 	if (timerActive)
 		timer += deltaTime;
-	if (timer > attackRatio) {
+	if (timer > attackRatio) 
+	{
 		timerActive = false;
 		timer = 0;
 	}
 
-	if (health <= 0) {
+	if (health <= 0) 
+	{
 		Die();
 	}
 
-	if (deathTimerActive) {
+	if (deathTimerActive) 
+	{
 		ACowboynoutPlayerController* pCtrl = Cast<ACowboynoutPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-		if (playerChar) {
+		if (playerChar) 
+		{
 			pCtrl->endGame = true;
 			pCtrl->deathTimerFull = pCtrl->endCD;
 		}
 	}
 
-	if (bossFightActive) {
+	if (bossFightActive) 
+	{
 		BossFight(deltaTime);
 	}
 
@@ -170,10 +190,12 @@ void AEnemy::Tick(float deltaTime) {
 	//this->action = ai->EvaluateActions(this->evalInput);
 }
 
-void AEnemy::BossFight(float deltaTime) {
+void AEnemy::BossFight(float deltaTime) 
+{
 	// pillars
 	bossEffectTimerActive += deltaTime;
-	if (bossEffectTimerActive >= bossEffectTimer) {
+	if (bossEffectTimerActive >= bossEffectTimer) 
+	{
 		// > enable 2 plates
 		bossEffectTimerActive = 0;
 		bossEffectTimer = FMath::RandRange(1.f, 6.f);
@@ -190,7 +212,8 @@ void AEnemy::BossFight(float deltaTime) {
 		pa = -1;
 		pillarsLastActive = -1;
 
-		while (pillarsActive < pillarsToActivate) {
+		while (pillarsActive < pillarsToActivate) 
+		{
 			while (pa == pillarsLastActive)
 				pa = FMath::RandRange(0, foundPillars.Num()-1);
 
@@ -208,30 +231,36 @@ void AEnemy::BossFight(float deltaTime) {
 					for (UActorComponent* c : childComp) {
 
 						FString name = c->GetName();
-						if (c->GetName() == "BossAreaDamage") {
+						if (c->GetName() == "BossAreaDamage") 
+						{
 							USceneComponent* node = Cast<USceneComponent>(c);
-							if (c->IsActive()) {
+							if (c->IsActive()) 
+							{
 								c->Deactivate();
 								node->ToggleVisibility(true);
 								//FString msg = c->GetName() + " + " + FString::FromInt(pa) + "+";
 								//GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, msg);
 							}
-							else {
+							else 
+							{
 								c->Activate();
 								node->ToggleVisibility(true);
 								//FString msg = c->GetName() + " + " + FString::FromInt(pa) + "-";
 								//GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, msg);
 							}
 						}
-						else if (c->GetName() == "BossAreaWarning") {
+						else if (c->GetName() == "BossAreaWarning") 
+						{
 							USceneComponent* node = Cast<USceneComponent>(c);
-							if (c->IsActive()) {
+							if (c->IsActive()) 
+							{
 								c->Deactivate();
 								node->ToggleVisibility(true);
 								//FString msg = c->GetName() + " + " + FString::FromInt(pa) + "+";
 								//GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, msg);
 							}
-							else {
+							else 
+							{
 								c->Activate();	
 								node->ToggleVisibility(true);
 								//FString msg = c->GetName() + " + " + FString::FromInt(pa) + "-";
@@ -252,46 +281,55 @@ void AEnemy::BossFight(float deltaTime) {
 	}
 }
 
-void AEnemy::SenseStuff(TArray<AActor*> testActors) {
+void AEnemy::SenseStuff(TArray<AActor*> testActors) 
+{
 	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "I see you!");
 }
 
-void AEnemy::SetNewMoveDestination(const FVector DestLocation) {
+void AEnemy::SetNewMoveDestination(const FVector DestLocation) 
+{
 
 }
 
-void AEnemy::RotateCharacter(const FVector DestLocation) {
+void AEnemy::RotateCharacter(const FVector DestLocation) 
+{
 	FRotator rot = FRotationMatrix::MakeFromX(GetActorLocation() - DestLocation).Rotator();
 	//SetActorLocation(actorLoc);
 	SetActorRotation(rot);
 }
 
-void AEnemy::Die() {
+void AEnemy::Die() 
+{
 	ULoot* loot = AActor::FindComponentByClass<ULoot>();
-	if (loot) {
+	if (loot) 
+	{
 		loot->DropChance(GetActorLocation(), this);
 	}
 
 	playerChar = Cast<ACowboynoutCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
-	if (playerChar) {
+	if (playerChar) 
+	{
 		playerChar->SetTarget(0);
 		playerChar->targetString = "";
 	}
 
-	if (type == 666) {
+	if (type == 666) 
+	{
 		deathTimerActive = true;
 	}
 
 	Destroy();
 }
 
-void AEnemy::DoAPeriodicCheck() {
+void AEnemy::DoAPeriodicCheck() 
+{
 	FString msg = this->GetName();
 	GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::White, msg + ": Periodic Check has fired!");
 	//GLog->Log("Periodic Check has fired!");
 }
 
-void AEnemy::Attack() {
+void AEnemy::Attack() 
+{
 	timerActive = true;
 	FRotator rot = GetActorRotation();
 	FActorSpawnParameters spawnInfo;
@@ -299,7 +337,8 @@ void AEnemy::Attack() {
 	if (bullet) PlaySound(1);
 }
 
-void AEnemy::MouseOverBegin(UPrimitiveComponent* TouchedComponent) {
+void AEnemy::MouseOverBegin(UPrimitiveComponent* TouchedComponent) 
+{
 	playerChar = Cast<ACowboynoutCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
 	FString hitObjectName = TouchedComponent->GetFName().ToString();
 	if (playerChar) {
@@ -308,40 +347,51 @@ void AEnemy::MouseOverBegin(UPrimitiveComponent* TouchedComponent) {
 	}
 }
 
-void AEnemy::MouseOverEnd() {
+void AEnemy::MouseOverEnd() 
+{
 	playerChar = Cast<ACowboynoutCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
-	if (playerChar) {
+	if (playerChar) 
+	{
 		playerChar->SetTarget(0);
 		playerChar->targetString = "";
 	}
 }
 
-void AEnemy::DestroyShield() {
-	if (shieldFourActive) {
+void AEnemy::DestroyShield()
+{
+	if (shieldFourActive) 
+	{
 		shieldFour = 0;
 		shieldFourActive = false;
 	}
-	else if (shieldThreeActive) {
+	else if (shieldThreeActive) 
+	{
 		shieldThree = 0;
 		shieldThreeActive = false;
 	}
-	else if (shieldTwoActive) {
+	else if (shieldTwoActive) 
+	{
 		shieldTwo = 0;
 		shieldTwoActive = false;
 	}
-	else if (shieldOneActive) {
+	else if (shieldOneActive) 
+	{
 		shieldOne = 0;
 		shieldOneActive = false;
 	}
 }
 
-void AEnemy::Damage(int dmg) {
+void AEnemy::Damage(int dmg) 
+{
 	if (type == 1) {
 		health -= dmg;
 	}
-	else if (type == 2) {
-		if (shieldOneActive) {
-			if (shieldOne > dmg) {
+	else if (type == 2) 
+	{
+		if (shieldOneActive) 
+		{
+			if (shieldOne > dmg) 
+			{
 				shieldOne -= dmg;
 			}
 			else {
@@ -352,62 +402,79 @@ void AEnemy::Damage(int dmg) {
 		else
 			health -= dmg;
 	}
-	else if (type == 666) {
-		if (shieldFourActive) {
-			if (shieldFour > dmg) {
+	else if (type == 666) 
+	{
+		if (shieldFourActive) 
+		{
+			if (shieldFour > dmg) 
+			{
 				shieldFour -= dmg;
 			}
-			else {
+			else 
+			{
 				shieldFour = 0;
 				shieldFourActive = false;
 			}
 		}
-		else if (shieldThreeActive) {
-			if (shieldThree > dmg) {
+		else if (shieldThreeActive) 
+		{
+			if (shieldThree > dmg) 
+			{
 				shieldThree -= dmg;
 			}
-			else {
+			else 
+			{
 				shieldThree = 0;
 				shieldThreeActive = false;
 			}
 		}
-		else if (shieldTwoActive) {
-			if (shieldTwo > dmg) {
+		else if (shieldTwoActive) 
+		{
+			if (shieldTwo > dmg) 
+			{
 				shieldTwo -= dmg;
 			}
-			else {
+			else 
+			{
 				shieldTwo = 0;
 				shieldTwoActive = false;
 			}
 		}
-		else if (shieldOneActive) {
-			if (shieldOne > dmg) {
+		else if (shieldOneActive) 
+		{
+			if (shieldOne > dmg) 
+			{
 				shieldOne -= dmg;
 			}
-			else {
+			else 
+			{
 				shieldOne = 0;
 				shieldOneActive = false;
 			}
 		}
-		else {
+		else 
+		{
 			health -= dmg;
 		}
 		
 	}
-	else{
+	else
+	{
 		health -= dmg;
 	}
 }
 
 
 // 0: been hit; 1: attack; 
-void AEnemy::PlaySound(int sound) {
+void AEnemy::PlaySound(int sound) 
+{
 	float volumeMultiplier = 1.f;
 	float pitchMultiplier = 1.f;
 	float startTime = 0.f;
 
 	UObject* worldContextObject = GetWorld();
-	if (sound == 1) {
+	if (sound == 1) 
+	{
 		int rnd = FMath::RandRange(0, 3);
 		if (rnd == 1)
 			UGameplayStatics::PlaySound2D(worldContextObject, soundSkill1a, volumeMultiplier, pitchMultiplier, startTime);
