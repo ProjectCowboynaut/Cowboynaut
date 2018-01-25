@@ -232,10 +232,10 @@ public:
 	USoundBase* soundHit;
 
 	UFUNCTION()
-	void SetAIBehaviour(FActionType behaviour);
+	void SetAIBehaviour(FActionType actionType);
 
 	UPROPERTY(EditDefaultsOnly, Category = "AI")
-	FActionType behaviour;
+	FActionType currentAIAction;
 
 protected:
 	
