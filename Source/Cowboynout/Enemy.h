@@ -231,6 +231,12 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "SFX")
 	USoundBase* soundHit;
 
+	UFUNCTION()
+	void SetAIBehaviour(FActionType behaviour);
+
+	UPROPERTY(EditDefaultsOnly, Category = "AI")
+	FActionType behaviour;
+
 protected:
 	
 	virtual void BeginPlay() override;
