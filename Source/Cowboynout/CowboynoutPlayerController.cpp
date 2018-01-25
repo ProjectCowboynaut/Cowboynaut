@@ -19,7 +19,7 @@ const FString legitMapNames[] = {	"MapSpaceGanzesLV", "UEDPIE_0_MapSpaceGanzesLV
 									"Test_Map_Maddin", "UEDPIE_0_Test_Map_Maddin",
 									"BossMap", "UEDPIE_0_BossMap",
 									"MapSpaceMaxwell", "UEDPIE_0_MapSpaceMaxwell",
-									"BossMap+Level", "UEDPIE_0_BossMap+Level"
+									"BossLevel", "UEDPIE_0_BossLevel"
 };
 
 ACowboynoutPlayerController::ACowboynoutPlayerController() {

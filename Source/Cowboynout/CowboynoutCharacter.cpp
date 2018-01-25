@@ -27,12 +27,6 @@ ACowboynoutCharacter::ACowboynoutCharacter() {
 	muzzleLocationR = CreateDefaultSubobject<USceneComponent>(TEXT("MuzzleLocationR"));
 	muzzleLocationR->SetupAttachment(RootComponent);
 
-	// set collision cmop
-	CollisionComp = CreateDefaultSubobject<USphereComponent>(TEXT("COLLIDAAAAAAAA"));
-	CollisionComp->InitSphereRadius(3.0f);
-	CollisionComp->OnComponentBeginOverlap.AddDynamic(this, &ACowboynoutCharacter::OnOverlapBegin);
-	CollisionComp->BodyInstance.SetCollisionProfileName("COLLIDAAAAAAAA");
-
 	// Don't rotate character to camera direction
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = false;
