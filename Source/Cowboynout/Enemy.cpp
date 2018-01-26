@@ -3,6 +3,7 @@
 #include "Enemy.h"
 #include <limits>
 #include "Loot.h"
+#include "BossComponent.h"
 //#include "Perception/AIPerceptionComponent.h"
 //#include "Runtime/AIModule/Classes/AIController.h"
 #include "AAIAgent.h"
@@ -31,7 +32,7 @@ AEnemy::AEnemy()
 	bossFightActive = false;				// set over BP
 
 	isFriendly = false;
-
+	isBoss = false;
 	pillarsToActivate = 0;
 	pillarsActive = 0;
 
@@ -78,6 +79,7 @@ AEnemy::AEnemy()
 		shieldFourActive = true;
 		shieldFour = 1200.f;
 		armor = 1.f;
+		isBoss = true;
 	}
 	else 
 	{
@@ -194,93 +196,102 @@ void AEnemy::Tick(float deltaTime)
 
 void AEnemy::BossFight(float deltaTime) 
 {
-	// pillars
-	bossEffectTimerActive += deltaTime;
-	if (bossEffectTimerActive >= bossEffectTimer) 
+	if (isBoss) 
 	{
-		// > enable 2 plates
-		bossEffectTimerActive = 0;
-		bossEffectTimer = FMath::RandRange(1.f, 6.f);
-
-		UGameplayStatics::GetAllActorsOfClass(GetWorld(), PillarBPClass, foundPillars);
-		pillars = foundPillars.Num();
-
-#pragma region de-/activate half the pillars
-
-		pillarsToActivate = pillars / 2;
-		pillarsActive = 0;
-		//FString msg = "# of pillars to activate: ";
-		//GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::White, msg + FString::FromInt(pillarsToActivate));
-		pa = -1;
-		pillarsLastActive = -1;
-
-		while (pillarsActive < pillarsToActivate) 
+		UBossComponent* boss = AActor::FindComponentByClass<UBossComponent>();
+		if (boss)
 		{
-			while (pa == pillarsLastActive)
-				pa = FMath::RandRange(0, foundPillars.Num()-1);
-
-			//FString msg = "activating pillar: ";
-			//GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::White, msg + FString::FromInt(pa));
-			// -----
-			TArray<UActorComponent*> childComp;
-			//for (int p = 0; p < pillars; p++) {
-				// check if pillar is to activate or not
-				
-				foundPillars[pa]->GetComponents(childComp);
-				if (childComp.IsValidIndex(pa)) {
-					UActorComponent* child = childComp[pa];
-						
-					for (UActorComponent* c : childComp) {
-
-						FString name = c->GetName();
-						if (c->GetName() == "BossAreaDamage") 
-						{
-							USceneComponent* node = Cast<USceneComponent>(c);
-							if (c->IsActive()) 
-							{
-								c->Deactivate();
-								node->ToggleVisibility(true);
-								//FString msg = c->GetName() + " + " + FString::FromInt(pa) + "+";
-								//GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, msg);
-							}
-							else 
-							{
-								c->Activate();
-								node->ToggleVisibility(true);
-								//FString msg = c->GetName() + " + " + FString::FromInt(pa) + "-";
-								//GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, msg);
-							}
-						}
-						else if (c->GetName() == "BossAreaWarning") 
-						{
-							USceneComponent* node = Cast<USceneComponent>(c);
-							if (c->IsActive()) 
-							{
-								c->Deactivate();
-								node->ToggleVisibility(true);
-								//FString msg = c->GetName() + " + " + FString::FromInt(pa) + "+";
-								//GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, msg);
-							}
-							else 
-							{
-								c->Activate();	
-								node->ToggleVisibility(true);
-								//FString msg = c->GetName() + " + " + FString::FromInt(pa) + "-";
-								//GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, msg);
-							}
-						}
-						
-					}
-
-				}
-			//}
-			// -----
-			pillarsLastActive = pa;
-			pillarsActive++;
-		}	
-#pragma endregion
-
+			boss->BossFight();
+		}
 	}
+//	// pillars
+//	bossEffectTimerActive += deltaTime;
+//	if (bossEffectTimerActive >= bossEffectTimer) 
+//	{
+//		// > enable 2 plates
+//		bossEffectTimerActive = 0;
+//		bossEffectTimer = FMath::RandRange(1.f, 6.f);
+//
+//		UGameplayStatics::GetAllActorsOfClass(GetWorld(), PillarBPClass, foundPillars);
+//		pillars = foundPillars.Num();
+//
+//#pragma region de-/activate half the pillars
+//
+//		pillarsToActivate = pillars / 2;
+//		pillarsActive = 0;
+//		//FString msg = "# of pillars to activate: ";
+//		//GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::White, msg + FString::FromInt(pillarsToActivate));
+//		pa = -1;
+//		pillarsLastActive = -1;
+//
+//		while (pillarsActive < pillarsToActivate) 
+//		{
+//			while (pa == pillarsLastActive)
+//				pa = FMath::RandRange(0, foundPillars.Num()-1);
+//
+//			//FString msg = "activating pillar: ";
+//			//GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::White, msg + FString::FromInt(pa));
+//			// -----
+//			TArray<UActorComponent*> childComp;
+//			//for (int p = 0; p < pillars; p++) {
+//				// check if pillar is to activate or not
+//				
+//				foundPillars[pa]->GetComponents(childComp);
+//				if (childComp.IsValidIndex(pa)) {
+//					UActorComponent* child = childComp[pa];
+//						
+//					for (UActorComponent* c : childComp) {
+//
+//						FString name = c->GetName();
+//						if (c->GetName() == "BossAreaDamage") 
+//						{
+//							USceneComponent* node = Cast<USceneComponent>(c);
+//							if (c->IsActive()) 
+//							{
+//								c->Deactivate();
+//								node->ToggleVisibility(true);
+//								//FString msg = c->GetName() + " + " + FString::FromInt(pa) + "+";
+//								//GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, msg);
+//							}
+//							else 
+//							{
+//								c->Activate();
+//								node->ToggleVisibility(true);
+//								//FString msg = c->GetName() + " + " + FString::FromInt(pa) + "-";
+//								//GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, msg);
+//							}
+//						}
+//						else if (c->GetName() == "BossAreaWarning") 
+//						{
+//							USceneComponent* node = Cast<USceneComponent>(c);
+//							if (c->IsActive()) 
+//							{
+//								c->Deactivate();
+//								node->ToggleVisibility(true);
+//								//FString msg = c->GetName() + " + " + FString::FromInt(pa) + "+";
+//								//GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Green, msg);
+//							}
+//							else 
+//							{
+//								c->Activate();	
+//								node->ToggleVisibility(true);
+//								//FString msg = c->GetName() + " + " + FString::FromInt(pa) + "-";
+//								//GEngine->AddOnScreenDebugMessage(-1, 3.0f, FColor::Red, msg);
+//							}
+//						}
+//						
+//					}
+//
+//				}
+//			//}
+//			// -----
+//			pillarsLastActive = pa;
+//			pillarsActive++;
+//		}	
+//	}
+//#pragma endregion
+//
+	
 }
 
 void AEnemy::SenseStuff(TArray<AActor*> testActors) 

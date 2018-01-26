@@ -22,6 +22,9 @@ public:
 
 	virtual void Tick(float DeltaTime) override;
 
+	UPROPERTY(EditAnywhere, Category = "EnemyType Stats")
+	bool isBoss;
+
 	UFUNCTION(BlueprintCallable)
 	void MouseOverBegin(UPrimitiveComponent* TouchedComponent);
 
