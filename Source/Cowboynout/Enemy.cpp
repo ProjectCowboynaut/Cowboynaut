@@ -4,6 +4,7 @@
 #include <limits>
 #include "Loot.h"
 //#include "Perception/AIPerceptionComponent.h"
+//#include "Runtime/AIModule/Classes/AIController.h"
 #include "AAIAgent.h"
 #include "CowboynoutPlayerController.h"
 
@@ -37,7 +38,7 @@ AEnemy::AEnemy()
 	if (type == 1) 
 	{
 		health = 110;
-		attackRatio = .4;					// faster attacks, less dmg
+		attackRatio = .15f;					// faster attacks, less dmg
 		shieldOneActive = false;
 		shieldOne = 0.f;
 		shieldTwoActive = false;
@@ -82,7 +83,7 @@ AEnemy::AEnemy()
 	{
 		type = 1;
 		health = 110;
-		attackRatio = .3f;					// faster attacks, less dmg
+		attackRatio = .2f;					// faster attacks, less dmg
 		shieldOneActive = false;
 		shieldOne = 0.f;
 		shieldTwoActive = false;
@@ -487,9 +488,23 @@ void AEnemy::PlaySound(int sound)
 		
 }
 
+
 void AEnemy::FollowActor(AActor* actor, float deltaTime)
 {
-	float speed = 250.0f;
+	//auto lookAt = (actor->GetActorLocation() - this->GetActorLocation());
+	//if (lookAt.Normalize())
+	//{
+	//	auto rotation = lookAt.Rotation();
+	//	auto trafo = GetActorTransform();
+	//}
+	//// spawns default controller (if not, there is no controller for NPC to control)
+	//this->SpawnDefaultController();
+	//// cast controller recieved in NCP in Bar Class, derived from AAIController class
+	//ABarNPCAIController * moveController = Cast<ABarNPCAIController>(NPC->GetController());
+	//// moves character to location defined by TargetLocation component of moveEvent	
+	//moveController->MoveToLocation(*moveEvent.targetLocation);
+
+	/*float speed = 250.0f;
 
 	auto lookAt = (actor->GetActorLocation() - this->GetActorLocation());
 	if (lookAt.Normalize())
@@ -499,5 +514,5 @@ void AEnemy::FollowActor(AActor* actor, float deltaTime)
 
 		this->SetActorRotation(rotation);
 		this->SetActorLocation(GetActorLocation() + (GetActorForwardVector() * speed * deltaTime));
-	}
+	}*/
 }
