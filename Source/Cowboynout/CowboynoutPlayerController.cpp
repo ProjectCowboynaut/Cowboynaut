@@ -257,6 +257,14 @@ void ACowboynoutPlayerController::Tick(float deltaTime) {
 }
 
 void ACowboynoutPlayerController::WASDMove(float deltaTime) {
+	ACowboynoutGameState* state = Cast<ACowboynoutGameState>(GetWorld()->GetGameState());
+	if (state)
+	{
+		if (state->isPaused)
+		{
+			return;
+		}
+	}
 	if (!MovementInput.IsZero()) {
 		//Scale our movement input axis values by 100 units per second
 		MovementInput = MovementInput.GetSafeNormal() *100.f;
@@ -273,6 +281,14 @@ void ACowboynoutPlayerController::WASDMove(float deltaTime) {
 }
 
 void ACowboynoutPlayerController::DodgeMove() {
+	ACowboynoutGameState* state = Cast<ACowboynoutGameState>(GetWorld()->GetGameState());
+	if (state)
+	{
+		if (state->isPaused)
+		{
+			return;
+		}
+	}
 	cowboy = Cast<ACowboynoutCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
 	FVector NewLocation ;
 	ACharacter* character = GetCharacter();
@@ -347,10 +363,27 @@ bool ACowboynoutPlayerController::CheckMap() {
 }
 
 void ACowboynoutPlayerController::OnLeftMousePressed() {
+	ACowboynoutGameState* state = Cast<ACowboynoutGameState>(GetWorld()->GetGameState());
+	if (state)
+	{
+		if (state->isPaused)
+		{
+			return;
+		}
+	}
 	this->autoFire = true;
 }
 
 void ACowboynoutPlayerController::OnLeftMouseReleased() {
+	ACowboynoutGameState* state = Cast<ACowboynoutGameState>(GetWorld()->GetGameState());
+	if (state)
+	{
+		if (state->isPaused)
+		{
+			return;
+		}
+	}
+
 	this->autoFire = false;
 
 	ACowboynoutCharacter* playerChar = Cast<ACowboynoutCharacter>(GetCharacter());
@@ -383,6 +416,14 @@ void ACowboynoutPlayerController::OnLeftMouseReleased() {
 }
 
 void ACowboynoutPlayerController::OnRightMousePressed() {
+	ACowboynoutGameState* state = Cast<ACowboynoutGameState>(GetWorld()->GetGameState());
+	if (state)
+	{
+		if (state->isPaused)
+		{
+			return;
+		}
+	}
 	ACowboynoutCharacter* playerChar = Cast<ACowboynoutCharacter>(GetCharacter());
 	if (playerChar) {
 		SkillThree();
@@ -390,10 +431,26 @@ void ACowboynoutPlayerController::OnRightMousePressed() {
 }
 
 void ACowboynoutPlayerController::OnSpacePressed() {
+	ACowboynoutGameState* state = Cast<ACowboynoutGameState>(GetWorld()->GetGameState());
+	if (state)
+	{
+		if (state->isPaused)
+		{
+			return;
+		}
+	}
 	SkillTwo();
 }
 
 void ACowboynoutPlayerController::OnShiftPressed() {
+	ACowboynoutGameState* state = Cast<ACowboynoutGameState>(GetWorld()->GetGameState());
+	if (state)
+	{
+		if (state->isPaused)
+		{
+			return;
+		}
+	}
 	SkillThree();
 }
 
@@ -416,7 +473,15 @@ void ACowboynoutPlayerController::OnSimulateDamageReleased() {
 }
 
 void ACowboynoutPlayerController::RotatePlayer() {
-	
+	ACowboynoutGameState* state = Cast<ACowboynoutGameState>(GetWorld()->GetGameState());
+	if (state)
+	{
+		if (state->isPaused)
+		{
+			return;
+		}
+	}
+
 	// Get mouse position on screen
 	float xMouse;
 	float yMouse;

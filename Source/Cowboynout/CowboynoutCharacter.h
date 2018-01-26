@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "Projectile.h"
 #include "Grenade.h"
+#include "CowboynoutGameState.h"
 #include "CowboynoutCharacter.generated.h"
 
 UCLASS(Blueprintable)
