@@ -33,16 +33,11 @@ AEnemy::AEnemy()
 
 	pillarsToActivate = 0;
 	pillarsActive = 0;
-}
 
-void AEnemy::BeginPlay() 
-{
-	Super::BeginPlay();
-	// trash mob stats
 	if (type == 1) 
 	{
 		health = 110;
-		attackRatio = attackRatioBase;					// faster attacks, less dmg
+		attackRatio = .4;					// faster attacks, less dmg
 		shieldOneActive = false;
 		shieldOne = 0.f;
 		shieldTwoActive = false;
@@ -57,7 +52,7 @@ void AEnemy::BeginPlay()
 	else if (type == 2) 
 	{
 		health = 200;
-		attackRatio = attackRatioElite;					// faster attacks, less dmg
+		attackRatio = .3f;					// faster attacks, less dmg
 		shieldOneActive = false;
 		shieldOne = 0;
 		shieldTwoActive = false;
@@ -72,7 +67,7 @@ void AEnemy::BeginPlay()
 	else if (type == 666) 
 	{
 		health = 510;
-		attackRatio = attackRatioBoss;					// lower ratio, more dmg per shot
+		attackRatio = .2f;					// lower ratio, more dmg per shot
 		shieldOneActive = true;
 		shieldOne = 1200.f;
 		shieldTwoActive = true;
@@ -87,7 +82,7 @@ void AEnemy::BeginPlay()
 	{
 		type = 1;
 		health = 110;
-		attackRatio = attackRatioBase;					// faster attacks, less dmg
+		attackRatio = .3f;					// faster attacks, less dmg
 		shieldOneActive = false;
 		shieldOne = 0.f;
 		shieldTwoActive = false;
@@ -99,6 +94,13 @@ void AEnemy::BeginPlay()
 	}
 
 	healthMax = health;
+}
+
+void AEnemy::BeginPlay() 
+{
+	Super::BeginPlay();
+	// trash mob stats
+	
 
 	// disable boss dmg area on start
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), PillarBPClass, foundPillars);
