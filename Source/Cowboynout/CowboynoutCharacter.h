@@ -130,19 +130,19 @@ public:
 	float GetHealth();
 
 	UFUNCTION(BlueprintCallable)
-	void ConvertChipSkillA();
+	void ConvertChipSkillA(int ammount);
 
 	UFUNCTION(BlueprintCallable)
-	void ConvertChipSkillB();
+	void ConvertChipSkillB(int ammount);
 
 	UFUNCTION(BlueprintCallable)
-	void ConvertChipStatA();
+	void ConvertChipStatA(int ammount);
 
 	UFUNCTION(BlueprintCallable)
-	void ConvertChipStatB();
+	void ConvertChipStatB(int ammount);
 
 	UFUNCTION(BlueprintCallable)
-	void ConvertChipStatC();
+	void ConvertChipStatC(int ammount);
 
 	UFUNCTION()
 	void Die();

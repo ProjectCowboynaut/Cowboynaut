@@ -290,19 +290,21 @@ void ACowboynoutPlayerController::DodgeMove() {
 		}
 	}
 	cowboy = Cast<ACowboynoutCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
-	FVector NewLocation ;
+	FVector launchSpeed ;
 	ACharacter* character = GetCharacter();
 
 	if (character != NULL) {
 		FVector charLoc = character->GetActorLocation();
 
 		if (cowboy) {
-			NewLocation = FVector(0, 0, 0);
+			launchSpeed = FVector(0, 0, 0);
 			if (MovementInput.X != 0 || MovementInput.Y != 0)
-				NewLocation += FVector((MovementInput.X * dashDistance), (MovementInput.Y * dashDistance),0);
+				launchSpeed += FVector((MovementInput.X * dashDistance), (MovementInput.Y * dashDistance),0);
 			else 
-				NewLocation += FVector(character->GetRootComponent()->GetForwardVector() * 100 * dashDistance);
-			cowboy->LaunchCharacter(NewLocation,false, false);
+				launchSpeed += FVector(character->GetRootComponent()->GetForwardVector() * 100 * dashDistance);
+
+			launchSpeed.Z = 25.f;
+			cowboy->LaunchCharacter(launchSpeed,true, true);
 			//DebugMsg("launch @" + FString::SanitizeFloat(NewLocation.X) + "," + FString::SanitizeFloat(NewLocation.Y), 3.f, FColor::White);
 		}
 	}
@@ -606,15 +608,15 @@ void ACowboynoutPlayerController::DebugMsg(FString msg, float dTime, FColor clr)
 
 void ACowboynoutPlayerController::PlusStatA() {
 	ACowboynoutCharacter* cowboy = Cast<ACowboynoutCharacter>(GetCharacter());
-	cowboy->ConvertChipStatA();
+	cowboy->ConvertChipStatA(0);
 }
 
 void ACowboynoutPlayerController::PlusStatB() {
 	ACowboynoutCharacter* cowboy = Cast<ACowboynoutCharacter>(GetCharacter());
-	cowboy->ConvertChipStatB();
+	cowboy->ConvertChipStatB(0);
 }
 
 void ACowboynoutPlayerController::PlusStatC() {
 	ACowboynoutCharacter* cowboy = Cast<ACowboynoutCharacter>(GetCharacter());
-	cowboy->ConvertChipStatC();
+	cowboy->ConvertChipStatC(0);
 }

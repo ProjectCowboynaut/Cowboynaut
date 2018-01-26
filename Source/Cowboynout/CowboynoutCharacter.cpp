@@ -122,6 +122,7 @@ void ACowboynoutCharacter::SetTarget(int targetStatus) {			/// 0: no target; 1: 
 void ACowboynoutCharacter::Tick(float DeltaSeconds) {
     Super::Tick(DeltaSeconds);
 
+#pragma region get enemy ammount
 	if (!enemiesSet) {
 		// set total number of enemies
 		UGameplayStatics::GetAllActorsOfClass(GetWorld(), AEnemy::StaticClass(), foundActors);
@@ -147,7 +148,9 @@ void ACowboynoutCharacter::Tick(float DeltaSeconds) {
 
 	if (enemiesTotal != 0 && bossBarrikades != 0)
 		enemiesToDisableBarrier = enemiesTotal / bossBarrikades;
+#pragma endregion 
 
+#pragma region set game state (paused/playing)
 	ACowboynoutGameState* state = Cast<ACowboynoutGameState>(GetWorld()->GetGameState());
 	if (state)
 	{
@@ -155,21 +158,22 @@ void ACowboynoutCharacter::Tick(float DeltaSeconds) {
 		{
 		}
 	}
-			if (CursorToWorld != nullptr)
-			{
-				APlayerController* playerCtrl = Cast<APlayerController>(GetController());
-				if (playerCtrl)
-				{
-					FHitResult TraceHitResult;
-					playerCtrl->GetHitResultUnderCursor(ECC_Visibility, true, TraceHitResult);
-					FVector CursorFV = TraceHitResult.ImpactNormal;
-					FRotator CursorR = CursorFV.Rotation();
-					CursorToWorld->SetWorldLocation(TraceHitResult.Location);
-					CursorToWorld->SetWorldRotation(CursorR);
-				}
-			}
+	if (CursorToWorld != nullptr)
+	{
+		APlayerController* playerCtrl = Cast<APlayerController>(GetController());
+		if (playerCtrl)
+		{
+			FHitResult TraceHitResult;
+			playerCtrl->GetHitResultUnderCursor(ECC_Visibility, true, TraceHitResult);
+			FVector CursorFV = TraceHitResult.ImpactNormal;
+			FRotator CursorR = CursorFV.Rotation();
+			CursorToWorld->SetWorldLocation(TraceHitResult.Location);
+			CursorToWorld->SetWorldRotation(CursorR);
+		}
+	}
+#pragma endregion 
 
-
+#pragma region Life stuff
 	// play low life sound warning
 	if (life <= lifeWarningValue) {
 		if (lifeWarningTimer > lifeWarningTimerFull) {
@@ -190,6 +194,20 @@ void ACowboynoutCharacter::Tick(float DeltaSeconds) {
 		if (deathTimer <= 0)
 			UGameplayStatics::OpenLevel(this, TEXT("/Game/Maps/DeathScreen"), false);
 	}
+#pragma endregion 
+
+#pragma region auto stat upgrades
+	// check for chip update
+	if (chipsA > 5) {
+		ConvertChipStatA(5);
+	}
+	if (chipsB > 5) {
+		ConvertChipStatB(5);
+	}
+	if (chipsC > 5) {
+		ConvertChipStatC(5);
+	}
+#pragma endregion 
 }
 
 
@@ -214,53 +232,58 @@ void ACowboynoutCharacter::Die() {
 	animDying = true;
 }
 
-void ACowboynoutCharacter::ConvertChipStatA() {
-	/*if (chipsA >= 5) {
-		chipsA -= 5;*/
+// converts [ammount of chip A] of chips to upgrade stat A
+void ACowboynoutCharacter::ConvertChipStatA(int ammount) {
+	if (chipsA >= ammount) {
+		chipsA -= ammount;
 		lifeMax += lifeGainPerLevel;
 		//life = lifeMax;
-	/*}
+	}
 	else
-		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "not enough chips to convert to stat A");*/
+		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "not enough chips to convert to stat A");
 }
 
-void ACowboynoutCharacter::ConvertChipStatB() {
-	/*if (chipsB >= 5) {
-		chipsB -= 5;*/
+// converts [ammount of chip B] of chips to upgrade stat B
+void ACowboynoutCharacter::ConvertChipStatB(int ammount) {
+	if (chipsB >= ammount) {
+		chipsB -= ammount;
 		speed++;
 		GetCharacterMovement()->MaxWalkSpeed += speedGainPerLevel;
-	/*}
+	}
 	else
-		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "not enough chips to convert to stat B");*/
+		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "not enough chips to convert to stat B");
 }
 
-void ACowboynoutCharacter::ConvertChipStatC() {
-	/*if (chipsC >= 5) {
-		chipsC -= 5;*/
+// converts [ammount of chip C] of chips to upgrade stat C
+void ACowboynoutCharacter::ConvertChipStatC(int ammount) {
+	if (chipsC >= ammount) {
+		chipsC -= ammount;
 		attack += 1;
-	/*}
+	}
 	else
-		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "not enough chips to convert to stat C");*/
+		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "not enough chips to convert to stat C");
 }
 
-void ACowboynoutCharacter::ConvertChipSkillA() {
-	/*if (chipsA >= 10 && chipsB >= 10) {
-		chipsA -= 10;
-		chipsB -= 10;*/
+// converts [ammount of chip A and B] of chips to upgrade skill A
+void ACowboynoutCharacter::ConvertChipSkillA(int ammount) {
+	if (chipsA >= ammount && chipsB >= ammount) {
+		chipsA -= ammount;
+		chipsB -= ammount;
 		skillLvlOne++;
-	/*}
+	}
 	else
-		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "not enough chips to convert to skill A");*/
+		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "not enough chips to convert to skill A");
 }
 
-void ACowboynoutCharacter::ConvertChipSkillB() {
-	/*if (chipsB >= 10 && chipsC >= 10) {
-		chipsB -= 10;
-		chipsC -= 10;*/
+// converts [ammount of chip B and C] of chips to upgrade skill B
+void ACowboynoutCharacter::ConvertChipSkillB(int ammount) {
+	if (chipsB >= ammount && chipsC >= ammount) {
+		chipsB -= ammount;
+		chipsC -= ammount;
 		skillLvlTwo++;
-	/*}
+	}
 	else
-		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "not enough chips to convert to skill B");*/
+		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "not enough chips to convert to skill B");
 }
 
 int ACowboynoutCharacter::GetChipsA() {

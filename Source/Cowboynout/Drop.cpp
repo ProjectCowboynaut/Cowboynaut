@@ -49,9 +49,9 @@ void ADrop::OnOverlap(UPrimitiveComponent* HitComp, AActor* OtherActor, class UP
 
 		ACowboynoutCharacter* playerChar = Cast<ACowboynoutCharacter>(OtherActor);
 		// increase chip ammount
-		if		(type == 1)	playerChar->ConvertChipStatA();
-		else if (type == 2) playerChar->ConvertChipStatB();
-		else if (type == 3) playerChar->ConvertChipStatC();
+		if		(type == 1)	playerChar->chipsA++;
+		else if (type == 2) playerChar->chipsB++;
+		else if (type == 3) playerChar->chipsC++;
 		else if (type == 4) {
 			if (playerChar->life + 50 <= playerChar->lifeMax) playerChar->life += 15;
 			else playerChar->life = playerChar->lifeMax;
