@@ -6,6 +6,7 @@
 #include "GameFramework/PlayerController.h"
 #include "Projectile.h"
 #include "CowboynoutCharacter.h"
+#include "CowboynoutGameState.h"
 #include "TextboxUserWidget.h"
 #include "CowboynoutPlayerController.generated.h"
 

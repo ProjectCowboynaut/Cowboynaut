@@ -148,19 +148,27 @@ void ACowboynoutCharacter::Tick(float DeltaSeconds) {
 	if (enemiesTotal != 0 && bossBarrikades != 0)
 		enemiesToDisableBarrier = enemiesTotal / bossBarrikades;
 
-	if (CursorToWorld != nullptr)
+	ACowboynoutGameState* state = Cast<ACowboynoutGameState>(GetWorld()->GetGameState());
+	if (state)
 	{
-		APlayerController* playerCtrl = Cast<APlayerController>(GetController());
-		if (playerCtrl)
+		if (!state->isPaused)
 		{
-			FHitResult TraceHitResult;
-			playerCtrl->GetHitResultUnderCursor(ECC_Visibility, true, TraceHitResult);
-			FVector CursorFV = TraceHitResult.ImpactNormal;
-			FRotator CursorR = CursorFV.Rotation();
-			CursorToWorld->SetWorldLocation(TraceHitResult.Location);
-			CursorToWorld->SetWorldRotation(CursorR);
 		}
 	}
+			if (CursorToWorld != nullptr)
+			{
+				APlayerController* playerCtrl = Cast<APlayerController>(GetController());
+				if (playerCtrl)
+				{
+					FHitResult TraceHitResult;
+					playerCtrl->GetHitResultUnderCursor(ECC_Visibility, true, TraceHitResult);
+					FVector CursorFV = TraceHitResult.ImpactNormal;
+					FRotator CursorR = CursorFV.Rotation();
+					CursorToWorld->SetWorldLocation(TraceHitResult.Location);
+					CursorToWorld->SetWorldRotation(CursorR);
+				}
+			}
+
 
 	// play low life sound warning
 	if (life <= lifeWarningValue) {
