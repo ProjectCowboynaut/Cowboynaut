@@ -130,6 +130,9 @@ public:
 	float GetHealth();
 
 	UFUNCTION(BlueprintCallable)
+	int GetNades();
+
+	UFUNCTION(BlueprintCallable)
 	void ConvertChipSkillA(int ammount);
 
 	UFUNCTION(BlueprintCallable)
@@ -183,6 +186,9 @@ public:
 	FString targetString;
 
 	// "Inventory"
+	UPROPERTY(EditAnywhere, Category = "Loot")
+	int nades;
+
 	UPROPERTY(EditAnywhere, Category= "Loot")
 	int chipsA;
 

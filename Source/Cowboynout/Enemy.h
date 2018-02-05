@@ -11,6 +11,16 @@
 #include "Projectile.h"
 #include "Enemy.generated.h"
 
+
+UENUM(Blueprintable)
+enum class EnemyType : uint8
+{
+	EnemyBase UMETA(DisplayName = "Base Drone"),
+	EnemyElite UMETA(DisplayName = "Elite Drone"),
+	EnemyBoss UMETA(DisplayName = "Boss Drone")
+	
+};
+
 UCLASS()
 class COWBOYNOUT_API AEnemy : public ACharacter
 {
@@ -109,6 +119,9 @@ public:
 	UPROPERTY()
 	int lastRnd;
 
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<AActor> brokenDroneMesh;
+
 	// base stats for enemy types
 	UPROPERTY(EditAnywhere, Category = "EnemyType Stats")
 	float attackRatioBase;
@@ -140,7 +153,7 @@ public:
 	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "EnemyStats")
 	float attackRatio;
 
-	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "EnemyStats")
+	UPROPERTY(EditAnywhere, BluePrintReadWrite, Category = "EnemyStats")
 	int health;
 
 	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "EnemyStats")
@@ -152,8 +165,11 @@ public:
 	UPROPERTY()
 	bool deathTimerActive;
 
+	//UPROPERTY(EditAnywhere, BluePrintReadWrite, Category = "EnemyStats")
+	//int type;								// 0 = not initialized type; 1 = trash mob; 666 = boss mob
+
 	UPROPERTY(EditAnywhere, BluePrintReadWrite, Category = "EnemyStats")
-	int type;								// 0 = not initialized type; 1 = trash mob; 666 = boss mob
+	EnemyType enemyType;
 	
 	UPROPERTY(EditAnywhere, BluePrintReadWrite, Category = "EnemyStats")
 	bool shieldOneActive;
@@ -236,6 +252,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void FollowActor(AActor* actor, float deltaTime);
+
+	UPROPERTY(EditDefaultsOnly, Category = "particles")
+	UParticleSystem* dmgEffectParticle;
 
 protected:
 	

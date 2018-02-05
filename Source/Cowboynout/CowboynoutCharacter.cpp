@@ -73,6 +73,7 @@ ACowboynoutCharacter::ACowboynoutCharacter() {
 	chipsB = 0;
 	chipsC = 0;
 	medPacks = 0;
+	nades = 2;
 
 	// base level up gains in percent
 	lifeGainPerLevel = 10;
@@ -192,7 +193,7 @@ void ACowboynoutCharacter::Tick(float DeltaSeconds) {
 			//GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, msg);
 		}
 		if (deathTimer <= 0)
-			UGameplayStatics::OpenLevel(this, TEXT("/Game/Maps/DeathScreen"), false);
+			UGameplayStatics::OpenLevel(this, TEXT("/Game/Maps/DeathScreen_Menu"), false);
 	}
 #pragma endregion 
 
@@ -232,7 +233,7 @@ void ACowboynoutCharacter::Die() {
 	animDying = true;
 }
 
-// converts [ammount of chip A] of chips to upgrade stat A
+// converts [ammount of chip A] of chips to upgrade stat A : life, blue
 void ACowboynoutCharacter::ConvertChipStatA(int ammount) {
 	if (chipsA >= ammount) {
 		chipsA -= ammount;
@@ -243,7 +244,7 @@ void ACowboynoutCharacter::ConvertChipStatA(int ammount) {
 		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "not enough chips to convert to stat A");
 }
 
-// converts [ammount of chip B] of chips to upgrade stat B
+// converts [ammount of chip B] of chips to upgrade stat B : speed, green
 void ACowboynoutCharacter::ConvertChipStatB(int ammount) {
 	if (chipsB >= ammount) {
 		chipsB -= ammount;
@@ -254,7 +255,7 @@ void ACowboynoutCharacter::ConvertChipStatB(int ammount) {
 		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "not enough chips to convert to stat B");
 }
 
-// converts [ammount of chip C] of chips to upgrade stat C
+// converts [ammount of chip C] of chips to upgrade stat C : attack, red
 void ACowboynoutCharacter::ConvertChipStatC(int ammount) {
 	if (chipsC >= ammount) {
 		chipsC -= ammount;
@@ -286,16 +287,24 @@ void ACowboynoutCharacter::ConvertChipSkillB(int ammount) {
 		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "not enough chips to convert to skill B");
 }
 
+// returns ammount of chips Stat A : life
 int ACowboynoutCharacter::GetChipsA() {
 	return chipsA;
 }
 
+// returns ammount of chips Stat B : speed
 int ACowboynoutCharacter::GetChipsB() {
 	return chipsB;
 }
 
+// returns ammount of chips Stat C : attack
 int ACowboynoutCharacter::GetChipsC() {
 	return chipsC;
+}
+
+// returns ammount of grenades
+int ACowboynoutCharacter::GetNades() {
+	return nades;
 }
 
 void ACowboynoutCharacter::FireSkillOne() {
@@ -306,9 +315,11 @@ void ACowboynoutCharacter::FireSkillOne() {
 		FActorSpawnParameters spawnInfo;
 		if (skillLvlOne == 1) {
 			AProjectile* bullet = GetWorld()->SpawnActor<AProjectile>(ProjectileClassT1, muzzleLocation->GetComponentLocation(), muzzleLocation->GetComponentRotation(), spawnInfo);
+			if (bullet) bullet->bulletType = BulletType::PlayerBullet;
 		}
 		else if (skillLvlOne == 2) {
 			AProjectile* bullet = GetWorld()->SpawnActor<AProjectile>(ProjectileClassT2, muzzleLocation->GetComponentLocation(), muzzleLocation->GetComponentRotation(), spawnInfo);
+			if (bullet) bullet->bulletType = BulletType::PlayerBullet;
 		}
 		else if (skillLvlOne == 3) {
 			// multiple projectiles spawned
@@ -317,8 +328,11 @@ void ACowboynoutCharacter::FireSkillOne() {
 			FRotator rotR = muzzleLocation->GetComponentRotation();
 			rotR.Yaw -= 30;
 			AProjectile* bulletL = GetWorld()->SpawnActor<AProjectile>(ProjectileClassT1, muzzleLocationL->GetComponentLocation(), rotL, spawnInfo);
+			if (bulletL) bulletL->bulletType = BulletType::PlayerBullet;
 			AProjectile* bullet = GetWorld()->SpawnActor<AProjectile>(ProjectileClassT3, muzzleLocation->GetComponentLocation(), muzzleLocation->GetComponentRotation(), spawnInfo);
+			if (bullet)  bullet->bulletType = BulletType::PlayerBullet;
 			AProjectile* bulletR = GetWorld()->SpawnActor<AProjectile>(ProjectileClassT1, muzzleLocationR->GetComponentLocation(), rotR, spawnInfo);
+			if (bulletR) bulletR->bulletType = BulletType::PlayerBullet;
 		}
 		PlaySound(1);
 	}
@@ -330,20 +344,24 @@ void ACowboynoutCharacter::FireSkillTwo() {
 		explodeNade = false;
 		ACowboynoutPlayerController* playerCtrl = Cast<ACowboynoutPlayerController>(GetController());
 		if (playerCtrl) {
-			FActorSpawnParameters spawnInfo;
-			if (skillLvlTwo == 1) {
-				playerCtrl->canTP = false;
-				nade = GetWorld()->SpawnActor<AGrenade>(GrenadeClassT1, GetActorLocation(), muzzleLocation->GetComponentRotation(), spawnInfo);
+			if (nades > 0) {
+				FActorSpawnParameters spawnInfo;
+				if (skillLvlTwo == 1) {
+					playerCtrl->canTP = false;
+					nade = GetWorld()->SpawnActor<AGrenade>(GrenadeClassT1, GetActorLocation(), muzzleLocation->GetComponentRotation(), spawnInfo);
+				}
+				else if (skillLvlTwo == 2) {
+					playerCtrl->canTP = false;
+					nade = GetWorld()->SpawnActor<AGrenade>(GrenadeClassT2, GetActorLocation(), muzzleLocation->GetComponentRotation(), spawnInfo);
+				}
+				else if (skillLvlTwo == 3) {
+					playerCtrl->canTP = false;
+					nade = GetWorld()->SpawnActor<AGrenade>(GrenadeClassT3, GetActorLocation(), muzzleLocation->GetComponentRotation(), spawnInfo);
+				}
+				PlaySound(2);
+				nades--;
 			}
-			else if (skillLvlTwo == 2) {
-				playerCtrl->canTP = false;
-				nade = GetWorld()->SpawnActor<AGrenade>(GrenadeClassT2, GetActorLocation(), muzzleLocation->GetComponentRotation(), spawnInfo);
-			}
-			else if (skillLvlTwo == 3) {
-				playerCtrl->canTP = false;
-				nade = GetWorld()->SpawnActor<AGrenade>(GrenadeClassT3, GetActorLocation(), muzzleLocation->GetComponentRotation(), spawnInfo);
-			}
-			PlaySound(2);
+			
 		}
 }
 

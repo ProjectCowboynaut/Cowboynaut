@@ -36,9 +36,9 @@ AEnemy::AEnemy()
 	pillarsToActivate = 0;
 	pillarsActive = 0;
 
-	if (type == 1) 
+	if (this->enemyType == EnemyType::EnemyBase)
 	{
-		health = 110;
+		/*this->health = healthBase;*/
 		attackRatio = .15f;					// faster attacks, less dmg
 		shieldOneActive = false;
 		shieldOne = 0.f;
@@ -51,9 +51,9 @@ AEnemy::AEnemy()
 		armor = 1.f;
 	}
 	// elite mob stats
-	else if (type == 2) 
+	else if (this->enemyType == EnemyType::EnemyElite)
 	{
-		health = 200;
+		/*this->health = healthElite;*/
 		attackRatio = .3f;					// faster attacks, less dmg
 		shieldOneActive = false;
 		shieldOne = 0;
@@ -66,9 +66,10 @@ AEnemy::AEnemy()
 		armor = 1.f;
 	}
 	// boss mob stats
-	else if (type == 666) 
+	else if (this->enemyType == EnemyType::EnemyBoss)
 	{
-		health = 510;
+		/*this->health = healthBoss;
+		if (this->health == 0) health = 10000;*/
 		attackRatio = .2f;					// lower ratio, more dmg per shot
 		shieldOneActive = true;
 		shieldOne = 1200.f;
@@ -83,8 +84,7 @@ AEnemy::AEnemy()
 	}
 	else 
 	{
-		type = 1;
-		health = 110;
+		/*this->health = 123;*/
 		attackRatio = .2f;					// faster attacks, less dmg
 		shieldOneActive = false;
 		shieldOne = 0.f;
@@ -313,10 +313,12 @@ void AEnemy::RotateCharacter(const FVector DestLocation)
 
 void AEnemy::Die() 
 {
+	FVector lootLocation = this->GetActorLocation();
+	lootLocation += FVector(0, 0, 100.f);
 	ULoot* loot = AActor::FindComponentByClass<ULoot>();
 	if (loot) 
 	{
-		loot->DropChance(GetActorLocation(), this);
+		loot->DropChance(lootLocation, this);
 	}
 
 	playerChar = Cast<ACowboynoutCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
@@ -326,10 +328,22 @@ void AEnemy::Die()
 		playerChar->targetString = "";
 	}
 
-	if (type == 666) 
+	// if dead enemy == boss, start end
+	if (enemyType == EnemyType::EnemyBoss) 
 	{
+		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::White, "Boss killed, the end is nigh");
 		deathTimerActive = true;
 	}
+	UObject* worldContextObject = GetWorld();
+	FVector spawnLocation = this->GetActorLocation();
+
+	FActorSpawnParameters spawnInfo;
+	AActor* borkedDrone = GetWorld()->SpawnActor<AActor>(brokenDroneMesh, spawnLocation, FRotator(90,0,0), spawnInfo);
+	// Create a damage event  
+	TSubclassOf<UDamageType> const ValidDamageTypeClass = TSubclassOf<UDamageType>(UDamageType::StaticClass());
+	FDamageEvent DamageEvent(ValidDamageTypeClass);
+	class AActor* DamageCauser = playerChar;
+	if (borkedDrone) borkedDrone->TakeDamage(100, DamageEvent, UGameplayStatics::GetPlayerController(GetWorld(), 0), Cast<ACowboynoutCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0)));			// initialize dmg to break drone
 
 	Destroy();
 }
@@ -397,10 +411,10 @@ void AEnemy::DestroyShield()
 void AEnemy::Damage(int dmg) {
 	if (isFriendly) return;
 
-	if (type == 1) {
+	if (enemyType == EnemyType::EnemyBase) {
 		health -= dmg;
 	}
-	else if (type == 2) 
+	else if (enemyType == EnemyType::EnemyElite)
 	{
 		if (shieldOneActive) 
 		{
@@ -416,7 +430,7 @@ void AEnemy::Damage(int dmg) {
 		else
 			health -= dmg;
 	}
-	else if (type == 666) 
+	else if (enemyType == EnemyType::EnemyBoss)
 	{
 		if (shieldFourActive) 
 		{
@@ -476,6 +490,13 @@ void AEnemy::Damage(int dmg) {
 	{
 		health -= dmg;
 	}
+
+	// play dmg effect & spawn broken actor
+	UObject* worldContextObject = GetWorld();
+	FVector spawnLocation = this->GetActorLocation();
+	FRotator spawnRotation = this->GetActorRotation();
+
+	UGameplayStatics::SpawnEmitterAtLocation(worldContextObject, dmgEffectParticle, spawnLocation, spawnRotation, true);
 }
 
 // 0: been hit; 1: attack; 

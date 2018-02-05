@@ -24,20 +24,26 @@ public:
 	void BossFight();
 
 	UFUNCTION(BlueprintCallable)
-	void SpawnBullets(TSubclassOf<AProjectile> bulletBP, FVector center, float radius, int numberOfBulletsToFire, float bulletSpeed);
+	void SpawnBullets(TSubclassOf<AProjectile> bulletBP, FVector center, float radius, int numberOfBulletsToFire, float bulletSpeed, float bulletDamage, float DeltaTime);
 
+	// number of phases to go through, b4 starting at 0 again
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int numberOfPhases;
 	
+	// number of the actual running phase
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int numberOfPhasesLive;
 
+	// max timer per phase
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float phaseTimerMax;
 
 	// running timer
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	float phaseTimerLive;
+
+	UPROPERTY()
+	float rotationTicker;
 
 protected:
 	// Called when the game starts

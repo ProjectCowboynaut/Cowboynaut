@@ -5,6 +5,7 @@
 #include "Cowboynout.h"
 #include "Components/ActorComponent.h"
 #include "Enemy.h"
+#include "Drop.h"
 #include "Loot.generated.h"
 
 
@@ -35,6 +36,9 @@ public:
 	UFUNCTION()
 	void LootDropH(FVector spawnLoc);
 
+	UFUNCTION()
+	void LootDropG(FVector spawnLoc);
+
 	UPROPERTY(VisibleAnywhere, BluePrintReadWrite)
 	float dropChanceA;
 
@@ -47,11 +51,11 @@ public:
 	UPROPERTY(VisibleAnywhere, BluePrintReadWrite)
 	float dropChanceH;
 
+	UPROPERTY(VisibleAnywhere, BluePrintReadWrite)
+	float dropChanceG;
+
 	UPROPERTY()
 	float rnd;
-	
-	UPROPERTY()
-	int enemyType;
 
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<class AActor> droppedItemA;
@@ -64,6 +68,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<class AActor> droppedItemH;
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<class AActor> droppedItemG;
 
 protected:
 	// Called when the game starts

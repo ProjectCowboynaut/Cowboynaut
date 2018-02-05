@@ -195,17 +195,16 @@ void ACowboynoutPlayerController::Tick(float deltaTime) {
 	}
 	
 	if (endGame) {
-		deathTimer += deltaTime;
+
 		if (!deathTimerNotSet) {
-			deathTimerFull = deathTimer;
+			deathTimerActive = deathTimerFull;
 			deathTimerNotSet = true;
 		}
+		deathTimerActive -= deltaTime;
+		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Cyan, FString::SanitizeFloat(deathTimerActive));
 
-		countDown = deathTimerFull - deathTimer;
-		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Cyan, FString::SanitizeFloat(countDown));
-
-		if (deathTimer >= deathTimerFull) {
-			UGameplayStatics::OpenLevel(this, TEXT("/Game/Maps/WinScreen"), false);
+		if (deathTimerActive <= 0) {
+			UGameplayStatics::OpenLevel(this, TEXT("/Game/Maps/WinScreen_Menu"), false);
 			deathTimer = 0;
 		}
 	}

@@ -61,6 +61,9 @@ public:
 	UPROPERTY()
 	float deathTimer;
 
+	UPROPERTY(VisibleAnywhere, BluePrintReadOnly)
+	float deathTimerActive;
+
 	UPROPERTY()
 	bool endGame;
 

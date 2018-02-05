@@ -6,6 +6,12 @@
 #include "GameFramework/Actor.h"
 #include "Projectile.generated.h"
 
+UENUM(Blueprintable)
+enum class BulletType : uint8
+{
+	PlayerBullet UMETA(DisplayName = "Player Bullet"),
+	EnemyBullet UMETA(DisplayName = "Enemy Bullet")
+};
 
 UCLASS()
 class AProjectile : public AActor
@@ -40,8 +46,8 @@ public:
 	UFUNCTION()
 	virtual void Tick(float deltaTime) override;
 
-	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Projectile")
-	FString bulletType;
+	/*UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category = "Projectile")
+	FString bulletType;*/
 
 	UPROPERTY(VisibleAnywhere, BluePrintReadOnly, Category="Projectile")
 	bool playerProjectile;
@@ -74,5 +80,14 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "Projectile")
 	int penetration;
+
+	UFUNCTION()
+	void setBulletStats();
+
+	UPROPERTY()
+	bool statsSet;
+
+	UPROPERTY()
+	BulletType bulletType;
 
 };
