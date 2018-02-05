@@ -355,12 +355,14 @@ void ACowboynoutPlayerController::OnSetStationairyReleased() {
 // ## mouse functions
 
 bool ACowboynoutPlayerController::CheckMap() {
-	bool r = false;
+	bool r = true;
 
-	for(const FString& mapName : legitMapNames) {
-		if (mapName == GetWorld()->GetMapName()) r = true;
+	const FString& currentMap = GetWorld()->GetMapName();
+
+	if (currentMap.EndsWith("Menu") || currentMap.EndsWith("menu")) {
+		r = false;
 	}
-		
+
 	return r;
 }
 
