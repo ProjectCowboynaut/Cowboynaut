@@ -491,7 +491,8 @@ void AEnemy::Damage(int dmg) {
 		health -= dmg;
 	}
 
-	// play dmg effect & spawn broken actor
+	// play dmg effect, sound & spawn broken actor
+	PlaySound(0);
 	UObject* worldContextObject = GetWorld();
 	FVector spawnLocation = this->GetActorLocation();
 	FRotator spawnRotation = this->GetActorRotation();
@@ -507,7 +508,17 @@ void AEnemy::PlaySound(int sound)
 	float startTime = 0.f;
 
 	UObject* worldContextObject = GetWorld();
-	if (sound == 1) 
+	if (sound == 0)
+	{
+		int rnd = FMath::RandRange(0, 3);
+		if (rnd == 1)
+			UGameplayStatics::PlaySound2D(worldContextObject, soundHit, volumeMultiplier *.85f, pitchMultiplier * .9f, startTime);
+		else if (rnd == 2)
+			UGameplayStatics::PlaySound2D(worldContextObject, soundHit, volumeMultiplier *.8f, pitchMultiplier, startTime);
+		else if (rnd == 3)
+			UGameplayStatics::PlaySound2D(worldContextObject, soundHit, volumeMultiplier *.75f, pitchMultiplier * 1.2f, startTime);
+	}
+	else if (sound == 1) 
 	{
 		int rnd = FMath::RandRange(0, 3);
 		if (rnd == 1)
