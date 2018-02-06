@@ -31,6 +31,9 @@ public:
 	UFUNCTION()
 	void BossFight(float DeltaTime);
 
+	UFUNCTION()
+	void SwitchState();
+
 	UFUNCTION(BlueprintCallable)
 	void SpawnBullets(TSubclassOf<AProjectile> bulletBP, FVector center, float radius, int numberOfBulletsToFire, float bulletSpeed, float bulletDamage, float DeltaTime);
 
@@ -41,7 +44,7 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	BossState bossState;
 
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	int stateSwitchesCount;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -62,6 +65,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int numberOfDronesToSpawnPerPhase;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	int numberOfDronesSpawned;
+
 	// number of phases to go through, b4 starting at 0 again  (different bullet during attack state)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int numberOfPhases;
@@ -78,7 +84,12 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	float phaseTimerLive;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float healthForNextPhase;
+
 	UPROPERTY()
 	float rotationTicker;
 
+protected:
+	virtual void BeginPlay() override;
 };

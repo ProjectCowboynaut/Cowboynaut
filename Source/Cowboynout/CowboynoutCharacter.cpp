@@ -208,12 +208,20 @@ void ACowboynoutCharacter::Tick(float DeltaSeconds) {
 
 
 void ACowboynoutCharacter::Damage(int dmg) {
-	life -= dmg;
-	if (life <= 0) {
-		PlaySound(5);
-		Die();
-		animDead = true;
-	}
+	ACowboynoutPlayerController* playerCtrl = Cast<ACowboynoutPlayerController>(GetController());
+	if (playerCtrl) 
+		if (playerCtrl->isDashing) return; 
+	
+		else
+		{
+			life -= dmg;
+			if (life <= 0) {
+				PlaySound(5);
+				Die();
+				animDead = true;
+			}
+		}
+	
 }
 
 float ACowboynoutCharacter::GetHealth() {

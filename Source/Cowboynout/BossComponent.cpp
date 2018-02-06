@@ -9,60 +9,122 @@ UBossComponent::UBossComponent()
 	PrimaryComponentTick.bCanEverTick = true;
 	//PrimaryActorTick.bStartWithTickEnabled = true;
 	rotationTicker = 0;
-	numberOfTotalStateSwitches = (int) (100 / stateSwitchPercentage);
+
 	boss = Cast<AEnemy>(this);
 	stateSwitchesCount = 0;
 	droneSpawnTimer = 0;
+	healthForNextPhase = 0;
+	numberOfDronesSpawned = 0;
+}
+
+void UBossComponent::BeginPlay()
+{
+	numberOfTotalStateSwitches = 100 / stateSwitchPercentage;
+	GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, FString::SanitizeFloat(stateSwitchPercentage));
+	bossState = BossState::BossShield;
+}
+
+void UBossComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+{
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	rotationTicker += DeltaTime;
+
+	if (!boss) boss = Cast<AEnemy>(this->GetOwner());
+	if (boss != nullptr) {
+		//if (boss->bossFightActive) {
+		healthForNextPhase = (boss->healthMax / numberOfTotalStateSwitches) * (numberOfTotalStateSwitches - stateSwitchesCount);
+		BossFight(DeltaTime);
+		//}
+
+	}
 }
 
 void UBossComponent::BossFight(float DeltaTime)
 {
-	if (!boss) boss = Cast<AEnemy>(this);
+	if (!boss) boss = Cast<AEnemy>(this->GetOwner());
 	else 
 	{
 		// switch states and increase state counter
-		if (boss->health < (boss->healthMax / numberOfTotalStateSwitches * stateSwitchesCount))
+
+		//GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, FString::SanitizeFloat(healthForNextPhase));
+		if (bossState == BossState::BossShield) 
 		{
-			stateSwitchesCount++;
-			switch (bossState) {
-				case BossState::BossIdle:
-					bossState = BossState::BossAttack;
-					break;
-				case BossState::BossAttack:
-					bossState = BossState::BossShield;
-					break;
-				case BossState::BossShield:
-					bossState = BossState::BossAttack;
-					break;
-			}
-		}
-		// with spawn phase
-		if (bossState == BossState::BossShield) {
+			// with spawn phase
 			droneSpawnTimer += DeltaTime;
-			if (droneSpawnTimer > droneSpawnTime) {
+			
+			if (droneSpawnTimer > droneSpawnTime && numberOfDronesSpawned < numberOfDronesToSpawnPerPhase)
+			{
 				GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "i be spawning!");
+				droneSpawnTimer = 0;
 				
 				FVector spawnPosi = boss->GetActorLocation();
+				spawnPosi += FVector(-1000, 0, 0);
+				spawnPosi.Z = -840.876831f;
 				FRotator rot;
 				FActorSpawnParameters spawnInfo;
-				for (int i = 0; i < numberOfDronesToSpawnPerPhase; i++) {
-					AEnemy* droneSpawn = GetWorld()->SpawnActor<AEnemy>(DroneBP, spawnPosi, rot, spawnInfo);
+
+				AEnemy* droneSpawn = GetWorld()->SpawnActor<AEnemy>(DroneBP, spawnPosi, rot, spawnInfo);
+				numberOfDronesSpawned++;
+				if (droneSpawn)
+				{
+					droneSpawn->health = 200.f;
+					droneSpawn->enemyType = EnemyType::EnemyBase;
+				}	
+			}
+
+			if (numberOfDronesSpawned == numberOfDronesToSpawnPerPhase)
+			{
+				ACowboynoutCharacter* playerChar = Cast<ACowboynoutCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+				if (playerChar)
+				{
+					if (playerChar->enemiesActual == 1)
+					{
+						SwitchState();
+					}
 				}
 			}
 		}
-		else if (bossState == BossState::BossAttack) {
+		else if (bossState == BossState::BossAttack) 
+		{
+			
+			if (boss->health < healthForNextPhase)
+			{
+				SwitchState();
+				GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "switching states");
+			}
 			//  ### during bossfight ###
 			phaseTimerLive += DeltaTime;
 			if (phaseTimerMax == 0) phaseTimerMax = 5.f;
-			if (phaseTimerLive >= phaseTimerMax) {
+			if (phaseTimerLive >= phaseTimerMax) 
+			{
 				numberOfPhasesLive++;		// incrase phase number
 				phaseTimerLive = 0;			// reset phase timer
 				//GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, FString::FromInt(numberOfPhasesLive));
 			}
-			if (numberOfPhasesLive > numberOfPhases) {
+			if (numberOfPhasesLive > numberOfPhases) 
+			{
 				numberOfPhasesLive = 0;
 			}
 		}
+	}
+}
+
+void UBossComponent::SwitchState() 
+{
+	stateSwitchesCount++;
+	numberOfDronesSpawned = 0;
+
+	switch (bossState) 
+	{
+		case BossState::BossIdle:
+			bossState = BossState::BossShield;
+			break;
+		case BossState::BossShield:
+			bossState = BossState::BossAttack;
+			break;
+		case BossState::BossAttack:
+			bossState = BossState::BossShield;
+			break;
 	}
 }
 
@@ -97,18 +159,3 @@ void UBossComponent::SpawnBullets(TSubclassOf<AProjectile> bulletBP, FVector cen
 		//GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, bulletBP->GetFName().ToString() + " fired");
 	}
 }
-
-void UBossComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
-{
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-	rotationTicker += DeltaTime;
-
-	if (!boss) boss = Cast<AEnemy>(this);
-	if (boss != nullptr) {
-		if (boss->bossFightActive) {
-			
-			BossFight(DeltaTime);
-		}
-	}
-}
-
