@@ -41,7 +41,7 @@ void ULoot::DropChance(FVector spawnLoc, AEnemy* enemyChar) {
 	// dropchance chip A
 	rnd = FMath::RandRange(.0f, 1.0f);
 	for (int i = 0; i < lootMass; i++){
-		GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "loot a( " + FString::SanitizeFloat(dropChanceA) + "): " + FString::SanitizeFloat(rnd));
+		//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "loot a( " + FString::SanitizeFloat(dropChanceA) + "): " + FString::SanitizeFloat(rnd));
 		if (rnd < dropChanceA) {
 			LootDropA(spawnLoc);
 		}
@@ -50,7 +50,7 @@ void ULoot::DropChance(FVector spawnLoc, AEnemy* enemyChar) {
 	// dropchance chip B
 	rnd = FMath::RandRange(.0f, 1.0f);
 	for (int i = 0; i < lootMass; i++) {
-		GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "loot b( " + FString::SanitizeFloat(dropChanceB) + "): " + FString::SanitizeFloat(rnd));
+		//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "loot b( " + FString::SanitizeFloat(dropChanceB) + "): " + FString::SanitizeFloat(rnd));
 		if (rnd < dropChanceB) {
 			LootDropB(spawnLoc);
 		}
@@ -59,7 +59,7 @@ void ULoot::DropChance(FVector spawnLoc, AEnemy* enemyChar) {
 	// dropchance chip C
 	rnd = FMath::RandRange(.0f, 1.0f);
 	for (int i = 0; i < lootMass; i++) {
-		GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "loot b( " + FString::SanitizeFloat(dropChanceB) + "): " + FString::SanitizeFloat(rnd));
+		//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "loot b( " + FString::SanitizeFloat(dropChanceB) + "): " + FString::SanitizeFloat(rnd));
 		if (rnd < dropChanceC) {
 			LootDropC(spawnLoc);
 		}
@@ -68,7 +68,7 @@ void ULoot::DropChance(FVector spawnLoc, AEnemy* enemyChar) {
 	// dropchance health
 	rnd = FMath::RandRange(.0f, 1.0f);
 	for (int i = 0; i < lootMass; i++) {
-		GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "loot h: " + FString::SanitizeFloat(rnd));
+		//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "loot h: " + FString::SanitizeFloat(rnd));
 		if (rnd < dropChanceH) {
 			LootDropH(spawnLoc);
 		}
@@ -77,7 +77,7 @@ void ULoot::DropChance(FVector spawnLoc, AEnemy* enemyChar) {
 	// dropchance nades
 	rnd = FMath::RandRange(.0f, 1.0f);
 	for (int i = 0; i < lootMass; i++) {
-		GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "loot g: " + FString::SanitizeFloat(rnd));
+		//GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Red, "loot g: " + FString::SanitizeFloat(rnd));
 		if (rnd < dropChanceG) {
 			LootDropG(spawnLoc);
 		}

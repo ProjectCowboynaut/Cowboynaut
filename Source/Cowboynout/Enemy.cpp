@@ -115,7 +115,8 @@ void AEnemy::Tick(float deltaTime)
 	if (this->enemyType == EnemyType::EnemyBoss)
 	{
 		bossHealth = health;
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::SanitizeFloat(bossHealth));
+		if (bossHealth > bossHealthMax) bossHealthMax = bossHealth;
+		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::SanitizeFloat(bossHealth));
 	}
 	if (health > healthMax) healthMax = health;
 

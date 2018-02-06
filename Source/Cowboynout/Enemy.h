@@ -122,6 +122,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	float GetBossHealth();
 
+	UPROPERTY(VisibleAnywhere, BluePrintReadOnly)
+	float bossHealthMax;
+
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<AActor> brokenDroneMesh;
 
