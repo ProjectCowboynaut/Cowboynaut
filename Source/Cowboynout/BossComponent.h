@@ -8,6 +8,14 @@
 #include "Enemy.h"
 #include "BossComponent.generated.h"
 
+UENUM(Blueprintable)
+enum class BossState : uint8
+{
+	BossIdle UMETA(DisplayName = "Boss Idling"),
+	BossAttack UMETA(DisplayName = "Boss Attacking /w Shield deactivated"),
+	BossShield UMETA(DisplayName = "Boss Spawning w/ Shield activated")
+};
+
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class COWBOYNOUT_API UBossComponent : public UActorComponent
 {
@@ -21,17 +29,45 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	UFUNCTION()
-	void BossFight();
+	void BossFight(float DeltaTime);
 
 	UFUNCTION(BlueprintCallable)
 	void SpawnBullets(TSubclassOf<AProjectile> bulletBP, FVector center, float radius, int numberOfBulletsToFire, float bulletSpeed, float bulletDamage, float DeltaTime);
 
-	// number of phases to go through, b4 starting at 0 again
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<AEnemy> DroneBP;
+
+	// idle, attack, spawn
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	BossState bossState;
+
+	UPROPERTY()
+	int stateSwitchesCount;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float stateSwitchPercentage;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	float droneSpawnTimer;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float droneSpawnTime;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	AEnemy* boss;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	int numberOfTotalStateSwitches;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int numberOfDronesToSpawnPerPhase;
+
+	// number of phases to go through, b4 starting at 0 again  (different bullet during attack state)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int numberOfPhases;
 	
 	// number of the actual running phase
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	int numberOfPhasesLive;
 
 	// max timer per phase
@@ -45,8 +81,4 @@ public:
 	UPROPERTY()
 	float rotationTicker;
 
-protected:
-	// Called when the game starts
-	virtual void BeginPlay() override;		
-	
 };
