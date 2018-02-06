@@ -8,6 +8,8 @@
 #include "Curves/CurveFloat.h"
 #include "AAIAgent.generated.h"
 
+DECLARE_DYNAMIC_DELEGATE_RetVal(float, FActionDelegate);
+
 UENUM(Blueprintable)
 enum class FActionType : uint8
 {
@@ -38,9 +40,10 @@ struct FAction
 
 public:
 
-	UPROPERTY(EditAnywhere, Category = "AI") FActionType actionType;
-	UPROPERTY(EditAnywhere, Category = "AI") UCurveFloat* considerationCurve;
-	UPROPERTY(EditAnywhere, Category = "AI") float actionLockTime;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI") FActionType actionType;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI") UCurveFloat* considerationCurve;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI") FActionDelegate actionDelegate;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI") float actionLockTime;
 
 };
 

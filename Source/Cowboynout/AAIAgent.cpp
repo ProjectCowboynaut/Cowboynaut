@@ -25,30 +25,10 @@ FActionType UAAIAgent::EvaluateActions(const FEvaluationInput& evaluationInput)
 	for (auto& action : this->actionList)
 	{
 		float priority = 0.0f;
+		float inputValue = 0.0f;
 
-		switch (action.actionType)
-		{
-		case FActionType::FATFollowPlayer:
-			priority = action.considerationCurve->GetFloatValue(
-				evaluationInput.rangeToPlayer / this->perceptionRange
-			);
-			break;
-		case FActionType::FATRoaming:
-			priority = action.considerationCurve->GetFloatValue(
-				evaluationInput.rangeToPlayer / this->perceptionRange
-			);
-			break;
-		case FActionType::FATTakeCover:
-			priority = action.considerationCurve->GetFloatValue(
-				evaluationInput.rangeToPlayer / this->perceptionRange
-			);
-			break;
-		case FActionType::FATNeedHeal:
-			priority = action.considerationCurve->GetFloatValue(
-				evaluationInput.currentHealth / evaluationInput.maxHealth
-			);
-			break;
-		}
+		inputValue = action.actionDelegate.Execute();
+		priority = action.considerationCurve->GetFloatValue(inputValue);
 
 		if (priority > currentPriority)
 		{
