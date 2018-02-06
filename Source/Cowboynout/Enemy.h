@@ -231,6 +231,22 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "particles")
 	UParticleSystem* dmgEffectParticle;
 
+	UFUNCTION(BlueprintNativeEvent, Category = "AI|Enemy")
+	float GetFollowConstraint();
+	virtual float GetFollowConstraint_Implementation();
+
+	UFUNCTION(BlueprintNativeEvent, Category = "AI|Enemy")
+	float GetCoverConstraint();
+	virtual float GetCoverConstraint_Implementation();
+
+	UFUNCTION(BlueprintNativeEvent, Category = "AI|Enemy")
+	float GetRoamConstraint();
+	virtual float GetRoamConstraint_Implementation();
+
+	UFUNCTION(BlueprintNativeEvent, Category = "AI|Enemy")
+	float GetHealConstraint();
+	virtual float GetHealConstraint_Implementation();
+
 protected:
 	
 	virtual void BeginPlay() override;

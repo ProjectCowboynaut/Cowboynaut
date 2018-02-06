@@ -474,3 +474,20 @@ void AEnemy::FollowActor(AActor* actor, float deltaTime)
 		this->SetActorLocation(GetActorLocation() + (GetActorForwardVector() * speed * deltaTime));
 	}*/
 }
+
+float AEnemy::GetFollowConstraint_Implementation()
+{
+	return 0.f;
+}
+float AEnemy::GetCoverConstraint_Implementation()
+{
+	return 0.f;
+}
+float AEnemy::GetRoamConstraint_Implementation()
+{
+	return 0.f;
+}
+float AEnemy::GetHealConstraint_Implementation()
+{
+	return 0.f;
+}
