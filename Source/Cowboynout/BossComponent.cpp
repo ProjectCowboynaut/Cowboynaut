@@ -9,16 +9,61 @@ UBossComponent::UBossComponent()
 	PrimaryComponentTick.bCanEverTick = true;
 	//PrimaryActorTick.bStartWithTickEnabled = true;
 	rotationTicker = 0;
+	numberOfTotalStateSwitches = (int) (100 / stateSwitchPercentage);
+	boss = Cast<AEnemy>(this);
+	stateSwitchesCount = 0;
+	droneSpawnTimer = 0;
 }
 
-void UBossComponent::BeginPlay()
+void UBossComponent::BossFight(float DeltaTime)
 {
-	Super::BeginPlay();
-}
-
-void UBossComponent::BossFight() 
-{
-
+	if (!boss) boss = Cast<AEnemy>(this);
+	else 
+	{
+		// switch states and increase state counter
+		if (boss->health < (boss->healthMax / numberOfTotalStateSwitches * stateSwitchesCount))
+		{
+			stateSwitchesCount++;
+			switch (bossState) {
+				case BossState::BossIdle:
+					bossState = BossState::BossAttack;
+					break;
+				case BossState::BossAttack:
+					bossState = BossState::BossShield;
+					break;
+				case BossState::BossShield:
+					bossState = BossState::BossAttack;
+					break;
+			}
+		}
+		// with spawn phase
+		if (bossState == BossState::BossShield) {
+			droneSpawnTimer += DeltaTime;
+			if (droneSpawnTimer > droneSpawnTime) {
+				GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "i be spawning!");
+				
+				FVector spawnPosi = boss->GetActorLocation();
+				FRotator rot;
+				FActorSpawnParameters spawnInfo;
+				for (int i = 0; i < numberOfDronesToSpawnPerPhase; i++) {
+					AEnemy* droneSpawn = GetWorld()->SpawnActor<AEnemy>(DroneBP, spawnPosi, rot, spawnInfo);
+				}
+			}
+		}
+		else if (bossState == BossState::BossAttack) {
+			//  ### during bossfight ###
+			phaseTimerLive += DeltaTime;
+			if (phaseTimerMax == 0) phaseTimerMax = 5.f;
+			if (phaseTimerLive >= phaseTimerMax) {
+				numberOfPhasesLive++;		// incrase phase number
+				phaseTimerLive = 0;			// reset phase timer
+				//GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, FString::FromInt(numberOfPhasesLive));
+			}
+			if (numberOfPhasesLive > numberOfPhases) {
+				numberOfPhasesLive = 0;
+			}
+		}
+	}
 }
 
 void UBossComponent::SpawnBullets(TSubclassOf<AProjectile> bulletBP, FVector center, float radius, int numberOfBulletsToFire, float bulletSpeed, float bulletDamage, float rotationSpeed) 
@@ -58,22 +103,12 @@ void UBossComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 	rotationTicker += DeltaTime;
 
-	//AEnemy* enemy = Cast<AEnemy>(this);
-	//if (enemy != nullptr) {
-	//	if (enemy->bossFightActive) {
-			//  ### during bossfight ###
-	phaseTimerLive += DeltaTime;
-	if (phaseTimerMax == 0) phaseTimerMax = 5.f;
-	if (phaseTimerLive >= phaseTimerMax) {
-		numberOfPhasesLive++;		// incrase phase number
-		phaseTimerLive = 0;			// reset phase timer
-		//GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, FString::FromInt(numberOfPhasesLive));
+	if (!boss) boss = Cast<AEnemy>(this);
+	if (boss != nullptr) {
+		if (boss->bossFightActive) {
+			
+			BossFight(DeltaTime);
+		}
 	}
-	if (numberOfPhasesLive > numberOfPhases) {
-		numberOfPhasesLive = 0;
-	}
-	BossFight();
-	//	}
-	//}
 }
 

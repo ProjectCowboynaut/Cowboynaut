@@ -18,8 +18,6 @@ AEnemy::AEnemy()
 	chipsA = 0;
 	chipsB = 0;
 	chipsC = 0;
-	behaviour = 0;							// 1 = go combat range, attack on sight; 2 = alert others; 3 = go close range, explode
-	state = 0;								// 0 = passiv; 1 = allerted, 2 = attacking/triggered
 	armor = 1;
 	loopTime = 2.f;
 
@@ -35,19 +33,14 @@ AEnemy::AEnemy()
 	isBoss = false;
 	pillarsToActivate = 0;
 	pillarsActive = 0;
+	vincible = false;
+
 
 	if (this->enemyType == EnemyType::EnemyBase)
 	{
 		/*this->health = healthBase;*/
-		attackRatio = .15f;					// faster attacks, less dmg
-		shieldOneActive = false;
-		shieldOne = 0.f;
-		shieldTwoActive = false;
-		shieldTwo = 0.f;
-		shieldThreeActive = false;
-		shieldThree = 0.f;
-		shieldFourActive = false;
-		shieldFour = 0.f;
+		attackRatio = .25f;					// faster attacks, less dmg
+
 		armor = 1.f;
 	}
 	// elite mob stats
@@ -55,14 +48,7 @@ AEnemy::AEnemy()
 	{
 		/*this->health = healthElite;*/
 		attackRatio = .3f;					// faster attacks, less dmg
-		shieldOneActive = false;
-		shieldOne = 0;
-		shieldTwoActive = false;
-		shieldTwo = 0.f;
-		shieldThreeActive = false;
-		shieldThree = 0.f;
-		shieldFourActive = false;
-		shieldFour = 0.f;
+
 		armor = 1.f;
 	}
 	// boss mob stats
@@ -70,15 +56,8 @@ AEnemy::AEnemy()
 	{
 		/*this->health = healthBoss;
 		if (this->health == 0) health = 10000;*/
-		attackRatio = .2f;					// lower ratio, more dmg per shot
-		shieldOneActive = true;
-		shieldOne = 1200.f;
-		shieldTwoActive = true;
-		shieldTwo = 1200.f;
-		shieldThreeActive = true;
-		shieldThree = 1200.f;
-		shieldFourActive = true;
-		shieldFour = 1200.f;
+		attackRatio = .4f;					// lower ratio, more dmg per shot
+
 		armor = 1.f;
 		isBoss = true;
 	}
@@ -86,14 +65,7 @@ AEnemy::AEnemy()
 	{
 		/*this->health = 123;*/
 		attackRatio = .2f;					// faster attacks, less dmg
-		shieldOneActive = false;
-		shieldOne = 0.f;
-		shieldTwoActive = false;
-		shieldTwo = 0.f;
-		shieldThreeActive = false;
-		shieldThree = 0.f;
-		shieldFourActive = false;
-		shieldFour = 0.f;
+
 	}
 
 	healthMax = health;
@@ -139,6 +111,22 @@ void AEnemy::BeginPlay()
 void AEnemy::Tick(float deltaTime) 
 {
 	Super::Tick(deltaTime);
+
+	if (this->enemyType == EnemyType::EnemyBoss)
+	{
+		bossHealth = health;
+		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::SanitizeFloat(bossHealth));
+	}
+	if (health > healthMax) healthMax = health;
+
+	// change state if all drones (but boss) are destroyed
+	if (!playerChar) playerChar = Cast<ACowboynoutCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+	if (playerChar) {
+		int compare = playerChar->enemiesActual;
+		if (compare <= 1) vincible = true;
+		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::FromInt(compare));
+		else vincible = false;
+	}
 
 	if (timerActive)
 		timer += deltaTime;
@@ -194,16 +182,21 @@ void AEnemy::Tick(float deltaTime)
 	//this->action = ai->EvaluateActions(this->evalInput);
 }
 
+float AEnemy::GetBossHealth() {
+	return bossHealth;
+}
+
+// old one, use the new one in bosscomponent
 void AEnemy::BossFight(float deltaTime) 
 {
-	if (isBoss) 
-	{
-		UBossComponent* boss = AActor::FindComponentByClass<UBossComponent>();
-		if (boss)
-		{
-			boss->BossFight();
-		}
-	}
+	//if (isBoss) 
+	//{
+	//	UBossComponent* boss = AActor::FindComponentByClass<UBossComponent>();
+	//	if (boss)
+	//	{
+	//		boss->BossFight(deltaTime);
+	//	}
+	//}
 //	// pillars
 //	bossEffectTimerActive += deltaTime;
 //	if (bossEffectTimerActive >= bossEffectTimer) 
@@ -343,7 +336,11 @@ void AEnemy::Die()
 	TSubclassOf<UDamageType> const ValidDamageTypeClass = TSubclassOf<UDamageType>(UDamageType::StaticClass());
 	FDamageEvent DamageEvent(ValidDamageTypeClass);
 	class AActor* DamageCauser = playerChar;
-	if (borkedDrone) borkedDrone->TakeDamage(100, DamageEvent, UGameplayStatics::GetPlayerController(GetWorld(), 0), Cast<ACowboynoutCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0)));			// initialize dmg to break drone
+	if (borkedDrone) 
+	{
+		borkedDrone->TakeDamage(100, DamageEvent, UGameplayStatics::GetPlayerController(GetWorld(), 0), Cast<ACowboynoutCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0)));			// initialize dmg to break drone
+		borkedDrone->InitialLifeSpan = 3.f;		// auto destroy after x secs
+	}
 
 	Destroy();
 }
@@ -361,7 +358,12 @@ void AEnemy::Attack()
 	FRotator rot = GetActorRotation();
 	FActorSpawnParameters spawnInfo;
 	AProjectile* bullet = GetWorld()->SpawnActor<AProjectile>(ProjectileClass, muzzleLocation->GetComponentLocation(), rot, spawnInfo);
-	if (bullet) PlaySound(1);
+	if (bullet) {
+		bullet->enemyProjectile = true;
+		bullet->bulletType = BulletType::EnemyBullet;
+		bullet->playerProjectile = false;
+	}
+	PlaySound(1);
 }
 
 void AEnemy::MouseOverBegin(UPrimitiveComponent* TouchedComponent) 
@@ -384,30 +386,7 @@ void AEnemy::MouseOverEnd()
 	}
 }
 
-void AEnemy::DestroyShield()
-{
-	if (shieldFourActive) 
-	{
-		shieldFour = 0;
-		shieldFourActive = false;
-	}
-	else if (shieldThreeActive) 
-	{
-		shieldThree = 0;
-		shieldThreeActive = false;
-	}
-	else if (shieldTwoActive) 
-	{
-		shieldTwo = 0;
-		shieldTwoActive = false;
-	}
-	else if (shieldOneActive) 
-	{
-		shieldOne = 0;
-		shieldOneActive = false;
-	}
-}
-
+// deal damage to drone
 void AEnemy::Damage(int dmg) {
 	if (isFriendly) return;
 
@@ -416,82 +395,19 @@ void AEnemy::Damage(int dmg) {
 	}
 	else if (enemyType == EnemyType::EnemyElite)
 	{
-		if (shieldOneActive) 
-		{
-			if (shieldOne > dmg) 
-			{
-				shieldOne -= dmg;
-			}
-			else {
-				shieldOne = 0;
-				shieldOneActive = false;
-			}
-		}
-		else
-			health -= dmg;
+		health -= dmg;
 	}
 	else if (enemyType == EnemyType::EnemyBoss)
 	{
-		if (shieldFourActive) 
-		{
-			if (shieldFour > dmg) 
-			{
-				shieldFour -= dmg;
-			}
-			else 
-			{
-				shieldFour = 0;
-				shieldFourActive = false;
-			}
-		}
-		else if (shieldThreeActive) 
-		{
-			if (shieldThree > dmg) 
-			{
-				shieldThree -= dmg;
-			}
-			else 
-			{
-				shieldThree = 0;
-				shieldThreeActive = false;
-			}
-		}
-		else if (shieldTwoActive) 
-		{
-			if (shieldTwo > dmg) 
-			{
-				shieldTwo -= dmg;
-			}
-			else 
-			{
-				shieldTwo = 0;
-				shieldTwoActive = false;
-			}
-		}
-		else if (shieldOneActive) 
-		{
-			if (shieldOne > dmg) 
-			{
-				shieldOne -= dmg;
-			}
-			else 
-			{
-				shieldOne = 0;
-				shieldOneActive = false;
-			}
-		}
-		else 
-		{
-			health -= dmg;
-		}
-		
+		if (vincible) health -= dmg;
 	}
 	else
 	{
 		health -= dmg;
 	}
 
-	// play dmg effect & spawn broken actor
+	// play dmg effect, sound & spawn broken actor
+	PlaySound(0);
 	UObject* worldContextObject = GetWorld();
 	FVector spawnLocation = this->GetActorLocation();
 	FRotator spawnRotation = this->GetActorRotation();
@@ -507,7 +423,17 @@ void AEnemy::PlaySound(int sound)
 	float startTime = 0.f;
 
 	UObject* worldContextObject = GetWorld();
-	if (sound == 1) 
+	if (sound == 0)
+	{
+		int rnd = FMath::RandRange(0, 3);
+		if (rnd == 1)
+			UGameplayStatics::PlaySound2D(worldContextObject, soundHit, volumeMultiplier *.85f, pitchMultiplier * .9f, startTime);
+		else if (rnd == 2)
+			UGameplayStatics::PlaySound2D(worldContextObject, soundHit, volumeMultiplier *.8f, pitchMultiplier, startTime);
+		else if (rnd == 3)
+			UGameplayStatics::PlaySound2D(worldContextObject, soundHit, volumeMultiplier *.75f, pitchMultiplier * 1.2f, startTime);
+	}
+	else if (sound == 1) 
 	{
 		int rnd = FMath::RandRange(0, 3);
 		if (rnd == 1)

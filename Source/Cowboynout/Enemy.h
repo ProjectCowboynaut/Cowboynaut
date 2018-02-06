@@ -56,9 +56,6 @@ public:
 	UFUNCTION()
 	void DoAPeriodicCheck();
 
-	UFUNCTION(BlueprintCallable)
-	void DestroyShield();
-
 	UPROPERTY(EditDefaultsOnly, BluePrintReadWrite)
 	bool bossFightActive;
 
@@ -119,12 +116,21 @@ public:
 	UPROPERTY()
 	int lastRnd;
 
+	UPROPERTY()
+	float bossHealth;
+
+	UFUNCTION(BlueprintCallable)
+	float GetBossHealth();
+
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<AActor> brokenDroneMesh;
 
 	// base stats for enemy types
 	UPROPERTY(EditAnywhere, Category = "EnemyType Stats")
 	float attackRatioBase;
+
+	UPROPERTY(VisibleAnywhere, BluePrintReadOnly)
+	bool vincible = false;
 
 	UPROPERTY(EditAnywhere, Category = "EnemyType Stats")
 	float attackRatioElite;
@@ -171,37 +177,6 @@ public:
 	UPROPERTY(EditAnywhere, BluePrintReadWrite, Category = "EnemyStats")
 	EnemyType enemyType;
 	
-	UPROPERTY(EditAnywhere, BluePrintReadWrite, Category = "EnemyStats")
-	bool shieldOneActive;
-
-	UPROPERTY(EditAnywhere, BluePrintReadWrite, Category = "EnemyStats")
-	float shieldOne;
-
-	UPROPERTY(EditAnywhere, BluePrintReadWrite, Category = "EnemyStats")
-	bool shieldTwoActive;
-
-	UPROPERTY(EditAnywhere, BluePrintReadWrite, Category = "EnemyStats")
-	float shieldTwo;
-	
-	UPROPERTY(EditAnywhere, BluePrintReadWrite, Category = "EnemyStats")
-	bool shieldThreeActive;
-
-	UPROPERTY(EditAnywhere, BluePrintReadWrite, Category = "EnemyStats")
-	float shieldThree;
-
-	UPROPERTY(EditAnywhere, BluePrintReadWrite, Category = "EnemyStats")
-	bool shieldFourActive;
-	
-	UPROPERTY(EditAnywhere, BluePrintReadWrite, Category = "EnemyStats")
-	float shieldFour;
-
-	//behaviour variables
-	UPROPERTY(EditAnywhere, BluePrintReadWrite, Category = "EnemyStats")
-	int behaviour;							// 0 = go combat range, attack on sight; 1 = alert others; 2 = go close range, explode
-
-	UPROPERTY(EditAnywhere, BluePrintReadWrite, Category = "EnemyStats")
-	int state;								// 0 = passiv; 1 = allerted, 2 = attacking/triggered
-
 	UPROPERTY(EditAnywhere, BluePrintReadWrite, Category = "EnemyStats")
 	int armor;								// used to check how many enemies can be punshed through with 1 shot	
 
