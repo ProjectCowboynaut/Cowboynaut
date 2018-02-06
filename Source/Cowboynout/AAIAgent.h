@@ -20,20 +20,6 @@ enum class FActionType : uint8
 };
 
 USTRUCT(Blueprintable)
-struct FEvaluationInput
-{
-	GENERATED_USTRUCT_BODY()
-
-public:
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Input") float currentHealth;
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Input") float maxHealth;
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Input") float rangeToHealer;
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Input") float rangeToPlayer;
-
-};
-
-USTRUCT(Blueprintable)
 struct FAction
 {
 	GENERATED_USTRUCT_BODY()
@@ -42,7 +28,7 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI") FActionType actionType;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI") UCurveFloat* considerationCurve;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI") FActionDelegate actionDelegate;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI") FActionDelegate actionAxisConstraint;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI") float actionLockTime;
 
 };
@@ -58,7 +44,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "AI") void AddAction(const FAction& action);
 
-	UFUNCTION(BlueprintCallable, Category = "AI") FActionType EvaluateActions(const FEvaluationInput& evaluationInput);
+	UFUNCTION(BlueprintCallable, Category = "AI") FActionType EvaluateActions();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI") TArray<FAction> actionList;
 

@@ -12,7 +12,7 @@ void UAAIAgent::AddAction(const FAction& action)
 	this->actionList.Add(action);
 }
 
-FActionType UAAIAgent::EvaluateActions(const FEvaluationInput& evaluationInput)
+FActionType UAAIAgent::EvaluateActions()
 {
 	if (currentLockTime < currentAction.actionLockTime)
 	{
@@ -27,7 +27,7 @@ FActionType UAAIAgent::EvaluateActions(const FEvaluationInput& evaluationInput)
 		float priority = 0.0f;
 		float inputValue = 0.0f;
 
-		inputValue = action.actionDelegate.Execute();
+		inputValue = action.actionAxisConstraint.Execute();
 		priority = action.considerationCurve->GetFloatValue(inputValue);
 
 		if (priority > currentPriority)
