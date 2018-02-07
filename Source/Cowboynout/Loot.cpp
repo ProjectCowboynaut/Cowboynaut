@@ -10,8 +10,8 @@ ULoot::ULoot() {
 	dropChanceA = .7f;
 	dropChanceB = .8f;
 	dropChanceC = .7f;
-	dropChanceH = .3f;
-	dropChanceG = .3f;
+	dropChanceH = .4f;
+	dropChanceG = .4f;
 }
 
 void ULoot::BeginPlay() {
@@ -85,7 +85,7 @@ void ULoot::DropChance(FVector spawnLoc, AEnemy* enemyChar) {
 }
 
 void ULoot::LootDropA(FVector spawnLoc) {
-	FRotator rot = FRotator(90, 0, 0);
+	FRotator rot = FRotator(0, 0, 0);
 	FActorSpawnParameters spawnInfo;
 	if (droppedItemA) {
 		ADrop* theDrop = GetWorld()->SpawnActor<ADrop>(droppedItemA, spawnLoc, rot, spawnInfo);
@@ -95,7 +95,7 @@ void ULoot::LootDropA(FVector spawnLoc) {
 }
 
 void ULoot::LootDropB(FVector spawnLoc) {
-	FRotator rot = FRotator(90, 0, 0);
+	FRotator rot = FRotator(0, 0, 0);
 	FActorSpawnParameters spawnInfo;
 	if (droppedItemB) {
 		ADrop* theDrop = GetWorld()->SpawnActor<ADrop>(droppedItemB, spawnLoc, rot, spawnInfo);
@@ -105,7 +105,7 @@ void ULoot::LootDropB(FVector spawnLoc) {
 }
 
 void ULoot::LootDropC(FVector spawnLoc) {
-	FRotator rot = FRotator(90, 0, 0);
+	FRotator rot = FRotator(0, 0, 0);
 	FActorSpawnParameters spawnInfo;
 	if (droppedItemC) {
 		ADrop* theDrop = GetWorld()->SpawnActor<ADrop>(droppedItemC, spawnLoc, rot, spawnInfo);

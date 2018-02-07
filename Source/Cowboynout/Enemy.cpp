@@ -321,6 +321,15 @@ void AEnemy::Die()
 		playerChar->SetTarget(0);
 		playerChar->targetString = "";
 	}
+	ACowboynoutPlayerController* playerCtrl = Cast<ACowboynoutPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	// add score points
+	if (playerCtrl) {
+		if (enemyType == EnemyType::EnemyBase) playerCtrl->sessionScore += 10;
+		else if (enemyType == EnemyType::EnemyElite) playerCtrl->sessionScore += 100;
+		else if (enemyType == EnemyType::EnemyBoss) playerCtrl->sessionScore += 1000;
+	}
+
+	
 
 	// if dead enemy == boss, start end
 	if (enemyType == EnemyType::EnemyBoss) 
@@ -362,6 +371,9 @@ void AEnemy::Attack()
 	if (bullet) {
 		bullet->enemyProjectile = true;
 		bullet->bulletType = BulletType::EnemyBullet;
+		if (enemyType == EnemyType::EnemyBase) bullet->projectileDamage = damageBase;
+		else if (enemyType == EnemyType::EnemyElite) bullet->projectileDamage = damageElite;
+		else if (enemyType == EnemyType::EnemyBoss) bullet->projectileDamage = damageBoss;
 		bullet->playerProjectile = false;
 	}
 	PlaySound(1);

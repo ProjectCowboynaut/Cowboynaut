@@ -31,6 +31,9 @@ public:
 	UFUNCTION()
 	void BossFight(float DeltaTime);
 
+	UPROPERTY()
+	TArray<int32> bossStages;
+
 	UFUNCTION()
 	void SwitchState();
 
@@ -43,6 +46,12 @@ public:
 	// idle, attack, spawn
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	BossState bossState;
+
+	/*	[phase nr (int x)] [phase type (int x)] [attacks to use (int x,int y,…)] [drone number to spawn (int x)] [health to switch (int x)]
+		>>  0 1 1,1,4,1,2 10 8000
+	*/
+	UPROPERTY(EditAnywhere, BluePrintReadWrite)
+	TArray<FString> stages;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	int stateSwitchesCount;

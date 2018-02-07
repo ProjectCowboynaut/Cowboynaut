@@ -76,8 +76,9 @@ ACowboynoutPlayerController::ACowboynoutPlayerController() {
 	dashDistance = 50.f;
 	dashTimer = .1f;
 
-	debugEnabled = false;
+	debugEnabled = true;
 
+	
 	// init player vars & refs (overwritten if used in BP)
 }
 
@@ -108,6 +109,8 @@ void ACowboynoutPlayerController::SetupInputComponent() {
 		InputComponent->BindAction("SimulateDamage", IE_Pressed, this, &ACowboynoutPlayerController::OnSimulateDamagePressed);
 		InputComponent->BindAction("SimulateDamage", IE_Released, this, &ACowboynoutPlayerController::OnSimulateDamageReleased);
 
+		InputComponent->BindAction("KILLKey", IE_Pressed, this, &ACowboynoutPlayerController::KillEmAll);
+
 		//UAIPerceptionSystem::RegisterPerceptionStimuliSource(this, sightConfig->GetSenseImplementation(), GetControlledPawn());
 
 		InputComponent->BindAction("LvlUpSkillOne", IE_Pressed, this, &ACowboynoutPlayerController::OnSkillOneLevelUp);
@@ -125,18 +128,37 @@ void ACowboynoutPlayerController::SetupInputComponent() {
 	}
 }
 
+void ACowboynoutPlayerController::KillEmAll()
+{
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AEnemy::StaticClass(), enemiesToKill);
+	
+	for (int i = 0; i < enemiesToKill.Num(); i++)
+	{
+		AEnemy* enemyToKill = Cast<AEnemy>(enemiesToKill[i]);
+		if (!enemyToKill->isBoss) enemyToKill->Damage(enemyToKill->health + 1);
+	}
+	
+}
+
 void ACowboynoutPlayerController::Tick(float deltaTime) {
 	Super::Tick(deltaTime);
+	
+	sessionTimer += deltaTime;
 
 	// new movement
 	if (CheckMap()) {
 		myLittlePawny = GetPawn();
 		if (myLittlePawny) {
 			characterMovementSpeed = myLittlePawny->GetVelocity().Size();
+			
 		}
 
 		if (isDashing && characterMovementSpeed <= 1250.f) {
 			isDashing = false;
+		}
+		// temp fix for dash check
+		if (characterMovementSpeed > 1250.f)  {
+			isDashing = true;
 		}
 
 		ACharacter* character = GetCharacter();
@@ -202,6 +224,13 @@ void ACowboynoutPlayerController::Tick(float deltaTime) {
 		}
 		deathTimerActive -= deltaTime;
 		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Cyan, FString::SanitizeFloat(deathTimerActive));
+
+		// save score to gamesave
+		/*int PlayerScore = sessionScore;
+		UGameSave* SaveGameInstance = Cast<UGameSave>(UGameplayStatics::CreateSaveGameObject(UGameSave::StaticClass()));
+		SaveGameInstance->Score = sessionScore;
+		SaveGameInstance->Timer = sessionTimer;
+		UGameplayStatics::SaveGameToSlot(SaveGameInstance, SaveGameInstance->SaveSlotName, SaveGameInstance->UserIndex);*/
 
 		if (deathTimerActive <= 0) {
 			UGameplayStatics::OpenLevel(this, TEXT("/Game/Maps/WinScreen_Menu"), false);
@@ -271,15 +300,16 @@ void ACowboynoutPlayerController::WASDMove(float deltaTime) {
 		myLittlePawny = GetPawn();
 		if (myLittlePawny) {
 			FVector NewLocation;
-			NewLocation += GetActorForwardVector() * MovementInput.X * deltaTime * characterMovementSpeed;
-			NewLocation += GetActorRightVector() * MovementInput.Y * deltaTime * characterMovementSpeed;
+			NewLocation += GetActorForwardVector() * MovementInput.X *  characterMovementSpeed;
+			NewLocation += GetActorRightVector() * MovementInput.Y *  characterMovementSpeed;
 			//DebugMsg(FString::SanitizeFloat(NewLocation.X)+","+ FString::SanitizeFloat(NewLocation.Y), 3.f, FColor::White);
-			myLittlePawny->AddMovementInput(NewLocation);
+			myLittlePawny->AddMovementInput(NewLocation,1.f);
 		}
 	}
 }
 
 void ACowboynoutPlayerController::DodgeMove() {
+	isDashing = true;
 	ACowboynoutGameState* state = Cast<ACowboynoutGameState>(GetWorld()->GetGameState());
 	if (state)
 	{
@@ -311,6 +341,18 @@ void ACowboynoutPlayerController::DodgeMove() {
 
 void ACowboynoutPlayerController::BeginPlay()
 {
+	/*UGameSave* LoadGameInstance = Cast<UGameSave>(UGameplayStatics::CreateSaveGameObject(UGameSave::StaticClass()));
+	if (LoadGameInstance)
+	{
+		LoadGameInstance = Cast<UGameSave>(UGameplayStatics::LoadGameFromSlot(LoadGameInstance->SaveSlotName, LoadGameInstance->UserIndex));
+		bestTime = LoadGameInstance->Timer;
+	}*/
+	// else bestTime = 0;
+
+	sessionTimer = 0;
+	sessionScore = 0;
+
+
 	if (wTextbox) {
 		info = true;
 		myTextbox = CreateWidget<UTextboxUserWidget>(this, wTextbox);
@@ -603,7 +645,7 @@ void ACowboynoutPlayerController::MedPack() {
 
 // bugs bunny
 void ACowboynoutPlayerController::DebugMsg(FString msg, float dTime, FColor clr) {
-	if (debugEnabled)
+	//if (debugEnabled)
 		GEngine->AddOnScreenDebugMessage(-1, dTime, clr, msg);
 }
 

@@ -96,12 +96,23 @@ public:
 	virtual void SetupInputComponent() override;
 	// End PlayerController interface
 
+	UPROPERTY(VisibleAnywhere, BluePrintReadWrite)
+	int sessionScore;
+
+	UPROPERTY(VisibleAnywhere, BluePrintReadWrite)
+	float sessionTimer;
+
+	UPROPERTY(VisibleAnywhere, BluePrintReadWrite)
+	float bestTime;
 
 	UFUNCTION()
 	void OnSetStationairyPressed();
 
 	UFUNCTION()
 	void OnSetStationairyReleased();
+
+	UPROPERTY(VisibleAnywhere)
+	TArray<AActor*> enemiesToKill;
 
 	UFUNCTION()
 	void OnSkillOneLevelUp();
@@ -131,6 +142,8 @@ public:
 	UFUNCTION()
 	void OnShiftPressed();
 
+	UFUNCTION()
+	void KillEmAll();
 
 	UFUNCTION()
 	void SkillOne();

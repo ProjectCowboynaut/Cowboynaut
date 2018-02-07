@@ -44,12 +44,23 @@ void UBossComponent::BossFight(float DeltaTime)
 	if (!boss) boss = Cast<AEnemy>(this->GetOwner());
 	else 
 	{
-		// switch states and increase state counter
+
+		// get array & read out stage vars from array
+		TArray<FString> stageInfo;
+		stages[stateSwitchesCount].ParseIntoArray(stageInfo, TEXT("; "));
+		// stageInfo >> [0]:#id; [1]:StageType; [2]:attacksToUse; [3]:droneAmmountToSpawn; [4]:droneSpawnTimer [5]:healthToSwitchStage; 
+		FString msg = "";
+		for (int i = 0; i < stageInfo.Num(); i++)
+		{
+			msg += "::" + stageInfo[i];
+		}
+		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, msg);
+
 
 		//GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, FString::SanitizeFloat(healthForNextPhase));
 		if (bossState == BossState::BossShield) 
 		{
-			// with spawn phase
+			// spawn stage
 			droneSpawnTimer += DeltaTime;
 			
 			if (droneSpawnTimer > droneSpawnTime && numberOfDronesSpawned < numberOfDronesToSpawnPerPhase)
@@ -84,6 +95,7 @@ void UBossComponent::BossFight(float DeltaTime)
 				}
 			}
 		}
+		// attack stage
 		else if (bossState == BossState::BossAttack) 
 		{
 			
@@ -92,7 +104,6 @@ void UBossComponent::BossFight(float DeltaTime)
 				SwitchState();
 				GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "switching states");
 			}
-			//  ### during bossfight ###
 			phaseTimerLive += DeltaTime;
 			if (phaseTimerMax == 0) phaseTimerMax = 5.f;
 			if (phaseTimerLive >= phaseTimerMax) 
