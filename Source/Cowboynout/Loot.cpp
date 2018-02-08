@@ -7,9 +7,9 @@ ULoot::ULoot() {
 	PrimaryComponentTick.bCanEverTick = true;
 
 	// set base loot chances
-	dropChanceA = .7f;
-	dropChanceB = .8f;
-	dropChanceC = .7f;
+	dropChanceA = .0f;
+	dropChanceB = .0f;
+	dropChanceC = .0f;
 	dropChanceH = .4f;
 	dropChanceG = .4f;
 }
@@ -115,7 +115,8 @@ void ULoot::LootDropC(FVector spawnLoc) {
 }
 
 void ULoot::LootDropH(FVector spawnLoc) {
-	FRotator rot = FRotator(90, 0, 0);
+	FRotator rot = FRotator(0, 0, 0);
+	spawnLoc = spawnLoc + FVector(50, 0, 0);
 	FActorSpawnParameters spawnInfo;
 	if (droppedItemH) {
 		ADrop* theDrop = GetWorld()->SpawnActor<ADrop>(droppedItemH, spawnLoc, rot, spawnInfo);
@@ -125,7 +126,8 @@ void ULoot::LootDropH(FVector spawnLoc) {
 }
 
 void ULoot::LootDropG(FVector spawnLoc) {
-	FRotator rot = FRotator(90, 0, 0);
+	FRotator rot = FRotator(0, 0, 0);
+	spawnLoc = spawnLoc + FVector(-50, 0, 0);
 	FActorSpawnParameters spawnInfo;
 	if (droppedItemG) {
 		ADrop* theDrop = GetWorld()->SpawnActor<ADrop>(droppedItemG, spawnLoc, rot, spawnInfo);

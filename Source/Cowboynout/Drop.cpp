@@ -52,14 +52,23 @@ void ADrop::OnOverlap(UPrimitiveComponent* HitComp, AActor* OtherActor, class UP
 		else if (lootType == LootType::LootChipC) playerChar->chipsC++;
 		else if (lootType == LootType::LootHealth) 
 		{
-			if (playerChar->life + 15 <= playerChar->lifeMax) playerChar->life += 15;
-			else playerChar->life = playerChar->lifeMax;
+			if (playerChar->life + 15 <= playerChar->lifeMax) 
+			{
+				playerChar->life += 15;
+				Destroy();
+			}
+			else if(playerChar->life < playerChar->lifeMax)
+			{
+				playerChar->life = playerChar->lifeMax;
+				Destroy();
+			}
+
 		}
 		else if (lootType == LootType::LootNade) playerChar->nades++;
 		// else
 			//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Magenta, "lootus borkus maximus!!!");
 		// destroy loot
-		Destroy();
+		
 	}
 }
 

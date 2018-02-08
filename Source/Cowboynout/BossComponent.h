@@ -40,6 +40,8 @@ struct FAttackPattern
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float rotationSpeed;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float attackRate;
 };
 
 
@@ -50,9 +52,6 @@ struct FStages
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	BossState stageType;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TArray<int> attackPatternsToUse;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int dronesToSpawn;
@@ -77,13 +76,20 @@ public:
 	// Sets default values for this component's properties
 	UBossComponent();
 
+	UPROPERTY()
+	FVector bossStartLocation;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	float bossHealthMax;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	int phaseCtr;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	float lastShotFired;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	// how often should the boss shot in attack phases
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float shotTimer;
 
 	// Called every frame
@@ -99,7 +105,7 @@ public:
 	void SwitchState(BossState state);
 
 	UFUNCTION(BlueprintCallable)
-	void SpawnBullets(TSubclassOf<AProjectile> bulletBP, float radius, int numberOfBulletsToFire, float bulletSpeed, float bulletDamage, float DeltaTime);
+	void SpawnBullets(TSubclassOf<AProjectile> bulletBP, float radius, int numberOfBulletsToFire, float bulletSpeed, float bulletDamage, float deltaTime, float attackRate);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<AEnemy> DroneBP;
@@ -162,8 +168,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	float phaseTimerLive;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	float healthForNextPhase;
+	// only displaying the set value for the actual stages, set in stages
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	float healthForNextStage;
 
 	UPROPERTY()
 	float rotationTicker;
