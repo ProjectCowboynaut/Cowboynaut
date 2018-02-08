@@ -124,22 +124,22 @@ void ACowboynoutCharacter::Tick(float DeltaSeconds) {
     Super::Tick(DeltaSeconds);
 
 #pragma region get enemy ammount
-	if (!enemiesSet) {
+	if (enemiesActual>enemiesTotal) {
 		// set total number of enemies
 		UGameplayStatics::GetAllActorsOfClass(GetWorld(), AEnemy::StaticClass(), foundActors);
 		enemiesTotal = foundActors.Num() -1;
 		// find all level barrikades
 		UGameplayStatics::GetAllActorsOfClass(GetWorld(), BarrierBPClass, foundActorsBarr);
-		bossBarrikades = foundActorsBarr.Num();
+		//bossBarrikades = foundActorsBarr.Num();
 		// set enemies needed to disable ONE barrier
-		enemiesSet = true;
+		//enemiesSet = true;
 	}
-	else {
-		// set actual number of enemies
-		UGameplayStatics::GetAllActorsOfClass(GetWorld(), AEnemy::StaticClass(), foundActors);
-		enemiesActual = foundActors.Num() ;			// boss os no onomoo!
-		//GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, FString::FromInt(enemiesActual));
-	}
+	
+	// set actual number of enemies
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AEnemy::StaticClass(), foundActors);
+	enemiesActual = foundActors.Num() ;			// boss os no onomoo!
+	//GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, FString::FromInt(enemiesActual));
+	
 
 	if (enemiesTotal != 0 && bossBarrikades != 0)
 		enemiesToDisableBarrier = enemiesTotal / bossBarrikades;

@@ -15,6 +15,9 @@ UBossComponent::UBossComponent()
 	droneSpawnTimer = 0;
 	healthForNextPhase = 0;
 	numberOfDronesSpawned = 0;
+	phaseCtr = 0;
+	shotTimer = 0;
+	lastShotFired = 0;
 }
 
 void UBossComponent::BeginPlay()
@@ -44,31 +47,13 @@ void UBossComponent::BossFight(float DeltaTime)
 	if (!boss) boss = Cast<AEnemy>(this->GetOwner());
 	else 
 	{
+		// ## read out vars from "array"
+		actualStageType = stages[stateSwitchesCount].stageType;
+		healthForNextPhase = stages[stateSwitchesCount].healthPercentageToSwitchStage;  		// when to switch to next stage
+		stages[stateSwitchesCount].attackPatternsToUse;											// patterns to use in attackstage phases
+		numberOfDronesToSpawnPerPhase = stages[stateSwitchesCount].dronesToSpawn;				// how many drones should be spawned during phase (kill all to end)
+		stages[stateSwitchesCount].spawnDuration;												// how long should drones be spawned
 
-		//// get array & read out stage vars from array
-		//TArray<FString> stageInfo;
-		//stages[stateSwitchesCount].ParseIntoArray(stageInfo, TEXT("; "));
-		//// stageInfo >> [0]:#id; [1]:StageType; [2]:attacksToUse; [3]:droneAmmountToSpawn; [4]:droneSpawnTimer [5]:healthToSwitchStage; 
-		//FString msg = "";
-		//for (int i = 0; i < stageInfo.Num(); i++)
-		//{
-		//	msg += "::" + stageInfo[i];
-		//}
-		//GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, msg);
-
-		
-		for (int i = 0; i < stages.Num(); i++)
-		{
-			stages[i].stageType;
-			stages[i].healthPercentageToSwitchStage;
-			stages[i].attackPatternsToUse;
-			stages[i].dronesToSpawn;
-			stages[i].spawnDuration;
-			
-		}
-
-
-		//GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, FString::SanitizeFloat(healthForNextPhase));
 		if (bossState == BossState::BossShield) 
 		{
 			// spawn stage
@@ -101,18 +86,34 @@ void UBossComponent::BossFight(float DeltaTime)
 				{
 					if (playerChar->enemiesActual == 1)
 					{
-						SwitchState();
+						// switch to next state in list
+						SwitchState(stages[stateSwitchesCount+1].stageType);
 					}
 				}
 			}
 		}
+		
 		// attack stage
 		else if (bossState == BossState::BossAttack) 
 		{
-			
+			lastShotFired += DeltaTime;
+			// add attack/bulletsapwn
+			if (lastShotFired > shotTimer)
+			{
+				SpawnBullets(	stages[stateSwitchesCount].attackPatterns[phaseCtr].bulletBP,
+								stages[stateSwitchesCount].attackPatterns[phaseCtr].radius,
+								stages[stateSwitchesCount].attackPatterns[phaseCtr].numberOfBulletsToFire,
+								stages[stateSwitchesCount].attackPatterns[phaseCtr].bulletSpeed,
+								stages[stateSwitchesCount].attackPatterns[phaseCtr].bulletDamage,
+								stages[stateSwitchesCount].attackPatterns[phaseCtr].rotationSpeed
+				);
+				lastShotFired = 0;
+				phaseCtr++;
+			}
+
 			if (boss->health < healthForNextPhase)
 			{
-				SwitchState();
+				SwitchState(stages[stateSwitchesCount + 1].stageType);
 				GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "switching states");
 			}
 			phaseTimerLive += DeltaTime;
@@ -131,27 +132,32 @@ void UBossComponent::BossFight(float DeltaTime)
 	}
 }
 
-void UBossComponent::SwitchState() 
+void UBossComponent::SwitchState(BossState state)
 {
 	stateSwitchesCount++;
 	numberOfDronesSpawned = 0;
 
-	switch (bossState) 
+	switch (state) 
 	{
-		case BossState::BossIdle:
+		case  BossState::BossShield:
 			bossState = BossState::BossShield;
-			break;
-		case BossState::BossShield:
-			bossState = BossState::BossAttack;
 			break;
 		case BossState::BossAttack:
-			bossState = BossState::BossShield;
+			bossState = BossState::BossAttack;
+			break;
+		case BossState::BossIdle:
+			bossState = BossState::BossIdle;
 			break;
 	}
 }
 
-void UBossComponent::SpawnBullets(TSubclassOf<AProjectile> bulletBP, FVector center, float radius, int numberOfBulletsToFire, float bulletSpeed, float bulletDamage, float rotationSpeed) 
+void UBossComponent::SpawnBullets(TSubclassOf<AProjectile> bulletBP, float radius, int numberOfBulletsToFire, float bulletSpeed, float bulletDamage, float rotationSpeed) 
 {
+	// xy: world location actor, z: world location player
+	FVector center;
+	ACowboynoutCharacter* playerChar = Cast<ACowboynoutCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+	if (playerChar)	center = FVector(GetOwner()->GetActorLocation().X, GetOwner()->GetActorLocation().Y, playerChar->GetActorLocation().Z);
+	else center = FVector(GetOwner()->GetActorLocation().X, GetOwner()->GetActorLocation().Y, -700.f);
 	float rotation = 2 * PI / numberOfBulletsToFire;
 	float d_rotation;
 	FVector spawnPosi;

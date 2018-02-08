@@ -352,7 +352,15 @@ void AEnemy::Die()
 		borkedDrone->InitialLifeSpan = 3.f;		// auto destroy after x secs
 	}
 
+
+	worldContextObject = GetWorld();
+	spawnLocation = this->GetActorLocation();
+	FRotator spawnRotation = this->GetActorRotation();
+
+	UGameplayStatics::SpawnEmitterAtLocation(worldContextObject, dmgEffectParticle, spawnLocation, spawnRotation, true);
+
 	Destroy();
+
 }
 
 void AEnemy::DoAPeriodicCheck() 
@@ -421,11 +429,7 @@ void AEnemy::Damage(int dmg) {
 
 	// play dmg effect, sound & spawn broken actor
 	PlaySound(0);
-	UObject* worldContextObject = GetWorld();
-	FVector spawnLocation = this->GetActorLocation();
-	FRotator spawnRotation = this->GetActorRotation();
-
-	UGameplayStatics::SpawnEmitterAtLocation(worldContextObject, dmgEffectParticle, spawnLocation, spawnRotation, true);
+	
 }
 
 // 0: been hit; 1: attack; 

@@ -16,13 +16,40 @@ enum class BossState : uint8
 	BossShield UMETA(DisplayName = "Boss Spawning w/ Shield activated")
 };
 
+
+USTRUCT(BlueprintType)
+struct FAttackPattern
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<AProjectile> bulletBP;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float radius;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int numberOfBulletsToFire;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float bulletSpeed;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float bulletDamage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float rotationSpeed;
+
+};
+
+
 USTRUCT(BlueprintType)
 struct FStages
 {
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int stageType;
+	BossState stageType;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<int> attackPatternsToUse;
@@ -36,7 +63,10 @@ struct FStages
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float healthPercentageToSwitchStage;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<FAttackPattern> attackPatterns;
 };
+
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class COWBOYNOUT_API UBossComponent : public UActorComponent
@@ -46,6 +76,15 @@ class COWBOYNOUT_API UBossComponent : public UActorComponent
 public:	
 	// Sets default values for this component's properties
 	UBossComponent();
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	int phaseCtr;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	float lastShotFired;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	float shotTimer;
 
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
@@ -57,10 +96,10 @@ public:
 	TArray<int32> bossStages;
 
 	UFUNCTION()
-	void SwitchState();
+	void SwitchState(BossState state);
 
 	UFUNCTION(BlueprintCallable)
-	void SpawnBullets(TSubclassOf<AProjectile> bulletBP, FVector center, float radius, int numberOfBulletsToFire, float bulletSpeed, float bulletDamage, float DeltaTime);
+	void SpawnBullets(TSubclassOf<AProjectile> bulletBP, float radius, int numberOfBulletsToFire, float bulletSpeed, float bulletDamage, float DeltaTime);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<AEnemy> DroneBP;
@@ -68,6 +107,10 @@ public:
 	// idle, attack, spawn
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	BossState bossState;
+
+	// what kind of stage is the boss in
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	BossState actualStageType;
 
 	/*	[phase nr (int x)] [phase type (int x)] [attacks to use (int x,int y,…)] [drone number to spawn (int x)] [health to switch (int x)]
 		>>  0 1 1,1,4,1,2 10 8000
@@ -79,12 +122,15 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	int stateSwitchesCount;
 
+	// percentage of health to switch into next state
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float stateSwitchPercentage;
 
+	// how long should drones be spawned (or ammount below)
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	float droneSpawnTimer;
 
+	// how many drones should be spawned (or time above)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float droneSpawnTime;
 

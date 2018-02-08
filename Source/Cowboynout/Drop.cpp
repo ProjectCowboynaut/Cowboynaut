@@ -12,11 +12,11 @@ ADrop::ADrop()
 	
 	// Use a sphere as a simple collision representation
 	CollisionComp = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
-	CollisionComp->InitSphereRadius(9.0f);
-	CollisionComp->BodyInstance.SetCollisionProfileName("Drop");
+	//CollisionComp->InitSphereRadius(9.0f);
+	//CollisionComp->BodyInstance.SetCollisionProfileName("Drop");
 	CollisionComp->OnComponentHit.AddDynamic(this, &ADrop::OnHit);		// set up a notification for when this component hits something blocking
-	CollisionComp->SetWalkableSlopeOverride(FWalkableSlopeOverride(WalkableSlope_Unwalkable, 0.f));// Players can't walk on it
-	CollisionComp->CanCharacterStepUpOn = ECB_No;
+	//CollisionComp->SetWalkableSlopeOverride(FWalkableSlopeOverride(WalkableSlope_Unwalkable, 0.f));// Players can't walk on it
+	//CollisionComp->CanCharacterStepUpOn = ECB_No;
 
 	CollisionComp->OnComponentBeginOverlap.AddDynamic(this, &ADrop::OnOverlap);
 
