@@ -14,6 +14,23 @@ class ACowboynoutGameMode : public AGameModeBase
 public:
 	ACowboynoutGameMode();
 
+	/*
+	
+	void InitiateBossEvent();
+
+	void SpawnBoss();
+
+	void SpawnWave();
+
+	*/
+
+	UFUNCTION(BlueprintCallable, Category = "Enemy")
+	void StartSpawn(float minDelay, float maxDelay, float freq);
+
+	UFUNCTION(BlueprintCallable, Category = "Enemy")
+	void StopSpawn();
+
+
 };
 
 
