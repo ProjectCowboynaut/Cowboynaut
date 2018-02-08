@@ -27,10 +27,9 @@ void UBossComponent::BeginPlay()
 	GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, FString::SanitizeFloat(stateSwitchPercentage));
 	bossState = BossState::BossShield;
 	if (!boss) boss = Cast<AEnemy>(this->GetOwner());
-	if (boss != nullptr) 
-		bossStartLocation = boss->GetActorLocation();
-	
-	bossStartLocation.Z = -958;
+	/*if (boss != nullptr) 
+		bossSpawnLocation = boss->GetActorLocation();*/
+
 }
 
 void UBossComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -59,7 +58,7 @@ void UBossComponent::BossFight(float DeltaTime)
 		// ## read out vars from "array"
 		actualStageType = stages[stateSwitchesCount].stageType;
 		healthForNextStage = stages[stateSwitchesCount].healthPercentageToSwitchStage;  		// when to switch to next stage
-		//stages[stateSwitchesCount].attackPatternsToUse;											// patterns to use in attackstage phases
+		//stages[stateSwitchesCount].attackPatternsToUse;										// patterns to use in attackstage phases
 		numberOfDronesToSpawnPerPhase = stages[stateSwitchesCount].dronesToSpawn;				// how many drones should be spawned during phase (kill all to end)
 		stages[stateSwitchesCount].spawnDuration;												// how long should drones be spawned
 
@@ -68,9 +67,13 @@ void UBossComponent::BossFight(float DeltaTime)
 			// spawn stage
 			droneSpawnTimer += DeltaTime;
 			
+			for (int i = 0; i < numberOfDronesToSpawnPerPhase; i++) 
+			{
+
+			}
 			if (droneSpawnTimer > droneSpawnTime && numberOfDronesSpawned < numberOfDronesToSpawnPerPhase)
 			{
-				GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "i be spawning @" + bossStartLocation.ToString());
+				GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "i be spawning @" + bossSpawnLocation.ToString());
 				droneSpawnTimer = 0;
 				
 				FVector spawnPosi = boss->GetActorLocation();
@@ -79,13 +82,19 @@ void UBossComponent::BossFight(float DeltaTime)
 				FRotator rot;
 				FActorSpawnParameters spawnInfo;
 
-				AEnemy* droneSpawn = GetWorld()->SpawnActor<AEnemy>(DroneBP, bossStartLocation, rot, spawnInfo);
-				numberOfDronesSpawned++;
-				if (droneSpawn)
+				for (int i = 0; i < numberOfDronesToSpawnPerPhase/3; i++)
 				{
-					droneSpawn->health = 200.f;
-					droneSpawn->enemyType = EnemyType::EnemyBase;
-				}	
+					AEnemy* droneSpawn = GetWorld()->SpawnActor<AEnemy>(DroneBP, bossSpawnLocation, rot, spawnInfo);
+
+					if (droneSpawn)
+					{
+						numberOfDronesSpawned++;
+						droneSpawn->health = 200.f;
+						droneSpawn->enemyType = EnemyType::EnemyBase;
+					}
+				}
+
+				
 			}
 
 			else if (numberOfDronesSpawned >= numberOfDronesToSpawnPerPhase)

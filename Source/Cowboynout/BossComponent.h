@@ -76,8 +76,8 @@ public:
 	// Sets default values for this component's properties
 	UBossComponent();
 
-	UPROPERTY()
-	FVector bossStartLocation;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FVector bossSpawnLocation;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	float bossHealthMax;

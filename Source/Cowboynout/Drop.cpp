@@ -64,7 +64,11 @@ void ADrop::OnOverlap(UPrimitiveComponent* HitComp, AActor* OtherActor, class UP
 			}
 
 		}
-		else if (lootType == LootType::LootNade) playerChar->nades++;
+		else if (lootType == LootType::LootNade) 
+		{
+			playerChar->nades++;
+			Destroy();
+		}
 		// else
 			//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Magenta, "lootus borkus maximus!!!");
 		// destroy loot
