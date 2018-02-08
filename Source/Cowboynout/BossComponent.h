@@ -16,6 +16,28 @@ enum class BossState : uint8
 	BossShield UMETA(DisplayName = "Boss Spawning w/ Shield activated")
 };
 
+USTRUCT(BlueprintType)
+struct FStages
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int stageType;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<int> attackPatternsToUse;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int dronesToSpawn;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float spawnDuration;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float healthPercentageToSwitchStage;
+
+};
+
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class COWBOYNOUT_API UBossComponent : public UActorComponent
 {
@@ -50,8 +72,9 @@ public:
 	/*	[phase nr (int x)] [phase type (int x)] [attacks to use (int x,int y,…)] [drone number to spawn (int x)] [health to switch (int x)]
 		>>  0 1 1,1,4,1,2 10 8000
 	*/
+
 	UPROPERTY(EditAnywhere, BluePrintReadWrite)
-	TArray<FString> stages;
+	TArray<FStages> stages;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	int stateSwitchesCount;

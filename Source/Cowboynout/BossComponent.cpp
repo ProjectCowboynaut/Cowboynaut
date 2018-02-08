@@ -45,16 +45,27 @@ void UBossComponent::BossFight(float DeltaTime)
 	else 
 	{
 
-		// get array & read out stage vars from array
-		TArray<FString> stageInfo;
-		stages[stateSwitchesCount].ParseIntoArray(stageInfo, TEXT("; "));
-		// stageInfo >> [0]:#id; [1]:StageType; [2]:attacksToUse; [3]:droneAmmountToSpawn; [4]:droneSpawnTimer [5]:healthToSwitchStage; 
-		FString msg = "";
-		for (int i = 0; i < stageInfo.Num(); i++)
+		//// get array & read out stage vars from array
+		//TArray<FString> stageInfo;
+		//stages[stateSwitchesCount].ParseIntoArray(stageInfo, TEXT("; "));
+		//// stageInfo >> [0]:#id; [1]:StageType; [2]:attacksToUse; [3]:droneAmmountToSpawn; [4]:droneSpawnTimer [5]:healthToSwitchStage; 
+		//FString msg = "";
+		//for (int i = 0; i < stageInfo.Num(); i++)
+		//{
+		//	msg += "::" + stageInfo[i];
+		//}
+		//GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, msg);
+
+		
+		for (int i = 0; i < stages.Num(); i++)
 		{
-			msg += "::" + stageInfo[i];
+			stages[i].stageType;
+			stages[i].healthPercentageToSwitchStage;
+			stages[i].attackPatternsToUse;
+			stages[i].dronesToSpawn;
+			stages[i].spawnDuration;
+			
 		}
-		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, msg);
 
 
 		//GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, FString::SanitizeFloat(healthForNextPhase));
