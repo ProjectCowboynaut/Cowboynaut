@@ -3,6 +3,7 @@
 #include "CowboynoutGameMode.h"
 #include "CowboynoutPlayerController.h"
 #include "CowboynoutCharacter.h"
+#include "EnemySpawner.h"
 #include "UObject/ConstructorHelpers.h"
 
 ACowboynoutGameMode::ACowboynoutGameMode()
@@ -16,5 +17,24 @@ ACowboynoutGameMode::ACowboynoutGameMode()
 	if (PlayerPawnBPClass.Class != NULL)
 	{
 		DefaultPawnClass = PlayerPawnBPClass.Class;
+	}
+}
+
+void ACowboynoutGameMode::StartSpawn(float minDelay, float maxDelay, float freq)
+{
+	for (TActorIterator<AEnemySpawner> StartItr(GetWorld()); StartItr; ++StartItr)
+	{
+		float f = FMath::RandRange(minDelay, maxDelay);
+		StartItr->StartSpawning(f, freq);
+	}
+}
+
+void ACowboynoutGameMode::StopSpawn()
+{
+	for (TActorIterator<AEnemySpawner> StartItr(GetWorld()); StartItr; ++StartItr)
+	{
+		float f = FMath::RandRange(minDelay, maxDelay);
+		StartItr->StartSpawning(f, freq);
+		StartItr->StopSpawning();
 	}
 }
