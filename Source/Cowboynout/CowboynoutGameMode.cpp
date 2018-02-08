@@ -33,8 +33,6 @@ void ACowboynoutGameMode::StopSpawn()
 {
 	for (TActorIterator<AEnemySpawner> StartItr(GetWorld()); StartItr; ++StartItr)
 	{
-		float f = FMath::RandRange(minDelay, maxDelay);
-		StartItr->StartSpawning(f, freq);
 		StartItr->StopSpawning();
 	}
 }
