@@ -58,6 +58,9 @@ public:
 	// Called every frame.
 	virtual void Tick(float DeltaSeconds) override;
 
+	UPROPERTY(VisibleAnywhere,BluePrintReadOnly)
+	float camRange;
+
 	/** Returns TopDownCameraComponent subobject **/
 	FORCEINLINE 
 	class UCameraComponent* GetTopDownCameraComponent() const { return TopDownCameraComponent; }
@@ -82,9 +85,6 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Projectile")
 	TSubclassOf<AProjectile> ProjectileClassT3;
-
-	UPROPERTY()
-	AGrenade* nade;
 
 	UPROPERTY()
 	FVector nadeLoc;

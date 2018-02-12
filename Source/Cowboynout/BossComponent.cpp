@@ -19,6 +19,7 @@ UBossComponent::UBossComponent()
 	shotTimer = 0;
 	lastShotFired = 0;
 	bossHealthMax = 0;
+		
 }
 
 void UBossComponent::BeginPlay()
@@ -29,15 +30,16 @@ void UBossComponent::BeginPlay()
 	if (!boss) boss = Cast<AEnemy>(this->GetOwner());
 	/*if (boss != nullptr) 
 		bossSpawnLocation = boss->GetActorLocation();*/
-
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AEnemy::StaticClass(), foundActors);
+	//GetBossDrones();
 }
+
+
 
 void UBossComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 	rotationTicker += DeltaTime;
-
-
 
 	if (!boss) boss = Cast<AEnemy>(this->GetOwner());
 	if (boss != nullptr) {
@@ -64,23 +66,26 @@ void UBossComponent::BossFight(float DeltaTime)
 
 		if (bossState == BossState::BossShield) 
 		{
+			UGameplayStatics::GetAllActorsOfClass(GetWorld(), AEnemy::StaticClass(), foundActors);
+			//GetBossDrones();
+
+			ACowboynoutGameMode* gm = Cast<ACowboynoutGameMode>(GetWorld()->GetAuthGameMode());
+			//gm->StartBossSpawn(0.f, 0.f, 0.f, stages[stateSwitchesCount].spawnerList);
+
 			// spawn stage
 			droneSpawnTimer += DeltaTime;
-			
-			for (int i = 0; i < numberOfDronesToSpawnPerPhase; i++) 
-			{
 
-			}
-			if (droneSpawnTimer > droneSpawnTime && numberOfDronesSpawned < numberOfDronesToSpawnPerPhase)
+			if (droneSpawnTimer > droneSpawnTime && boss->bossDrones.Num() < numberOfDronesToSpawnPerPhase)
 			{
-				GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "i be spawning @" + bossSpawnLocation.ToString());
+				//GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "trying to spawn @ " + bossSpawnLocation.ToString());
 				droneSpawnTimer = 0;
 				
-				FVector spawnPosi = boss->GetActorLocation();
-				spawnPosi += FVector(-1000, 0, 0);
-				spawnPosi.Z = -840.876831f;
-				FRotator rot;
+				//FVector spawnPosi = boss->GetActorLocation();
+				//spawnPosi += FVector(-1000, 0, 0);
+				//spawnPosi.Z = -840.876831f;
+				FRotator rot = FRotator(.0f, .0f, .0f);
 				FActorSpawnParameters spawnInfo;
+				spawnInfo.bNoFail = true;
 
 				for (int i = 0; i < numberOfDronesToSpawnPerPhase/3; i++)
 				{
@@ -90,13 +95,15 @@ void UBossComponent::BossFight(float DeltaTime)
 					{
 						numberOfDronesSpawned++;
 						droneSpawn->health = 200.f;
-						droneSpawn->enemyType = EnemyType::EnemyBase;
+						droneSpawn->enemyType = EnemyType::EnemyBossSpawn;
+						boss->bossDrones.Add(droneSpawn);
+						droneSpawn->SetActorScale3D(FVector(1.3f, 1.3f, 1.3f));
+						droneSpawn->SetActorLocation(FVector(droneSpawn->GetActorLocation().X, droneSpawn->GetActorLocation().Y, bossSpawnLocation.Z));
+						//GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "spawn completed @ " + droneSpawn->GetActorLocation().ToString());
 					}
+					//else GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "spawn broken");
 				}
-
-				
 			}
-
 			else if (numberOfDronesSpawned >= numberOfDronesToSpawnPerPhase)
 			{
 				ACowboynoutCharacter* playerChar = Cast<ACowboynoutCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
@@ -118,19 +125,14 @@ void UBossComponent::BossFight(float DeltaTime)
 			// set life value for next trigger
 			healthForNextStage = bossHealthMax * stages[stateSwitchesCount].healthPercentageToSwitchStage;
 
-			if (stages[stateSwitchesCount].attackPatterns[phaseCtr].attackRate != 0) {
-				shotTimer = stages[stateSwitchesCount].attackPatterns[phaseCtr].attackRate;
-			}
+
+			shotTimer = stages[stateSwitchesCount].attackPatterns[phaseCtr].attackRate;
+
 			if (lastShotFired > shotTimer)
 			{
-				if (phaseCtr == NULL) 
-				{
-					phaseCtr = 0;
-				}
-				if (stateSwitchesCount == NULL) {
-					stateSwitchesCount = 0;
-				}
-				//GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, FString::FromInt(stateSwitchesCount) + " " + FString::FromInt(phaseCtr));
+				if (phaseCtr == NULL) phaseCtr = 0;
+				if (stateSwitchesCount == NULL) stateSwitchesCount = 0;
+
 				SpawnBullets(	stages[stateSwitchesCount].attackPatterns[phaseCtr].bulletBP,
 								stages[stateSwitchesCount].attackPatterns[phaseCtr].radius,
 								stages[stateSwitchesCount].attackPatterns[phaseCtr].numberOfBulletsToFire,
@@ -139,9 +141,10 @@ void UBossComponent::BossFight(float DeltaTime)
 								DeltaTime,
 								stages[stateSwitchesCount].attackPatterns[phaseCtr].attackRate
 				);
+				GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, stages[stateSwitchesCount].attackPatterns[phaseCtr].bulletBP->GetFName().ToString());
 				lastShotFired = 0;
 				//  phase counter increase or reset @max
-				if (phaseCtr < stages[stateSwitchesCount].attackPatterns.Num() -1) 
+				if (phaseCtr < stages[stateSwitchesCount].attackPatterns.Num()-1) 
 					phaseCtr++;
 				else phaseCtr = 0;
 			}
@@ -151,6 +154,8 @@ void UBossComponent::BossFight(float DeltaTime)
 				SwitchState(stages[stateSwitchesCount + 1].stageType);
 				GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "switching states");
 			}
+
+			// switch attacks
 			phaseTimerLive += DeltaTime;
 			if (phaseTimerMax == 0) phaseTimerMax = 5.f;
 			if (phaseTimerLive >= phaseTimerMax) 
@@ -159,7 +164,7 @@ void UBossComponent::BossFight(float DeltaTime)
 				phaseTimerLive = 0;			// reset phase timer
 				//GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, FString::FromInt(numberOfPhasesLive));
 			}
-
+			// reset phases to 0 if max reached
 			if (numberOfPhasesLive > numberOfPhases) 
 			{
 				numberOfPhasesLive = 0;
@@ -170,8 +175,11 @@ void UBossComponent::BossFight(float DeltaTime)
 
 void UBossComponent::SwitchState(BossState state)
 {
+	if (boss->health <= 0) return;
+
 	stateSwitchesCount++;
 	numberOfDronesSpawned = 0;
+	phaseCtr = 0;
 
 	switch (state) 
 	{
@@ -216,7 +224,7 @@ void UBossComponent::SpawnBullets(TSubclassOf<AProjectile> bulletBP, float radiu
 		spawnPosi.Z = center.Z;
 		//GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, FString::SanitizeFloat(d_rotation));
 
-		FRotator rot = FRotator(0, (d_rotation / PI * 180) + (angle * deltaTime), 0);
+		FRotator rot = FRotator(0, (d_rotation / PI * 180) + (angle * 100), 0);
 		FActorSpawnParameters spawnInfo;
 		AProjectile* bossBullet = GetWorld()->SpawnActor<AProjectile>(bulletBP, spawnPosi, rot, spawnInfo);
 		if (bossBullet)

@@ -64,14 +64,14 @@ void ASplosion::Tick(float DeltaTime) {
 	if (theEnd) {
 		doHit = true;
 		// do dmg
-		DoDmg(100, 1);
+		DoDmg(200, 1);
 	}
 }
 
 void ASplosion::DoDmg(int damage, bool terminal) {
 	for (int32 Index = 0; Index != hitEnemies.Num(); ++Index) {
 		// do dmg
-		Cast<AEnemy>(hitEnemies[Index])->Damage(100);
+		Cast<AEnemy>(hitEnemies[Index])->Damage(damage);
 	}
 	// destroy orb
 	if (terminal == 1) {

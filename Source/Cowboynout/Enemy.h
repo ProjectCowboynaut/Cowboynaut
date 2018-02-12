@@ -17,6 +17,7 @@ enum class EnemyType : uint8
 {
 	EnemyBase UMETA(DisplayName = "Base Drone"),
 	EnemyElite UMETA(DisplayName = "Elite Drone"),
+	EnemyBossSpawn UMETA(DisplayName = "Boss Spawn Drone"),
 	EnemyBoss UMETA(DisplayName = "Boss Drone")
 	
 };
@@ -78,6 +79,9 @@ public:
 	UPROPERTY(VisibleAnywhere, Category = "BossFight")
 	TArray<AActor*> foundPillars;
 
+	UPROPERTY(VisibleAnywhere, Category = "BossFight")
+	TArray<AActor*> bossDrones;
+
 	UPROPERTY()
 	int pillars;
 
@@ -116,7 +120,7 @@ public:
 	UPROPERTY()
 	int lastRnd;
 
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere, BluePrintReadOnly)
 	float bossHealth;
 
 	UFUNCTION(BlueprintCallable)

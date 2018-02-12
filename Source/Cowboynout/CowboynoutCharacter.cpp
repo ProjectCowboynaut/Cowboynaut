@@ -46,6 +46,8 @@ ACowboynoutCharacter::ACowboynoutCharacter() {
 	CameraBoom->TargetArmLength = 800.f;
 	CameraBoom->RelativeRotation = FRotator(0.f, 0.f, 0.f);
 	CameraBoom->bDoCollisionTest = false; // Don't want to pull camera in when it collides with level
+	// set cam range var for referencing
+	camRange = CameraBoom->TargetArmLength;
 
 	// Create a camera...
 	TopDownCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("TopDownCamera"));
@@ -91,6 +93,10 @@ ACowboynoutCharacter::ACowboynoutCharacter() {
 	lifeWarningTimer = 3.11f;
 	lifeWarningTimerFull = 3.11f;
 
+	CollisionComp = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
+	//CollisionComp->BodyInstance.SetCollisionProfileName("Projectile");
+	CollisionComp->OnComponentBeginOverlap.AddDynamic(this, &ACowboynoutCharacter::OnOverlapBegin);
+
 	soundSkill1 = LoadObject<USoundBase>(NULL, TEXT("SoundWave'/Game/Assets/Audio/Player/Skill1fast.Skill1fast'"), NULL, LOAD_None, NULL);
 	soundSkill2shot = LoadObject<USoundBase>(NULL, TEXT("SoundWave'/Game/Assets/Audio/Player/Skill2LoadFinish.Skill2LoadFinish'"), NULL, LOAD_None, NULL);
 	soundSkill2explosion = LoadObject<USoundBase>(NULL, TEXT("SoundWave'/Game/Assets/Audio/Player/Skill2ExplodeFinish.Skill2ExplodeFinish'"), NULL, LOAD_None, NULL);
@@ -122,6 +128,8 @@ void ACowboynoutCharacter::SetTarget(int targetStatus) {			/// 0: no target; 1: 
 
 void ACowboynoutCharacter::Tick(float DeltaSeconds) {
     Super::Tick(DeltaSeconds);
+
+	CameraBoom->TargetArmLength = camRange;
 
 #pragma region get enemy ammount
 	if (enemiesActual>enemiesTotal) {
@@ -344,25 +352,20 @@ void ACowboynoutCharacter::FireSkillTwo() {
 		nadeLoc = GetActorLocation();
 		animShooting = true;
 		explodeNade = false;
+		
 		ACowboynoutPlayerController* playerCtrl = Cast<ACowboynoutPlayerController>(GetController());
 		if (playerCtrl) {
 			if (nades > 0) {
 				FActorSpawnParameters spawnInfo;
-				if (skillLvlTwo == 1) {
-					playerCtrl->canTP = false;
-					nade = GetWorld()->SpawnActor<AGrenade>(GrenadeClassT1, GetActorLocation(), muzzleLocation->GetComponentRotation(), spawnInfo);
-				}
-				else if (skillLvlTwo == 2) {
-					playerCtrl->canTP = false;
-					nade = GetWorld()->SpawnActor<AGrenade>(GrenadeClassT2, GetActorLocation(), muzzleLocation->GetComponentRotation(), spawnInfo);
-				}
-				else if (skillLvlTwo == 3) {
-					playerCtrl->canTP = false;
-					nade = GetWorld()->SpawnActor<AGrenade>(GrenadeClassT3, GetActorLocation(), muzzleLocation->GetComponentRotation(), spawnInfo);
-				}
+				spawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+				FRotator rot;
+				AGrenade* nade = GetWorld()->SpawnActor<AGrenade>(GrenadeClassT1, GetActorLocation(), rot, spawnInfo);
+				
 				PlaySound(2);
 				nades--;
 			}
+				
+			
 			
 		}
 }

@@ -51,7 +51,16 @@ AEnemy::AEnemy()
 
 		armor = 1.f;
 	}
-	// boss mob stats
+	else if (this->enemyType == EnemyType::EnemyBossSpawn)
+	{
+		/*this->health = healthBoss;
+		if (this->health == 0) health = 10000;*/
+		attackRatio = .25f;					// lower ratio, more dmg per shot
+
+		armor = 1.f;
+		isBoss = false;
+	}
+	// boss stats
 	else if (this->enemyType == EnemyType::EnemyBoss)
 	{
 		/*this->health = healthBoss;
@@ -359,6 +368,22 @@ void AEnemy::Die()
 
 	UGameplayStatics::SpawnEmitterAtLocation(worldContextObject, dmgEffectParticle, spawnLocation, spawnRotation, true);
 
+
+	if (enemyType == EnemyType::EnemyBossSpawn)
+	{
+		TArray<AActor*> foundActors;
+		UGameplayStatics::GetAllActorsOfClass(GetWorld(), AEnemy::StaticClass(), foundActors);
+		for (int i = 0; i < foundActors.Num(); i++)
+		{
+			AEnemy* thisDrone = Cast<AEnemy>(foundActors[i]);
+			if (thisDrone->enemyType == EnemyType::EnemyBoss)
+			{
+				thisDrone->bossDrones.Remove(foundActors[i]);
+			}
+		}
+	}
+		
+
 	Destroy();
 
 }
@@ -381,6 +406,7 @@ void AEnemy::Attack()
 		bullet->bulletType = BulletType::EnemyBullet;
 		if (enemyType == EnemyType::EnemyBase) bullet->projectileDamage = damageBase;
 		else if (enemyType == EnemyType::EnemyElite) bullet->projectileDamage = damageElite;
+		else if (enemyType == EnemyType::EnemyBossSpawn) bullet->projectileDamage = damageBase;
 		else if (enemyType == EnemyType::EnemyBoss) bullet->projectileDamage = damageBoss;
 		bullet->playerProjectile = false;
 	}

@@ -37,4 +37,7 @@ public:
 	TSubclassOf<class AEnemy> EnemyClass;
 
 	FTimerHandle SpawnTimerHandle;
+
+	UPROPERTY()
+	int dronesSpawned;
 };

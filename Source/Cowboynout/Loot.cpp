@@ -11,7 +11,7 @@ ULoot::ULoot() {
 	dropChanceB = .0f;
 	dropChanceC = .0f;
 	dropChanceH = .4f;
-	dropChanceG = .4f;
+	dropChanceG = .24f;
 }
 
 void ULoot::BeginPlay() {

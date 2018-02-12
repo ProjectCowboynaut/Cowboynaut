@@ -29,6 +29,16 @@ void ACowboynoutGameMode::StartSpawn(float minDelay, float maxDelay, float freq)
 	}
 }
 
+void ACowboynoutGameMode::StartBossSpawn(float minDelay, float maxDelay, float freq, TArray<AEnemySpawner*> spawnPoints)
+{
+	for (int i = 0; i < spawnPoints.Num(); i++) 
+	{
+		// while (spawnPoints[i]->dronesSpawned 
+		float f = FMath::RandRange(minDelay, maxDelay);
+		spawnPoints[i]->StartSpawning(f, freq);
+	}
+}
+
 void ACowboynoutGameMode::StopSpawn()
 {
 	for (TActorIterator<AEnemySpawner> StartItr(GetWorld()); StartItr; ++StartItr)

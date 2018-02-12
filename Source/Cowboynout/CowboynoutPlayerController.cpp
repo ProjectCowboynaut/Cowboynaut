@@ -78,7 +78,6 @@ ACowboynoutPlayerController::ACowboynoutPlayerController() {
 
 	debugEnabled = true;
 
-	
 	// init player vars & refs (overwritten if used in BP)
 }
 

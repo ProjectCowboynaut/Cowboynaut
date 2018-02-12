@@ -13,6 +13,7 @@ AEnemySpawner::AEnemySpawner()
 // Called when the game starts or when spawned
 void AEnemySpawner::BeginPlay()
 {
+	dronesSpawned = 0;
 	Super::BeginPlay();
 	SpawnEnemy();
 	
@@ -55,5 +56,8 @@ void AEnemySpawner::SpawnEnemy()
 	if(GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("fak-spawn")));
 	FActorSpawnParameters spawnInfo;
 	AEnemy* enemy = GetWorld()->SpawnActor<AEnemy>(EnemyClass, GetActorLocation(), GetActorRotation(), spawnInfo);
+	enemy->enemyType = EnemyType::EnemyBossSpawn;
+	enemy->SetActorScale3D(FVector(1.3f, 1.3f, 1.3f));
+	dronesSpawned++;
 }
 

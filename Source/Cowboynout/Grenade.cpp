@@ -15,7 +15,8 @@ AGrenade::AGrenade() {
 	CollisionComp = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
 	CollisionComp->InitSphereRadius(5.0f);
 	CollisionComp->BodyInstance.SetCollisionProfileName("Projectile");
-	CollisionComp->OnComponentHit.AddDynamic(this, &AGrenade::OnHit);		// set up a notification for when this component hits something blocking
+	//CollisionComp->OnComponentHit.AddDynamic(this, &AGrenade::OnHit);		// set up a notification for when this component hits something blocking
+	CollisionComp->OnComponentBeginOverlap.AddDynamic(this, &AGrenade::OnOverlapBegin);
 	CollisionComp->SetWalkableSlopeOverride(FWalkableSlopeOverride(WalkableSlope_Unwalkable, 0.f)); 
 	CollisionComp->CanCharacterStepUpOn = ECB_No;
 
@@ -25,83 +26,107 @@ AGrenade::AGrenade() {
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileComp"));
 	ProjectileMovement->UpdatedComponent = CollisionComp;
 	InitialLifeSpan = 4.0f;
-	grenadeDamage = 100.f;
+	grenadeDamage = 300.f;
 
 	cnt = 0;
 
-	ACowboynoutPlayerController* pCtrl = Cast<ACowboynoutPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-	if (pCtrl) {
-		pCtrl->GetHitResultUnderCursor(ECC_Visibility, false, cursorHit);
-		cursorLoc = cursorHit.Location;
-		
-	}
+	// Die after x seconds by default
+	InitialLifeSpan = .5f;
 
+	hitEnemies = {};
 }
 
 void AGrenade::Tick(float DeltaTime) {
-	actorLoc = GetActorLocation();
-	actorLoc.Z = 0;
-	cursorLoc.Z = 0;
-	locDistance = FVector::Distance(actorLoc, cursorLoc);
-	FString msg = "";
 
-	UObject* WorldContextObject = GetWorld();
-	FVector SpawnLocation = GetActorLocation();
-	FRotator SpawnRotation = GetActorRotation();
-	// spawn fx emitt0r
-	UGameplayStatics::SpawnEmitterAtLocation(WorldContextObject, EmitterTemplate, SpawnLocation, SpawnRotation, true);
-	FActorSpawnParameters spawnInfo;
-	// spawn sploding actor 
-	ASplosion* boomSphere = GetWorld()->SpawnActor<ASplosion>(SploderClass, SpawnLocation, SpawnRotation, spawnInfo);
 
-	Destroy();
 }
 
-void AGrenade::DebugMsg(FString msg, float dTime, FColor clr) {
+void AGrenade::DebugMsg(FString msg, float dTime, FColor clr)
+{
 	GEngine->AddOnScreenDebugMessage(-1, dTime, clr, msg);
 }
 
-void AGrenade::Initialize(int damage) {
-
+void AGrenade::Initialize(int damage) 
+{
 	grenadeDamage = damage;
 }
 
-void AGrenade::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit) {
-	if (OtherActor != NULL) {
-		// dmg should be inflicted by emitter later, not by this projectile
-		//AEnemy* hitEnemy = Cast<AEnemy>(OtherActor);
-		//if (hitEnemy != NULL) hitEnemy->Damage(grenadeDamage);
 
-		FHitResult cursorHit;
-		APlayerController* pCtrl = UGameplayStatics::GetPlayerController(GetWorld(), 0);
-		if (pCtrl != NULL) pCtrl->GetHitResultUnderCursor(ECC_Visibility, false, cursorHit);
+void AGrenade::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	DebugMsg("::" + OtherActor->GetFName().ToString() + "->" + OverlappedComp->GetFName().ToString(), 5.f, FColor::Yellow);
+	if (OtherActor != nullptr) {
 
-		float const distance = FVector::Dist(cursorHit.ImpactPoint, pCtrl->GetPawn()->GetActorLocation());
-		if (distance) DebugMsg(FString::SanitizeFloat(distance), 1.5f, FColor::Yellow);
+		// push box on hit
+		if (OtherActor != this && OtherActor->GetFName().ToString() == "Box")
+		{
+			OtherComp->AddImpulseAtLocation(GetVelocity() * 5.0f, GetActorLocation());
+		}
+		if (hitEnemies.Contains(OtherActor))
+		{
+			DebugMsg("schon getroffen", 1.5f, FColor::Yellow);
+		}
+		else
+		{
+			hitEnemies.AddUnique(OtherActor);
+
+			// >> hit enemy
+			if ((OtherActor->ActorHasTag("Enemy") || OverlappedComp->ComponentHasTag("Enemy")))
+			{
+				//DebugMsg("p hit: " + OtherActor->GetName(), 1.5f, FColor::Red);
+				// set dmg on enemy
+				AEnemy* hitEnemy = Cast<AEnemy>(OtherActor);
+				ACowboynoutCharacter* playerChar = Cast<ACowboynoutCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+				if (playerChar && hitEnemy)
+				{
+					hitEnemy->Damage(grenadeDamage * (1 + (playerChar->attack / 10)));
+					//hitEnemy->PlaySound(0);
+				}
+			}
+			else DebugMsg("no actor", 1.5f, FColor::Red);
+		}
 	}
-	else {
-		FString msg = "[skill 2] hit";
-		FString hitObjectName = OtherActor->GetFName().ToString();
-	}
+	else DebugMsg("no actor", 1.5f, FColor::Red);
 
-	if (!ProjectileMovement->bShouldBounce || cnt > 3)
-		Destroy();
+#pragma region old Nade
+	////DebugMsg("::" + OtherActor->GetFName().ToString() + "->" + OverlappedComp->GetFName().ToString(), 5.f, FColor::Yellow);
+	//if (OtherActor != nullptr) {
 
-	cnt++;
+	//	// push box on hit
+	//	if (OtherActor != this && OtherActor->GetFName().ToString() == "Box")
+	//	{
+	//		OtherComp->AddImpulseAtLocation(GetVelocity() * 5.0f, GetActorLocation());
+	//	}
 
-	UObject* WorldContextObject = GetWorld();
-	FVector SpawnLocation = this->GetActorLocation();
-	FRotator SpawnRotation = GetActorRotation();
-	UGameplayStatics::SpawnEmitterAtLocation(
-		WorldContextObject,
-		EmitterTemplate,
-		SpawnLocation,
-		SpawnRotation,
-		true
-	);
+	//	if (hitEnemies.Contains(OtherActor))
+	//	{
+	//		//DebugMsg("schon getroffen", 1.5f, FColor::Yellow);
+	//	}
+	//	else
+	//	{
+	//		hitEnemies.AddUnique(OtherActor);
+
+	//		// >> hit enemy
+	//		if ((OtherActor->ActorHasTag("Enemy") || OverlappedComp->ComponentHasTag("Enemy")))
+	//		{
+	//			//DebugMsg("p hit: " + OtherActor->GetName(), 1.5f, FColor::Red);
+	//			// set dmg on enemy
+	//			AEnemy* hitEnemy = Cast<AEnemy>(OtherActor);
+	//			ACowboynoutCharacter* playerChar = Cast<ACowboynoutCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+	//			if (playerChar && hitEnemy)
+	//			{
+	//				hitEnemy->Damage(grenadeDamage * (1 + (playerChar->attack / 10)));
+	//				hitEnemy->PlaySound(0);
+	//				// check for penetration and sub enemy armor
+	//			}
+	//		}
+	//		
+	//		else DebugMsg("no actor", 1.5f, FColor::Red);
+	//	}
+	//}
+	//else DebugMsg("no actor", 1.5f, FColor::Red);
 }
-
-
+#pragma endregion old dmg used for "aoe tick"
 
 void AGrenade::SpawnEmitter() {
 	
