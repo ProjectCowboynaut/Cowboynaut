@@ -44,6 +44,9 @@ struct FAttackPattern
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float attackRate;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float bulletLifeTime;
 };
 
 
@@ -90,9 +93,6 @@ public:
 	UPROPERTY(VisibleAnywhere, Category = "Level Stuff")
 	TArray<AActor*> bossDrones;
 
-	UPROPERTY(VisibleAnywhere, Category = "Level Stuff")
-	int bossDronesSpawnedThisPhase;
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	float bossHealthMax;
 
@@ -119,7 +119,7 @@ public:
 	void SwitchState(BossState state);
 
 	UFUNCTION(BlueprintCallable)
-	void SpawnBullets(TSubclassOf<AProjectile> bulletBP, float radius, int numberOfBulletsToFire, float bulletSpeed, float bulletDamage, float deltaTime, float attackRate);
+	void SpawnBullets(TSubclassOf<AProjectile> bulletBP, float radius, int numberOfBulletsToFire, float bulletSpeed, float bulletDamage, float deltaTime, float attackRate, float bulletLifeTime);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<AEnemy> DroneBP;

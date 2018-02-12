@@ -11,6 +11,7 @@
 #include "HeadMountedDisplayFunctionLibrary.h"
 #include "Materials/Material.h"
 #include "Enemy.h"
+#include "BossComponent.h"
 #include "CowboynoutPlayerController.h"
 
 
@@ -133,22 +134,27 @@ void ACowboynoutCharacter::Tick(float DeltaSeconds) {
 	CameraBoom->TargetArmLength = camRange;
 
 #pragma region get enemy ammount
+
 	if (enemiesActual>enemiesTotal) {
 		// set total number of enemies
 		UGameplayStatics::GetAllActorsOfClass(GetWorld(), AEnemy::StaticClass(), foundActors);
 		enemiesTotal = foundActors.Num() -1;
-		// find all level barrikades
-		UGameplayStatics::GetAllActorsOfClass(GetWorld(), BarrierBPClass, foundActorsBarr);
-		//bossBarrikades = foundActorsBarr.Num();
-		// set enemies needed to disable ONE barrier
-		//enemiesSet = true;
 	}
 	
 	// set actual number of enemies
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AEnemy::StaticClass(), foundActors);
-	enemiesActual = foundActors.Num() ;			// boss os no onomoo!
-	//GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, FString::FromInt(enemiesActual));
-	
+	for (int i = 0; i < foundActors.Num(); i++) {
+		AEnemy* enemiski = Cast<AEnemy>(foundActors[i]);
+		if (enemiski->isBoss)
+		{
+			enemiesActual = enemiski->bossDrones.Num();
+			//enemiesTotal = enemiski->bossDronesToSpawnThisPhase;
+			
+			TArray<UBossComponent*> Components;
+			enemiski->GetComponents<UBossComponent>(Components);
+			if (Components[0]->IsValidLowLevel()) enemiesTotal = Components[0]->stages[Components[0]->stateSwitchesCount].dronesToSpawn;
+		}
+	}
 
 	if (enemiesTotal != 0 && bossBarrikades != 0)
 		enemiesToDisableBarrier = enemiesTotal / bossBarrikades;

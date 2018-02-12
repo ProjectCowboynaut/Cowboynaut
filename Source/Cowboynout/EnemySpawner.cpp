@@ -73,24 +73,34 @@ void AEnemySpawner::SpawnEnemy()
 				//GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, "illegaler charakter");
 				boss = thisDrone;
 			}
+			//else GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, "illegal character");
 		}
 	}
 
 	FActorSpawnParameters spawnInfo;
 	spawnInfo.bNoFail = true;
-	AEnemy* enemy = GetWorld()->SpawnActor<AEnemy>(EnemyClass, GetActorLocation(), GetActorRotation(), spawnInfo);
+	FRotator rot = FRotator(.0f, .0f, 0.f);
+	FVector spawnLoc = GetActorLocation();
+	float rnd1 = FMath::RandRange(-250.f, 250.f);
+	float rnd2 = FMath::RandRange(-250.f, 250.f);
+	spawnLoc = FVector(spawnLoc.X + rnd1, spawnLoc.Y+rnd2, spawnLoc.Z);
+
+	AEnemy* enemy = GetWorld()->SpawnActor<AEnemy>(EnemyClass, spawnLoc, rot, spawnInfo);
 	if (enemy)
 	{
 		enemy->enemyType = EnemyType::EnemyBossSpawn;
 		enemy->SetActorScale3D(FVector(1.3f, 1.3f, 1.3f));
 		enemy->health = enemy->healthBase;
 		enemy->attackRatio = enemy->attackRatioBase;
+		enemy->SpawnDefaultController();				// wont move without.. obviously
 		if (boss) 
 		{
 			boss->bossDrones.Add(enemy);
+			boss->bossDronesSpawnedThisPhase++;
 		}
 		else GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, "couldn't add bossdrone!");
 		dronesSpawned++;
+
 	}
 	
 }

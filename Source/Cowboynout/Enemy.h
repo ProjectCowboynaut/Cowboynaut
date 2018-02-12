@@ -60,6 +60,12 @@ public:
 	UPROPERTY(EditDefaultsOnly, BluePrintReadWrite)
 	bool bossFightActive;
 
+	UPROPERTY(VisibleAnywhere, Category = "Level Stuff")
+	int bossDronesSpawnedThisPhase;
+
+	UPROPERTY(VisibleAnywhere, Category = "Level Stuff")
+	int bossDronesToSpawnThisPhase;
+
 	UPROPERTY()
 	float bossEffectTimer;
 

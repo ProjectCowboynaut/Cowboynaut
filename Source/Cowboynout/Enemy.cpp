@@ -133,21 +133,19 @@ void AEnemy::Tick(float deltaTime)
 	Super::Tick(deltaTime);
 
 	if (this->enemyType == EnemyType::EnemyBoss)
-	{
+	{		
 		bossHealth = health;
 		if (bossHealth > bossHealthMax) bossHealthMax = bossHealth;
-		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::SanitizeFloat(bossHealth));
+		int compare = bossDrones.Num();
+		if (compare <= 1) vincible = true;
+		else vincible = false;
+		
 	}
 	if (health > healthMax) healthMax = health;
 
 	// change state if all drones (but boss) are destroyed
 	if (!playerChar) playerChar = Cast<ACowboynoutCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
-	if (playerChar) {
-		int compare = playerChar->enemiesActual;
-		if (compare <= 1) vincible = true;
-		//GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Red, FString::FromInt(compare));
-		else vincible = false;
-	}
+	
 
 	if (timerActive)
 		timer += deltaTime;
@@ -372,13 +370,11 @@ void AEnemy::Die()
 		borkedDrone->InitialLifeSpan = 3.f;		// auto destroy after x secs
 	}
 
-
 	worldContextObject = GetWorld();
 	spawnLocation = this->GetActorLocation();
 	FRotator spawnRotation = this->GetActorRotation();
 
 	UGameplayStatics::SpawnEmitterAtLocation(worldContextObject, dmgEffectParticle, spawnLocation, spawnRotation, true);
-
 
 	if (enemyType == EnemyType::EnemyBossSpawn)
 	{
@@ -389,14 +385,12 @@ void AEnemy::Die()
 			AEnemy* thisDrone = Cast<AEnemy>(foundActors[i]);
 			if (thisDrone->enemyType == EnemyType::EnemyBoss)
 			{
-				thisDrone->bossDrones.Remove(foundActors[i]);
+				thisDrone->bossDrones.Remove(this);
 			}
 		}
 	}
-		
 
 	Destroy();
-
 }
 
 void AEnemy::DoAPeriodicCheck() 
