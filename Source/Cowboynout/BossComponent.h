@@ -59,7 +59,7 @@ struct FStages
 	int dronesToSpawn;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float spawnDuration;
+	float spawnFrequency;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float healthPercentageToSwitchStage;
@@ -89,6 +89,9 @@ public:
 
 	UPROPERTY(VisibleAnywhere, Category = "Level Stuff")
 	TArray<AActor*> bossDrones;
+
+	UPROPERTY(VisibleAnywhere, Category = "Level Stuff")
+	int bossDronesSpawnedThisPhase;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	float bossHealthMax;

@@ -33,6 +33,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Enemy")
 	void StopSpawn();
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	bool bossIsSpawning;
+
 
 };
 

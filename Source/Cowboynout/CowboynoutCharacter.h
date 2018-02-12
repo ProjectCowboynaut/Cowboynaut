@@ -229,13 +229,16 @@ public:
 	void PlaySound(int sound);
 
 	UPROPERTY(EditDefaultsOnly, Category = "SFX")
-	USoundBase* soundSkill1;
+	USoundBase* soundBeenHit;
 
 	UPROPERTY(EditDefaultsOnly, Category = "SFX")
-	USoundBase* soundSkill2shot;
+	USoundBase* dashSound;
 
 	UPROPERTY(EditDefaultsOnly, Category = "SFX")
-	USoundBase* soundSkill2explosion;
+	USoundBase* soundSkill1_Laser;
+
+	UPROPERTY(EditDefaultsOnly, Category = "SFX")
+	USoundBase* soundSkill2_Nade;
 
 	UPROPERTY(EditDefaultsOnly, Category = "SFX")
 	USoundBase* soundLowLife;

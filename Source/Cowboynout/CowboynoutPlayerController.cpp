@@ -335,6 +335,7 @@ void ACowboynoutPlayerController::DodgeMove() {
 			cowboy->LaunchCharacter(launchSpeed,true, true);
 			//DebugMsg("launch @" + FString::SanitizeFloat(NewLocation.X) + "," + FString::SanitizeFloat(NewLocation.Y), 3.f, FColor::White);
 		}
+		cowboy->PlaySound(3);
 	}
 }
 

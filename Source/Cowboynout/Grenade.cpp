@@ -64,7 +64,7 @@ void AGrenade::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* Other
 		}
 		if (hitEnemies.Contains(OtherActor))
 		{
-			DebugMsg("schon getroffen", 1.5f, FColor::Yellow);
+			//DebugMsg("schon getroffen", 1.5f, FColor::Yellow);
 		}
 		else
 		{

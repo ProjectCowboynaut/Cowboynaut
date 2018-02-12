@@ -24,6 +24,15 @@ void AEnemySpawner::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (!boss)
+	{
+		UGameplayStatics::GetAllActorsOfClass(GetWorld(), AEnemy::StaticClass(), foundActors);
+		for (int i = 0; i < foundActors.Num(); i++)
+		{
+			AEnemy* thisDrone = Cast<AEnemy>(foundActors[i]);
+			if (thisDrone->isBoss) boss = thisDrone;
+		}
+	}
 }
 
 void AEnemySpawner::StartSpawning(float delay, float freq)
@@ -53,11 +62,36 @@ void AEnemySpawner::StopSpawning()
 
 void AEnemySpawner::SpawnEnemy()
 {
-	if(GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("fak-spawn")));
+	if (!boss)
+	{
+		UGameplayStatics::GetAllActorsOfClass(GetWorld(), AEnemy::StaticClass(), foundActors);
+		for (int i = 0; i < foundActors.Num(); i++)
+		{
+			AEnemy* thisDrone = Cast<AEnemy>(foundActors[i]);
+			if (thisDrone->isBoss)
+			{
+				//GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, "illegaler charakter");
+				boss = thisDrone;
+			}
+		}
+	}
+
 	FActorSpawnParameters spawnInfo;
+	spawnInfo.bNoFail = true;
 	AEnemy* enemy = GetWorld()->SpawnActor<AEnemy>(EnemyClass, GetActorLocation(), GetActorRotation(), spawnInfo);
-	enemy->enemyType = EnemyType::EnemyBossSpawn;
-	enemy->SetActorScale3D(FVector(1.3f, 1.3f, 1.3f));
-	dronesSpawned++;
+	if (enemy)
+	{
+		enemy->enemyType = EnemyType::EnemyBossSpawn;
+		enemy->SetActorScale3D(FVector(1.3f, 1.3f, 1.3f));
+		enemy->health = enemy->healthBase;
+		enemy->attackRatio = enemy->attackRatioBase;
+		if (boss) 
+		{
+			boss->bossDrones.Add(enemy);
+		}
+		else GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, "couldn't add bossdrone!");
+		dronesSpawned++;
+	}
+	
 }
 

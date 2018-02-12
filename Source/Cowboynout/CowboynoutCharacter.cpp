@@ -43,7 +43,7 @@ ACowboynoutCharacter::ACowboynoutCharacter() {
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(RootComponent);
 	CameraBoom->bAbsoluteRotation = true; // Don't want arm to rotate when character does
-	CameraBoom->TargetArmLength = 800.f;
+	CameraBoom->TargetArmLength = 1000.f;
 	CameraBoom->RelativeRotation = FRotator(0.f, 0.f, 0.f);
 	CameraBoom->bDoCollisionTest = false; // Don't want to pull camera in when it collides with level
 	// set cam range var for referencing
@@ -97,9 +97,10 @@ ACowboynoutCharacter::ACowboynoutCharacter() {
 	//CollisionComp->BodyInstance.SetCollisionProfileName("Projectile");
 	CollisionComp->OnComponentBeginOverlap.AddDynamic(this, &ACowboynoutCharacter::OnOverlapBegin);
 
-	soundSkill1 = LoadObject<USoundBase>(NULL, TEXT("SoundWave'/Game/Assets/Audio/Player/Skill1fast.Skill1fast'"), NULL, LOAD_None, NULL);
-	soundSkill2shot = LoadObject<USoundBase>(NULL, TEXT("SoundWave'/Game/Assets/Audio/Player/Skill2LoadFinish.Skill2LoadFinish'"), NULL, LOAD_None, NULL);
-	soundSkill2explosion = LoadObject<USoundBase>(NULL, TEXT("SoundWave'/Game/Assets/Audio/Player/Skill2ExplodeFinish.Skill2ExplodeFinish'"), NULL, LOAD_None, NULL);
+	soundBeenHit = LoadObject<USoundBase>(NULL, TEXT("SoundCue'/Game/Assets/Audio/Player/PlayerHit_Cue.PlayerHit_Cue'"), NULL, LOAD_None, NULL);
+	dashSound = LoadObject<USoundBase>(NULL, TEXT("SoundCue'/Game/Assets/Audio/Player/Dash.Dash'"), NULL, LOAD_None, NULL);
+	soundSkill1_Laser = LoadObject<USoundBase>(NULL, TEXT("SoundWave'/Game/Assets/Audio/Player/Skill1fast.Skill1fast'"), NULL, LOAD_None, NULL);
+	soundSkill2_Nade = LoadObject<USoundBase>(NULL, TEXT("SoundCue'/Game/Assets/Audio/Player/AoeAttack_Cue.AoeAttack_Cue'"), NULL, LOAD_None, NULL);
 	soundLowLife = LoadObject<USoundBase>(NULL, TEXT("SoundWave'/Game/Assets/Audio/Player/PlayerLowLife.PlayerLowLife'"), NULL, LOAD_None, NULL);
 	soundDead = LoadObject<USoundBase>(NULL, TEXT("SoundWave'/Game/Assets/Audio/Player/PlayerDeath.PlayerDeath'"), NULL, LOAD_None, NULL);
 
@@ -212,8 +213,6 @@ void ACowboynoutCharacter::Tick(float DeltaSeconds) {
 	}
 #pragma endregion 
 }
-
-
 
 void ACowboynoutCharacter::Damage(int dmg) {
 	ACowboynoutPlayerController* playerCtrl = Cast<ACowboynoutPlayerController>(GetController());
@@ -364,29 +363,25 @@ void ACowboynoutCharacter::FireSkillTwo() {
 				PlaySound(2);
 				nades--;
 			}
-				
-			
-			
 		}
 }
 
-// 0: been hit; 1: skill one; 2: skill two fired; 3: skill two explosion sound; 4: low life warning; 5: death 
+// (0) been hit; (1) laser; (2) nade; (3) dash; (4) low life warning; (5) death;
 void ACowboynoutCharacter::PlaySound(int sound) {
 	float volumeMultiplier = 1.f;
 	float pitchMultiplier = 1.f;
 	float startTime = 0.f;
 
 	UObject* worldContextObject = GetWorld();
-	/*
+	
 	if (sound == 0)
-		UGameplayStatics::PlaySound2D(worldContextObject, soundSkill1, volumeMultiplier, pitchMultiplier, startTime);
-	/**/
-	if (sound == 1)
-		UGameplayStatics::PlaySound2D(worldContextObject, soundSkill1, volumeMultiplier, pitchMultiplier, startTime);
+		UGameplayStatics::PlaySound2D(worldContextObject, soundBeenHit, volumeMultiplier, pitchMultiplier, startTime);
+	else if (sound == 1)
+		UGameplayStatics::PlaySound2D(worldContextObject, soundSkill1_Laser, volumeMultiplier, pitchMultiplier, startTime);
 	else if (sound == 2)
-		UGameplayStatics::PlaySound2D(worldContextObject, soundSkill2shot, volumeMultiplier, pitchMultiplier, startTime);
+		UGameplayStatics::PlaySound2D(worldContextObject, soundSkill2_Nade, volumeMultiplier, pitchMultiplier, startTime);
 	else if (sound == 3)
-		UGameplayStatics::PlaySound2D(worldContextObject, soundSkill2explosion, volumeMultiplier, pitchMultiplier, startTime);
+		UGameplayStatics::PlaySound2D(worldContextObject, dashSound, volumeMultiplier, pitchMultiplier, startTime);
 	else if (sound == 4)
 		UGameplayStatics::PlaySound2D(worldContextObject, soundLowLife, volumeMultiplier, pitchMultiplier, startTime);
 	else if (sound == 5)

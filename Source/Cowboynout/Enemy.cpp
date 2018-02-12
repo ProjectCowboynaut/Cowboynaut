@@ -12,6 +12,17 @@
 // Sets default values
 AEnemy::AEnemy()
 {
+	healthBase = 200.f;
+	healthElite = 400.f;
+	healthBoss = 5000.f;
+	attackRatioBase = .5f;
+	attackRatioElite = .4f;
+	attackRatioBoss = .5f;
+	damageBase = 7.f;
+	damageElite = 15.f;
+	damageBoss = 20.f;
+
+
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.bStartWithTickEnabled = true;
 	// var init
@@ -39,24 +50,24 @@ AEnemy::AEnemy()
 	if (this->enemyType == EnemyType::EnemyBase)
 	{
 		/*this->health = healthBase;*/
-		attackRatio = .25f;					// faster attacks, less dmg
-
+		attackRatio = attackRatioBase;					// faster attacks, less dmg
+		health = healthBase;
 		armor = 1.f;
 	}
 	// elite mob stats
 	else if (this->enemyType == EnemyType::EnemyElite)
 	{
 		/*this->health = healthElite;*/
-		attackRatio = .3f;					// faster attacks, less dmg
-
+		attackRatio = attackRatioElite;					// faster attacks, less dmg
+		health = healthElite;
 		armor = 1.f;
 	}
 	else if (this->enemyType == EnemyType::EnemyBossSpawn)
 	{
 		/*this->health = healthBoss;
 		if (this->health == 0) health = 10000;*/
-		attackRatio = .25f;					// lower ratio, more dmg per shot
-
+		attackRatio = attackRatioBase;					// lower ratio, more dmg per shot
+		health = healthBase;
 		armor = 1.f;
 		isBoss = false;
 	}
@@ -65,8 +76,8 @@ AEnemy::AEnemy()
 	{
 		/*this->health = healthBoss;
 		if (this->health == 0) health = 10000;*/
-		attackRatio = .4f;					// lower ratio, more dmg per shot
-
+		attackRatio = attackRatioBoss;					// lower ratio, more dmg per shot
+		health = healthBoss;
 		armor = 1.f;
 		isBoss = true;
 	}
@@ -404,10 +415,10 @@ void AEnemy::Attack()
 	if (bullet) {
 		bullet->enemyProjectile = true;
 		bullet->bulletType = BulletType::EnemyBullet;
-		if (enemyType == EnemyType::EnemyBase) bullet->projectileDamage = damageBase;
-		else if (enemyType == EnemyType::EnemyElite) bullet->projectileDamage = damageElite;
-		else if (enemyType == EnemyType::EnemyBossSpawn) bullet->projectileDamage = damageBase;
-		else if (enemyType == EnemyType::EnemyBoss) bullet->projectileDamage = damageBoss;
+		if		(enemyType == EnemyType::EnemyBase)			bullet->projectileDamage = damageBase;
+		else if (enemyType == EnemyType::EnemyElite)		bullet->projectileDamage = damageElite;
+		else if (enemyType == EnemyType::EnemyBossSpawn)	bullet->projectileDamage = damageBase;
+		else if (enemyType == EnemyType::EnemyBoss)			bullet->projectileDamage = damageBoss;
 		bullet->playerProjectile = false;
 	}
 	PlaySound(1);
@@ -465,27 +476,55 @@ void AEnemy::PlaySound(int sound)
 	float pitchMultiplier = 1.f;
 	float startTime = 0.f;
 
-	UObject* worldContextObject = GetWorld();
-	if (sound == 0)
+	if (enemyType == EnemyType::EnemyBase || enemyType == EnemyType::EnemyElite || enemyType == EnemyType::EnemyBossSpawn)
 	{
-		int rnd = FMath::RandRange(0, 3);
-		if (rnd == 1)
-			UGameplayStatics::PlaySound2D(worldContextObject, soundHit, volumeMultiplier *.85f, pitchMultiplier * .9f, startTime);
-		else if (rnd == 2)
-			UGameplayStatics::PlaySound2D(worldContextObject, soundHit, volumeMultiplier *.8f, pitchMultiplier, startTime);
-		else if (rnd == 3)
-			UGameplayStatics::PlaySound2D(worldContextObject, soundHit, volumeMultiplier *.75f, pitchMultiplier * 1.2f, startTime);
+		UObject* worldContextObject = GetWorld();
+		if (sound == 0)
+		{
+			int rnd = FMath::RandRange(0, 3);
+			if (rnd == 1)
+				UGameplayStatics::PlaySound2D(worldContextObject, soundHit, volumeMultiplier *.85f, pitchMultiplier * .9f, startTime);
+			else if (rnd == 2)
+				UGameplayStatics::PlaySound2D(worldContextObject, soundHit, volumeMultiplier *.8f, pitchMultiplier, startTime);
+			else if (rnd == 3)
+				UGameplayStatics::PlaySound2D(worldContextObject, soundHit, volumeMultiplier *.75f, pitchMultiplier * 1.2f, startTime);
+		}
+		else if (sound == 1)
+		{
+			int rnd = FMath::RandRange(0, 3);
+			if (rnd == 1)
+				UGameplayStatics::PlaySound2D(worldContextObject, soundSkill1a, volumeMultiplier, pitchMultiplier, startTime);
+			else if (rnd == 2)
+				UGameplayStatics::PlaySound2D(worldContextObject, soundSkill1b, volumeMultiplier, pitchMultiplier, startTime);
+			else if (rnd == 3)
+				UGameplayStatics::PlaySound2D(worldContextObject, soundSkill1c, volumeMultiplier, pitchMultiplier, startTime);
+		}
 	}
-	else if (sound == 1) 
+	else if (enemyType == EnemyType::EnemyBoss)
 	{
-		int rnd = FMath::RandRange(0, 3);
-		if (rnd == 1)
-			UGameplayStatics::PlaySound2D(worldContextObject, soundSkill1a, volumeMultiplier, pitchMultiplier, startTime);
-		else if (rnd == 2)
-			UGameplayStatics::PlaySound2D(worldContextObject, soundSkill1b, volumeMultiplier, pitchMultiplier, startTime);
-		else if (rnd == 3)
-			UGameplayStatics::PlaySound2D(worldContextObject, soundSkill1c, volumeMultiplier, pitchMultiplier, startTime);
+		UObject* worldContextObject = GetWorld();
+		if (sound == 0)
+		{
+			int rnd = FMath::RandRange(0, 3);
+			if (rnd == 1)
+				UGameplayStatics::PlaySound2D(worldContextObject, bossSoundHit, volumeMultiplier *.85f, pitchMultiplier * .9f, startTime);
+			else if (rnd == 2)
+				UGameplayStatics::PlaySound2D(worldContextObject, bossSoundHit, volumeMultiplier *.8f, pitchMultiplier, startTime);
+			else if (rnd == 3)
+				UGameplayStatics::PlaySound2D(worldContextObject, bossSoundHit, volumeMultiplier *.75f, pitchMultiplier * 1.2f, startTime);
+		}
+		else if (sound == 1)
+		{
+			int rnd = FMath::RandRange(0, 3);
+			if (rnd == 1)
+				UGameplayStatics::PlaySound2D(worldContextObject, bossSoundSkill1a, volumeMultiplier, pitchMultiplier, startTime);
+			else if (rnd == 2)
+				UGameplayStatics::PlaySound2D(worldContextObject, bossSoundSkill1b, volumeMultiplier, pitchMultiplier, startTime);
+			else if (rnd == 3)
+				UGameplayStatics::PlaySound2D(worldContextObject, bossSoundSkill1c, volumeMultiplier, pitchMultiplier, startTime);
+		}
 	}
+	
 		
 }
 

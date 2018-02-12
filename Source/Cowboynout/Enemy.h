@@ -232,6 +232,18 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "SFX")
 	USoundBase* soundHit;
 
+	UPROPERTY(EditDefaultsOnly, Category = "SFX")
+		USoundBase* bossSoundSkill1a;
+
+	UPROPERTY(EditDefaultsOnly, Category = "SFX")
+		USoundBase* bossSoundSkill1b;
+
+	UPROPERTY(EditDefaultsOnly, Category = "SFX")
+		USoundBase* bossSoundSkill1c;
+
+	UPROPERTY(EditDefaultsOnly, Category = "SFX")
+		USoundBase* bossSoundHit;
+
 	UFUNCTION(BlueprintCallable)
 	void FollowActor(AActor* actor, float deltaTime);
 
