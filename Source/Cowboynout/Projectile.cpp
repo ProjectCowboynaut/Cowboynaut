@@ -40,9 +40,9 @@ AProjectile::AProjectile()
 
 void AProjectile::Tick(float deltaTime) 
 {
-	if (ProjectileMovement->Velocity.Size() <= 10.f) {
-		Destroy();
-	}
+	//if (ProjectileMovement->Velocity.Size() <= 10.f) {
+	//	Destroy();
+	//}
 
 	if (!statsSet) 
 	{

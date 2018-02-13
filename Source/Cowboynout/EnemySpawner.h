@@ -37,4 +37,13 @@ public:
 	TSubclassOf<class AEnemy> EnemyClass;
 
 	FTimerHandle SpawnTimerHandle;
+
+	UPROPERTY()
+	int dronesSpawned;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	AEnemy* boss;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TArray<AActor*> foundActors;
 };

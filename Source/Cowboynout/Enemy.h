@@ -17,6 +17,7 @@ enum class EnemyType : uint8
 {
 	EnemyBase UMETA(DisplayName = "Base Drone"),
 	EnemyElite UMETA(DisplayName = "Elite Drone"),
+	EnemyBossSpawn UMETA(DisplayName = "Boss Spawn Drone"),
 	EnemyBoss UMETA(DisplayName = "Boss Drone")
 	
 };
@@ -59,6 +60,12 @@ public:
 	UPROPERTY(EditDefaultsOnly, BluePrintReadWrite)
 	bool bossFightActive;
 
+	UPROPERTY(VisibleAnywhere, Category = "Level Stuff")
+	int bossDronesSpawnedThisPhase;
+
+	UPROPERTY(VisibleAnywhere, Category = "Level Stuff")
+	int bossDronesToSpawnThisPhase;
+
 	UPROPERTY()
 	float bossEffectTimer;
 
@@ -77,6 +84,9 @@ public:
 
 	UPROPERTY(VisibleAnywhere, Category = "BossFight")
 	TArray<AActor*> foundPillars;
+
+	UPROPERTY(VisibleAnywhere, Category = "BossFight")
+	TArray<AActor*> bossDrones;
 
 	UPROPERTY()
 	int pillars;
@@ -116,7 +126,7 @@ public:
 	UPROPERTY()
 	int lastRnd;
 
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere, BluePrintReadOnly)
 	float bossHealth;
 
 	UFUNCTION(BlueprintCallable)
@@ -227,6 +237,18 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = "SFX")
 	USoundBase* soundHit;
+
+	UPROPERTY(EditDefaultsOnly, Category = "SFX")
+		USoundBase* bossSoundSkill1a;
+
+	UPROPERTY(EditDefaultsOnly, Category = "SFX")
+		USoundBase* bossSoundSkill1b;
+
+	UPROPERTY(EditDefaultsOnly, Category = "SFX")
+		USoundBase* bossSoundSkill1c;
+
+	UPROPERTY(EditDefaultsOnly, Category = "SFX")
+		USoundBase* bossSoundHit;
 
 	UFUNCTION(BlueprintCallable)
 	void FollowActor(AActor* actor, float deltaTime);

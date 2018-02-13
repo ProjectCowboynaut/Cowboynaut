@@ -28,7 +28,13 @@ public:
 	void StartSpawn(float minDelay, float maxDelay, float freq);
 
 	UFUNCTION(BlueprintCallable, Category = "Enemy")
+	void StartBossSpawn(float minDelay, float maxDelay, float freq, TArray<AEnemySpawner*> spawnPoints);
+
+	UFUNCTION(BlueprintCallable, Category = "Enemy")
 	void StopSpawn();
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	bool bossIsSpawning;
 
 
 };

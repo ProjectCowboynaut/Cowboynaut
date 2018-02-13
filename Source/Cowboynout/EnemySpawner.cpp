@@ -13,6 +13,7 @@ AEnemySpawner::AEnemySpawner()
 // Called when the game starts or when spawned
 void AEnemySpawner::BeginPlay()
 {
+	dronesSpawned = 0;
 	Super::BeginPlay();
 	SpawnEnemy();
 	
@@ -23,6 +24,15 @@ void AEnemySpawner::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (!boss)
+	{
+		UGameplayStatics::GetAllActorsOfClass(GetWorld(), AEnemy::StaticClass(), foundActors);
+		for (int i = 0; i < foundActors.Num(); i++)
+		{
+			AEnemy* thisDrone = Cast<AEnemy>(foundActors[i]);
+			if (thisDrone->isBoss) boss = thisDrone;
+		}
+	}
 }
 
 void AEnemySpawner::StartSpawning(float delay, float freq)
@@ -52,8 +62,46 @@ void AEnemySpawner::StopSpawning()
 
 void AEnemySpawner::SpawnEnemy()
 {
-	if(GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("fak-spawn")));
+	if (!boss)
+	{
+		UGameplayStatics::GetAllActorsOfClass(GetWorld(), AEnemy::StaticClass(), foundActors);
+		for (int i = 0; i < foundActors.Num(); i++)
+		{
+			AEnemy* thisDrone = Cast<AEnemy>(foundActors[i]);
+			if (thisDrone->isBoss)
+			{
+				//GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, "illegaler charakter");
+				boss = thisDrone;
+			}
+			//else GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, "illegal character");
+		}
+	}
+
 	FActorSpawnParameters spawnInfo;
-	AEnemy* enemy = GetWorld()->SpawnActor<AEnemy>(EnemyClass, GetActorLocation(), GetActorRotation(), spawnInfo);
+	spawnInfo.bNoFail = true;
+	FRotator rot = FRotator(.0f, .0f, 0.f);
+	FVector spawnLoc = GetActorLocation();
+	float rnd1 = FMath::RandRange(-250.f, 250.f);
+	float rnd2 = FMath::RandRange(-250.f, 250.f);
+	spawnLoc = FVector(spawnLoc.X + rnd1, spawnLoc.Y+rnd2, spawnLoc.Z);
+
+	AEnemy* enemy = GetWorld()->SpawnActor<AEnemy>(EnemyClass, spawnLoc, rot, spawnInfo);
+	if (enemy)
+	{
+		enemy->enemyType = EnemyType::EnemyBossSpawn;
+		enemy->SetActorScale3D(FVector(1.3f, 1.3f, 1.3f));
+		enemy->health = enemy->healthBase;
+		enemy->attackRatio = enemy->attackRatioBase;
+		enemy->SpawnDefaultController();				// wont move without.. obviously
+		if (boss) 
+		{
+			boss->bossDrones.Add(enemy);
+			boss->bossDronesSpawnedThisPhase++;
+		}
+		else GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, "couldn't add bossdrone!");
+		dronesSpawned++;
+
+	}
+	
 }
 

@@ -6,6 +6,8 @@
 #include "Cowboynout.h"
 #include "Components/ActorComponent.h"
 #include "Enemy.h"
+#include "CowboynoutGameMode.h"
+#include "EnemySpawner.h"
 #include "BossComponent.generated.h"
 
 UENUM(Blueprintable)
@@ -41,7 +43,10 @@ struct FAttackPattern
 	float rotationSpeed;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		float attackRate;
+	float attackRate;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float bulletLifeTime;
 };
 
 
@@ -57,13 +62,16 @@ struct FStages
 	int dronesToSpawn;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float spawnDuration;
+	float spawnFrequency;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float healthPercentageToSwitchStage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<FAttackPattern> attackPatterns;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<AEnemySpawner*> spawnerList;
 };
 
 
@@ -78,6 +86,12 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FVector bossSpawnLocation;
+
+	UPROPERTY(VisibleAnywhere, Category = "Level Stuff")
+	TArray<AActor*> foundActors;
+
+	UPROPERTY(VisibleAnywhere, Category = "Level Stuff")
+	TArray<AActor*> bossDrones;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	float bossHealthMax;
@@ -105,7 +119,7 @@ public:
 	void SwitchState(BossState state);
 
 	UFUNCTION(BlueprintCallable)
-	void SpawnBullets(TSubclassOf<AProjectile> bulletBP, float radius, int numberOfBulletsToFire, float bulletSpeed, float bulletDamage, float deltaTime, float attackRate);
+	void SpawnBullets(TSubclassOf<AProjectile> bulletBP, float radius, int numberOfBulletsToFire, float bulletSpeed, float bulletDamage, float deltaTime, float attackRate, float bulletLifeTime);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<AEnemy> DroneBP;
@@ -146,7 +160,7 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	int numberOfTotalStateSwitches;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	int numberOfDronesToSpawnPerPhase;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
