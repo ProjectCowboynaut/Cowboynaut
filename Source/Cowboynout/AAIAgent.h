@@ -48,7 +48,6 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI") TArray<FAction> actionList;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI") float perceptionRange;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI") FAction currentAction;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI") float currentLockTime;
 
