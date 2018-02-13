@@ -141,8 +141,9 @@ void ACowboynoutPlayerController::KillEmAll()
 
 void ACowboynoutPlayerController::Tick(float deltaTime) {
 	Super::Tick(deltaTime);
+
 	ACowboynoutGameState* gs = Cast<ACowboynoutGameState>(GetWorld()->GetGameState());
-	if (!gs->isPaused) sessionTimer += deltaTime;
+	if (gs && !gs->isPaused) sessionTimer += deltaTime;
 
 	// new movement
 	if (CheckMap()) {
@@ -177,6 +178,8 @@ void ACowboynoutPlayerController::Tick(float deltaTime) {
 
 	cowboy = Cast<ACowboynoutCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
 	if (cowboy && cowboy->dead) return;
+
+
 
 	myLittlePawny = GetPawn();
 	if (myLittlePawny) {
@@ -232,7 +235,9 @@ void ACowboynoutPlayerController::Tick(float deltaTime) {
 		UGameplayStatics::SaveGameToSlot(SaveGameInstance, SaveGameInstance->SaveSlotName, SaveGameInstance->UserIndex);*/
 
 		if (deathTimerActive <= 0) {
-			UGameplayStatics::OpenLevel(this, TEXT("/Game/Maps/WinScreen_Menu"), false);
+			ToggleWinScreen();
+			
+			// UGameplayStatics::OpenLevel(this, TEXT("/Game/Maps/WinScreen_Menu"), false);
 			deathTimer = 0;
 		}
 	}
@@ -292,7 +297,9 @@ void ACowboynoutPlayerController::WASDMove(float deltaTime) {
 			return;
 		}
 	}
+
 	if (!MovementInput.IsZero()) {
+		//DebugMsg(FString::SanitizeFloat(MovementInput.X) + "," + FString::SanitizeFloat(MovementInput.Y), 3.f, FColor::White);
 		//Scale our movement input axis values by 100 units per second
 		MovementInput = MovementInput.GetSafeNormal() *100.f;
 
@@ -361,6 +368,45 @@ void ACowboynoutPlayerController::BeginPlay()
 		}
 	}
 }
+
+void ACowboynoutPlayerController::ToggleDeathScreen()
+{
+	if (!bShowingDeathScreen) 
+	{
+		bShowingDeathScreen = true;
+
+		myDeathW = CreateWidget<UUserWidget>(this, wDeathW);
+		if (myDeathW) 
+		{
+			myInfoW->AddToViewport();
+		}
+	}
+	else 
+	{
+		myDeathW->RemoveFromParent();
+		bShowingDeathScreen = false;
+	}
+}
+
+void ACowboynoutPlayerController::ToggleWinScreen()
+{
+	if (!bShowingWinScreen)
+	{
+		bShowingWinScreen = true;
+
+		myWinW = CreateWidget<UUserWidget>(this, wWinW);
+		if (myWinW)
+		{
+			myWinW->AddToViewport();
+		}
+	}
+	else
+	{
+		myWinW->RemoveFromParent();
+		bShowingWinScreen = false;
+	}
+}
+
 
 void ACowboynoutPlayerController::MoveForward(float axisValue) {
 	MovementInput.X = FMath::Clamp<float>(axisValue, -1.0f, 1.0f);

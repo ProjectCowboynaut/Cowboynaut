@@ -172,7 +172,11 @@ void AProjectile::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* Ot
 				//DebugMsg("e hit: " + OtherActor->GetName(), 1.5f, FColor::Red);
 				Destroy();
 			}
-			else DebugMsg("no actor", 1.5f, FColor::Red);
+			else 
+			{
+				if (playerProjectile) Destroy();
+				DebugMsg("no actor", 1.5f, FColor::Red);
+			}
 		}
 	}
 	else DebugMsg("no actor", 1.5f, FColor::Red);

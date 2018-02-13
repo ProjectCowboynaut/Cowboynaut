@@ -17,8 +17,14 @@ class ACowboynoutCharacter : public ACharacter
 public:
 	ACowboynoutCharacter();
 
-	UPROPERTY(VisibleAnywhere, Category = "Level Stuff")
-	TArray<AActor*> foundActors;
+	UPROPERTY()
+	bool bShowingDeathScreen;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widgets")
+	TSubclassOf<class UUserWidget> wInfoW;
+
+	UPROPERTY()
+	UUserWidget* myInfoW;
 
 	// find all level barrikades
 	UPROPERTY(EditDefaultsOnly, Category = "Level Stuff")
@@ -27,6 +33,12 @@ public:
 	UPROPERTY(VisibleAnywhere, Category = "Level Stuff")
 	TArray<AActor*> foundActorsBarr;
 
+	UPROPERTY(VisibleAnywhere, Category = "Level Stuff")
+	TArray<AActor*> foundActors;
+
+	UPROPERTY(VisibleAnywhere, BluePrintReadOnly)
+	int dronesToSpawn;
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Level Stuff")
 	int bossBarrikades;
 
@@ -60,6 +72,9 @@ public:
 
 	UPROPERTY(VisibleAnywhere,BluePrintReadOnly)
 	float camRange;
+
+	UPROPERTY(VisibleAnywhere, BluePrintReadOnly)
+	float camAngle;
 
 	/** Returns TopDownCameraComponent subobject **/
 	FORCEINLINE 
@@ -274,8 +289,6 @@ private:
 	/** A decal that projects to the cursor location. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
 	class UDecalComponent* CursorToWorld;
-
-//protected:
 
 };
 

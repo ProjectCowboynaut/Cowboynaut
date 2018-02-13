@@ -45,6 +45,29 @@ public:
 	UTextboxUserWidget* myTextbox;
 	//UUserWidget* 
 	
+	UFUNCTION()
+	void ToggleDeathScreen();
+
+	UFUNCTION()
+	void ToggleWinScreen();
+
+	UPROPERTY(BlueprintReadWrite, Category = "Widgets")
+	bool bShowingDeathScreen;
+
+	UPROPERTY(BlueprintReadWrite, Category = "Widgets")
+	bool bShowingWinScreen;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widgets")
+	TSubclassOf<class UUserWidget> wDeathW;
+
+	UPROPERTY()
+	UUserWidget* myDeathW;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widgets")
+	TSubclassOf<class UUserWidget> wWinW;
+
+	UPROPERTY()
+	UUserWidget* myWinW;
 
 	UPROPERTY()
 	bool info;

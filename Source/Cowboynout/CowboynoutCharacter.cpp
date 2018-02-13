@@ -12,6 +12,7 @@
 #include "Materials/Material.h"
 #include "Enemy.h"
 #include "BossComponent.h"
+#include "Blueprint/UserWidget.h"
 #include "CowboynoutPlayerController.h"
 #include "CowboynoutGameState.h"
 
@@ -115,6 +116,7 @@ ACowboynoutCharacter::ACowboynoutCharacter() {
 	//GrenadeClassT3 = LoadObject<TSubclassOf<AGrenade>>(NULL, TEXT("Blueprint'/Game/Blueprints/Skills/BP_SkillTwo_T03.BP_SkillTwo_T03'"), NULL, LOAD_None, NULL);
 }
 
+
 // set if the player has a target
 void ACowboynoutCharacter::SetTarget(int targetStatus) {			/// 0: no target; 1: enemy target; 2: usable
 	if (targetStatus == 0) {
@@ -133,6 +135,7 @@ void ACowboynoutCharacter::Tick(float DeltaSeconds) {
     Super::Tick(DeltaSeconds);
 
 	CameraBoom->TargetArmLength = camRange;
+	//CameraBoom->SetWorldRotation = camAngle;
 
 #pragma region get enemy ammount
 
@@ -203,7 +206,14 @@ void ACowboynoutCharacter::Tick(float DeltaSeconds) {
 			//GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, msg);
 		}
 		if (deathTimer <= 0)
-			UGameplayStatics::OpenLevel(this, TEXT("/Game/Maps/DeathScreen_Menu"), false);
+		{
+			ACowboynoutPlayerController* playerCtrl = Cast<ACowboynoutPlayerController>(GetController());
+			playerCtrl->ToggleDeathScreen();
+			//UGameplayStatics::OpenLevel(this, TEXT("/Game/Maps/DeathScreen_Menu"), false);
+			
+
+
+		}
 	}
 #pragma endregion 
 

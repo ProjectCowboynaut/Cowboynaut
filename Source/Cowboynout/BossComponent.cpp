@@ -41,6 +41,9 @@ void UBossComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 	rotationTicker += DeltaTime;
 
+	ACowboynoutCharacter* playerChar = Cast<ACowboynoutCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+	if (playerChar) playerChar->dronesToSpawn = stages[stateSwitchesCount].dronesToSpawn;
+
 	if (!boss) boss = Cast<AEnemy>(this->GetOwner());
 	if (boss != nullptr) {
 		if (bossHealthMax < boss->health || bossHealthMax == 0) bossHealthMax = boss->health;
@@ -51,14 +54,14 @@ void UBossComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 
 	}
 
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AEnemy::StaticClass(), foundActors);
-	for (int i = 0; i < foundActors.Num(); i++)
-	{
-		//AEnemy* derGegna = Cast<AEnemy>(foundActors[i]);
-		//if (derGegna->enemyType == EnemyType::EnemyBossSpawn)
-		//	if (bossDronesSpawnedThisPhase < bossDrones.Num()) 
-		//		bossDronesSpawnedThisPhase = bossDrones.Num();
-	}
+	//UGameplayStatics::GetAllActorsOfClass(GetWorld(), AEnemy::StaticClass(), foundActors);
+	//for (int i = 0; i < foundActors.Num(); i++)
+	//{
+	//	AEnemy* derGegna = Cast<AEnemy>(foundActors[i]);
+	//	if (derGegna->enemyType == EnemyType::EnemyBossSpawn)
+	//		if (bossDronesSpawnedThisPhase < bossDrones.Num()) 
+	//			bossDronesSpawnedThisPhase = bossDrones.Num();
+	//}
 	
 }
 
