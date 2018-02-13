@@ -141,8 +141,8 @@ void ACowboynoutPlayerController::KillEmAll()
 
 void ACowboynoutPlayerController::Tick(float deltaTime) {
 	Super::Tick(deltaTime);
-	
-	sessionTimer += deltaTime;
+	ACowboynoutGameState* gs = Cast<ACowboynoutGameState>(GetWorld()->GetGameState());
+	if (!gs->isPaused) sessionTimer += deltaTime;
 
 	// new movement
 	if (CheckMap()) {

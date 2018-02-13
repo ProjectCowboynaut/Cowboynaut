@@ -13,6 +13,7 @@
 #include "Enemy.h"
 #include "BossComponent.h"
 #include "CowboynoutPlayerController.h"
+#include "CowboynoutGameState.h"
 
 
 ACowboynoutCharacter::ACowboynoutCharacter() {
@@ -323,6 +324,8 @@ int ACowboynoutCharacter::GetNades() {
 }
 
 void ACowboynoutCharacter::FireSkillOne() {
+	ACowboynoutGameState* gs = Cast<ACowboynoutGameState>(GetWorld()->GetGameState());
+	if (dead || gs->isPaused) return;
 	ACowboynoutPlayerController* playerCtrl = Cast<ACowboynoutPlayerController>(GetController());
 	if (playerCtrl) {
 		animShooting = true;
@@ -354,22 +357,24 @@ void ACowboynoutCharacter::FireSkillOne() {
 }
 
 void ACowboynoutCharacter::FireSkillTwo() {
-		nadeLoc = GetActorLocation();
-		animShooting = true;
-		explodeNade = false;
+	ACowboynoutGameState* gs = Cast<ACowboynoutGameState>(GetWorld()->GetGameState());
+	if (dead || gs->isPaused) return;
+	nadeLoc = GetActorLocation();
+	animShooting = true;
+	explodeNade = false;
 		
-		ACowboynoutPlayerController* playerCtrl = Cast<ACowboynoutPlayerController>(GetController());
-		if (playerCtrl) {
-			if (nades > 0) {
-				FActorSpawnParameters spawnInfo;
-				spawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-				FRotator rot;
-				AGrenade* nade = GetWorld()->SpawnActor<AGrenade>(GrenadeClassT1, GetActorLocation(), rot, spawnInfo);
+	ACowboynoutPlayerController* playerCtrl = Cast<ACowboynoutPlayerController>(GetController());
+	if (playerCtrl) {
+		if (nades > 0) {
+			FActorSpawnParameters spawnInfo;
+			spawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+			FRotator rot;
+			AGrenade* nade = GetWorld()->SpawnActor<AGrenade>(GrenadeClassT1, GetActorLocation(), rot, spawnInfo);
 				
-				PlaySound(2);
-				nades--;
-			}
+			PlaySound(2);
+			nades--;
 		}
+	}
 }
 
 // (0) been hit; (1) laser; (2) nade; (3) dash; (4) low life warning; (5) death;
