@@ -124,6 +124,9 @@ public:
 	UFUNCTION()
 	void RotatePlayer();
 
+	UFUNCTION(BlueprintCallable, Category = "Menu")
+	void FullPauseToggle();
+
 	UFUNCTION()
 	void OnLeftMousePressed();
 

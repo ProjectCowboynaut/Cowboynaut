@@ -104,6 +104,9 @@ void ACowboynoutPlayerController::SetupInputComponent() {
 		InputComponent->BindAction("ShiftPressed", IE_Pressed, this, &ACowboynoutPlayerController::OnShiftPressed);
 		//InputComponent->BindAction("SpacePressed", IE_Pressed, this, &ACowboynoutPlayerController::OnSpacePressed);
 
+		InputComponent->BindAction("PauseMenu", IE_Pressed, this, &ACowboynoutPlayerController::FullPauseToggle);
+		
+
 		// simulate damage
 		InputComponent->BindAction("SimulateDamage", IE_Pressed, this, &ACowboynoutPlayerController::OnSimulateDamagePressed);
 		InputComponent->BindAction("SimulateDamage", IE_Released, this, &ACowboynoutPlayerController::OnSimulateDamageReleased);
@@ -142,7 +145,7 @@ void ACowboynoutPlayerController::KillEmAll()
 void ACowboynoutPlayerController::Tick(float deltaTime) {
 	Super::Tick(deltaTime);
 	ACowboynoutGameState* gs = Cast<ACowboynoutGameState>(GetWorld()->GetGameState());
-	if (!gs->isPaused) sessionTimer += deltaTime;
+	if (gs && !gs->isPaused) sessionTimer += deltaTime;
 
 	// new movement
 	if (CheckMap()) {
@@ -518,6 +521,9 @@ void ACowboynoutPlayerController::OnSimulateDamageReleased() {
 }
 
 void ACowboynoutPlayerController::RotatePlayer() {
+
+	if (UGameplayStatics::GetGlobalTimeDilation(GetWorld()) < 1.f) return;
+
 	ACowboynoutGameState* state = Cast<ACowboynoutGameState>(GetWorld()->GetGameState());
 	if (state)
 	{
@@ -555,6 +561,12 @@ void ACowboynoutPlayerController::RotatePlayer() {
 	}
 	
 
+}
+
+void ACowboynoutPlayerController::FullPauseToggle()
+{
+	if(UGameplayStatics::GetGlobalTimeDilation(GetWorld()) == 1.f) UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 0.f);
+	else UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1.f);
 }
 
 void ACowboynoutPlayerController::SkillOne() {
