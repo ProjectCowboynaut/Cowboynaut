@@ -1,8 +1,7 @@
 #include "AAIAgent.h"
 #include "Cowboynout.h"
 
-UAAIAgent::UAAIAgent() :
-	perceptionRange(3000.f)
+UAAIAgent::UAAIAgent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
 }
