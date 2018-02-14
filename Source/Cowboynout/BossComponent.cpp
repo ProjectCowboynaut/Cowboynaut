@@ -120,7 +120,6 @@ void UBossComponent::BossFight(float DeltaTime)
 			// set life value for next trigger
 			healthForNextStage = bossHealthMax * stages[stateSwitchesCount].healthPercentageToSwitchStage;
 
-
 			shotTimer = stages[stateSwitchesCount].attackPatterns[phaseCtr].attackRate;
 
 			if (lastShotFired > shotTimer)
@@ -147,6 +146,7 @@ void UBossComponent::BossFight(float DeltaTime)
 			// switch when life triggered
 			if (boss->health < healthForNextStage)
 			{
+				boss->vincible = false;
 				SwitchState(stages[stateSwitchesCount + 1].stageType);
 				//GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "switching states");
 			}

@@ -441,6 +441,7 @@ void AEnemy::MouseOverEnd()
 // deal damage to drone
 void AEnemy::Damage(int dmg) {
 	if (isFriendly) return;
+	if (vincible) return;
 
 	if (enemyType == EnemyType::EnemyBase) {
 		health -= dmg;
