@@ -139,7 +139,7 @@ public:
 	UPROPERTY(EditAnywhere, BluePrintReadWrite)
 	TArray<FStages> stages;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	int stateSwitchesCount;
 
 	// percentage of health to switch into next state
