@@ -87,7 +87,7 @@ ACowboynoutCharacter::ACowboynoutCharacter() {
 
 	explodeNade = false;
 	
-	enemiesTotal = 0;
+	enemiesTotal = 1;
 	bossBarrikades = 0;
 	enemiesSet = false;
 	barriersDisabled = 0;
@@ -238,7 +238,9 @@ void ACowboynoutCharacter::Damage(int dmg) {
 	
 		else
 		{
-			life -= dmg;
+			/*if (!life - dmg < 0) life -= dmg;
+			else life = 0;*/
+
 			PlaySound(0);
 			if (life <= 0) {
 				PlaySound(5);
@@ -370,6 +372,7 @@ void ACowboynoutCharacter::FireSkillOne() {
 void ACowboynoutCharacter::FireSkillTwo() {
 	ACowboynoutGameState* gs = Cast<ACowboynoutGameState>(GetWorld()->GetGameState());
 	if (dead || gs->isPaused) return;
+
 	nadeLoc = GetActorLocation();
 	animShooting = true;
 	explodeNade = false;

@@ -308,7 +308,7 @@ void AEnemy::BossFight(float deltaTime)
 
 void AEnemy::SenseStuff(TArray<AActor*> testActors) 
 {
-	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "I see you!");
+	//GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, "I see you!");
 }
 
 void AEnemy::SetNewMoveDestination(const FVector DestLocation) 
@@ -396,7 +396,7 @@ void AEnemy::Die()
 void AEnemy::DoAPeriodicCheck() 
 {
 	FString msg = this->GetName();
-	GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::White, msg + ": Periodic Check has fired!");
+	//GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::White, msg + ": Periodic Check has fired!");
 	//GLog->Log("Periodic Check has fired!");
 }
 

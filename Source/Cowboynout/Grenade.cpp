@@ -26,8 +26,8 @@ AGrenade::AGrenade() {
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileComp"));
 	ProjectileMovement->UpdatedComponent = CollisionComp;
 	InitialLifeSpan = 4.0f;
-	grenadeDamage = 300.f;
-
+	
+	if (grenadeDamage == 0) grenadeDamage = 300.f;
 	cnt = 0;
 
 	// Die after x seconds by default
