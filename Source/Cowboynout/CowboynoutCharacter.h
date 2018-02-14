@@ -20,6 +20,9 @@ public:
 	UPROPERTY()
 	bool bShowingDeathScreen;
 
+	UPROPERTY()
+	bool deathScreenSet;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widgets")
 	TSubclassOf<class UUserWidget> wInfoW;
 
@@ -50,6 +53,9 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Level Stuff")
 	bool enemiesSet;
+
+	UPROPERTY()
+	bool deathScreenActive;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Level Stuff")
 	int enemiesToDisableBarrier;

@@ -26,7 +26,7 @@ UBossComponent::UBossComponent()
 void UBossComponent::BeginPlay()
 {
 	numberOfTotalStateSwitches = 100 / stateSwitchPercentage;
-	GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, FString::SanitizeFloat(stateSwitchPercentage));
+	//GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, FString::SanitizeFloat(stateSwitchPercentage));
 	bossState = BossState::BossShield;
 	if (!boss) boss = Cast<AEnemy>(GetOwner());
 	if (boss != nullptr)
@@ -137,7 +137,7 @@ void UBossComponent::BossFight(float DeltaTime)
 								stages[stateSwitchesCount].attackPatterns[phaseCtr].attackRate,
 								stages[stateSwitchesCount].attackPatterns[phaseCtr].bulletLifeTime
 				);
-				GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, stages[stateSwitchesCount].attackPatterns[phaseCtr].bulletBP->GetFName().ToString());
+				//GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, stages[stateSwitchesCount].attackPatterns[phaseCtr].bulletBP->GetFName().ToString());
 				lastShotFired = 0;
 				//  phase counter increase or reset @max
 				if (phaseCtr < stages[stateSwitchesCount].attackPatterns.Num()-1) 
@@ -148,7 +148,7 @@ void UBossComponent::BossFight(float DeltaTime)
 			if (boss->health < healthForNextStage)
 			{
 				SwitchState(stages[stateSwitchesCount + 1].stageType);
-				GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "switching states");
+				//GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "switching states");
 			}
 
 			// switch attacks
@@ -186,8 +186,8 @@ void UBossComponent::SwitchState(BossState state)
 		case BossState::BossAttack:
 			bossState = BossState::BossAttack;
 			break;
-		case BossState::BossIdle:
-			bossState = BossState::BossIdle;
+		case BossState::BossRage:
+			bossState = BossState::BossRage;
 			break;
 	}
 }

@@ -13,9 +13,9 @@
 UENUM(Blueprintable)
 enum class BossState : uint8
 {
-	BossIdle UMETA(DisplayName = "Boss Idling"),
 	BossAttack UMETA(DisplayName = "Boss Attacking /w Shield deactivated"),
-	BossShield UMETA(DisplayName = "Boss Spawning w/ Shield activated")
+	BossShield UMETA(DisplayName = "Boss Spawning w/ Shield activated"),
+	BossRage UMETA(DisplayName = "Boss Spawning and attacking!"),
 };
 
 

@@ -93,6 +93,8 @@ ACowboynoutCharacter::ACowboynoutCharacter() {
 	barriersDisabled = 0;
 	enemiesToDisableBarrier = 0;
 
+	deathScreenSet = false;
+
 	lifeWarningTimer = 3.11f;
 	lifeWarningTimerFull = 3.11f;
 
@@ -102,7 +104,7 @@ ACowboynoutCharacter::ACowboynoutCharacter() {
 
 	soundBeenHit = LoadObject<USoundBase>(NULL, TEXT("SoundCue'/Game/Assets/Audio/Player/PlayerHit_Cue.PlayerHit_Cue'"), NULL, LOAD_None, NULL);
 	dashSound = LoadObject<USoundBase>(NULL, TEXT("SoundCue'/Game/Assets/Audio/Player/Dash.Dash'"), NULL, LOAD_None, NULL);
-	soundSkill1_Laser = LoadObject<USoundBase>(NULL, TEXT("SoundWave'/Game/Assets/Audio/Player/Skill1fast.Skill1fast'"), NULL, LOAD_None, NULL);
+	soundSkill1_Laser = LoadObject<USoundBase>(NULL, TEXT("SoundCue'/Game/Assets/Audio/Player/Skill_1_Cue.Skill_1_Cue'"), NULL, LOAD_None, NULL);
 	soundSkill2_Nade = LoadObject<USoundBase>(NULL, TEXT("SoundCue'/Game/Assets/Audio/Player/AoeAttack_Cue.AoeAttack_Cue'"), NULL, LOAD_None, NULL);
 	soundLowLife = LoadObject<USoundBase>(NULL, TEXT("SoundWave'/Game/Assets/Audio/Player/PlayerLowLife.PlayerLowLife'"), NULL, LOAD_None, NULL);
 	soundDead = LoadObject<USoundBase>(NULL, TEXT("SoundWave'/Game/Assets/Audio/Player/PlayerDeath.PlayerDeath'"), NULL, LOAD_None, NULL);
@@ -205,14 +207,12 @@ void ACowboynoutCharacter::Tick(float DeltaSeconds) {
 			//FString msg = FString::SanitizeFloat(deathTimerFull - (deathTimerFull - deathTimer));
 			//GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, msg);
 		}
-		if (deathTimer <= 0)
+		if (deathTimer <= 0 && !deathScreenActive)
 		{
+			deathScreenActive = true;
 			ACowboynoutPlayerController* playerCtrl = Cast<ACowboynoutPlayerController>(GetController());
 			playerCtrl->ToggleDeathScreen();
 			//UGameplayStatics::OpenLevel(this, TEXT("/Game/Maps/DeathScreen_Menu"), false);
-			
-
-
 		}
 	}
 #pragma endregion 
