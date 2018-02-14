@@ -89,7 +89,7 @@ void AEnemySpawner::SpawnEnemy()
 	if (enemy)
 	{
 		enemy->enemyType = EnemyType::EnemyBossSpawn;
-		enemy->SetActorScale3D(FVector(1.3f, 1.3f, 1.3f));
+		enemy->SetActorScale3D(FVector(1.45f, 1.45f, 1.45f));
 		enemy->health = enemy->healthBase;
 		enemy->attackRatio = enemy->attackRatioBase;
 		enemy->SpawnDefaultController();				// wont move without.. obviously

@@ -201,6 +201,13 @@ void ACowboynoutCharacter::Tick(float DeltaSeconds) {
 		}
 	}
 
+	if (life < 0)
+	{
+		deathScreenActive = true;
+		ACowboynoutPlayerController* playerCtrl = Cast<ACowboynoutPlayerController>(GetController());
+		playerCtrl->ToggleDeathScreen();
+	}
+
 	if (dead) {
 		if (deathTimer > 0) {
 			deathTimer -= DeltaSeconds;
