@@ -104,6 +104,9 @@ void ACowboynoutPlayerController::SetupInputComponent() {
 		InputComponent->BindAction("ShiftPressed", IE_Pressed, this, &ACowboynoutPlayerController::OnShiftPressed);
 		//InputComponent->BindAction("SpacePressed", IE_Pressed, this, &ACowboynoutPlayerController::OnSpacePressed);
 
+		InputComponent->BindAction("PauseMenu", IE_Pressed, this, &ACowboynoutPlayerController::FullPauseToggle);
+		
+
 		// simulate damage
 		InputComponent->BindAction("SimulateDamage", IE_Pressed, this, &ACowboynoutPlayerController::OnSimulateDamagePressed);
 		InputComponent->BindAction("SimulateDamage", IE_Released, this, &ACowboynoutPlayerController::OnSimulateDamageReleased);
@@ -367,6 +370,10 @@ void ACowboynoutPlayerController::BeginPlay()
 			myTextbox->AddToViewport();
 		}
 	}
+
+	if (wPauseW) {
+		myPauseW = CreateWidget<UUserWidget>(this, wPauseW);
+	}
 }
 
 void ACowboynoutPlayerController::ToggleDeathScreen()
@@ -564,6 +571,9 @@ void ACowboynoutPlayerController::OnSimulateDamageReleased() {
 }
 
 void ACowboynoutPlayerController::RotatePlayer() {
+
+	if (UGameplayStatics::GetGlobalTimeDilation(GetWorld()) < 1.f) return;
+
 	ACowboynoutGameState* state = Cast<ACowboynoutGameState>(GetWorld()->GetGameState());
 	if (state)
 	{
@@ -601,6 +611,21 @@ void ACowboynoutPlayerController::RotatePlayer() {
 	}
 	
 
+}
+
+void ACowboynoutPlayerController::FullPauseToggle()
+{
+	if (UGameplayStatics::GetGlobalTimeDilation(GetWorld()) == 1.f) // game is not paused
+	{
+		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 0.f);
+		if (myPauseW) myPauseW->AddToViewport(10);
+
+	}
+	else // game is paused
+	{
+		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1.f);
+		if (myPauseW) myPauseW->RemoveFromParent();
+	}
 }
 
 void ACowboynoutPlayerController::SkillOne() {

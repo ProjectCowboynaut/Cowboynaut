@@ -33,6 +33,12 @@ public:
 	FVector gunPosition;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widgets")
+	TSubclassOf<class UUserWidget> wPauseW;
+
+	UPROPERTY()
+	UUserWidget* myPauseW;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widgets")
 	TSubclassOf<class UUserWidget> wInfoW;
 
 	UPROPERTY()
@@ -146,6 +152,9 @@ public:
 	// Rotation
 	UFUNCTION()
 	void RotatePlayer();
+
+	UFUNCTION(BlueprintCallable, Category = "Menu")
+	void FullPauseToggle();
 
 	UFUNCTION()
 	void OnLeftMousePressed();
