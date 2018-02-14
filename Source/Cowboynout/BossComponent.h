@@ -115,7 +115,7 @@ public:
 	UPROPERTY()
 	TArray<int32> bossStages;
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void SwitchState(BossState state);
 
 	UFUNCTION(BlueprintCallable)
