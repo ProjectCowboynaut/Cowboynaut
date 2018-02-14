@@ -87,21 +87,21 @@ void AProjectile::setBulletStats()
 				//DebugMsg("p1", 2.f, FColor::Red);
 				ProjectileMovement->bShouldBounce = false;
 				projectileDamage = 50 + (playerChar->attack * playerChar->attackGainPerLevel);
-				penetration = 5;
+				penetration = 1;
 			}
 			else if (playerChar->skillLvlOne == 2) 
 			{
 				//DebugMsg("p2", 2.f, FColor::Red);
 				ProjectileMovement->bShouldBounce = false;
 				projectileDamage = 60 + (playerChar->attack * playerChar->attackGainPerLevel);
-				penetration = 10;
+				penetration = 1;
 			}
 			else if (playerChar->skillLvlOne == 3) 
 			{
 				//DebugMsg("p3", 2.f, FColor::Red);
 				ProjectileMovement->bShouldBounce = false;
 				projectileDamage = 70 + (playerChar->attack * playerChar->attackGainPerLevel);
-				penetration = 15;
+				penetration = 1;
 			}
 		}
 		else 
@@ -161,7 +161,7 @@ void AProjectile::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* Ot
 					hitEnemy->Damage(projectileDamage * (1 + (playerChar->attack / 10)));
 					hitEnemy->PlaySound(0);
 					// check for penetration and sub enemy armor
-					penetration -= hitEnemy->armor;
+					Destroy();
 				}
 			}
 			// >> hit player

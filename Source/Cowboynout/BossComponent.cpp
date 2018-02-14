@@ -173,21 +173,28 @@ void UBossComponent::SwitchState(BossState state)
 {
 	if (boss->health <= 0) return;
 
-	if (boss) boss->bossDronesSpawnedThisPhase = 0;
-	stateSwitchesCount++;
-	numberOfDronesSpawned = 0;
-	phaseCtr = 0;
-
 	switch (state) 
 	{
 		case  BossState::BossShield:
 			bossState = BossState::BossShield;
+			if (boss) boss->bossDronesSpawnedThisPhase = 0;
+			stateSwitchesCount++;
+			numberOfDronesSpawned = 0;
+			phaseCtr = 0;
 			break;
 		case BossState::BossAttack:
 			bossState = BossState::BossAttack;
+			if (boss) boss->bossDronesSpawnedThisPhase = 0;
+			stateSwitchesCount++;
+			numberOfDronesSpawned = 0;
+			phaseCtr = 0;
 			break;
 		case BossState::BossRage:
 			bossState = BossState::BossRage;
+			if (boss) boss->bossDronesSpawnedThisPhase = 0;
+			stateSwitchesCount++;
+			numberOfDronesSpawned = 0;
+			phaseCtr = 0;
 			break;
 	}
 }

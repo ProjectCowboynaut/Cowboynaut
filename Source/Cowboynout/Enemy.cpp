@@ -367,7 +367,7 @@ void AEnemy::Die()
 	if (borkedDrone) 
 	{
 		borkedDrone->TakeDamage(100, DamageEvent, UGameplayStatics::GetPlayerController(GetWorld(), 0), Cast<ACowboynoutCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0)));			// initialize dmg to break drone
-		borkedDrone->InitialLifeSpan = 3.f;		// auto destroy after x secs
+		borkedDrone->InitialLifeSpan = 1.5f;		// auto destroy after x secs
 	}
 
 	worldContextObject = GetWorld();
