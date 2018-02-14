@@ -363,6 +363,10 @@ void ACowboynoutPlayerController::BeginPlay()
 			myTextbox->AddToViewport();
 		}
 	}
+
+	if (wPauseW) {
+		myPauseW = CreateWidget<UUserWidget>(this, wPauseW);
+	}
 }
 
 void ACowboynoutPlayerController::MoveForward(float axisValue) {
@@ -565,8 +569,17 @@ void ACowboynoutPlayerController::RotatePlayer() {
 
 void ACowboynoutPlayerController::FullPauseToggle()
 {
-	if(UGameplayStatics::GetGlobalTimeDilation(GetWorld()) == 1.f) UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 0.f);
-	else UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1.f);
+	if (UGameplayStatics::GetGlobalTimeDilation(GetWorld()) == 1.f) // game is not paused
+	{
+		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 0.f);
+		if (myPauseW) myPauseW->AddToViewport(10);
+
+	}
+	else // game is paused
+	{
+		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1.f);
+		if (myPauseW) myPauseW->RemoveFromParent();
+	}
 }
 
 void ACowboynoutPlayerController::SkillOne() {
