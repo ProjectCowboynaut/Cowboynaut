@@ -238,8 +238,7 @@ void ACowboynoutCharacter::Damage(int dmg) {
 	
 		else
 		{
-			/*if (!life - dmg < 0) life -= dmg;
-			else life = 0;*/
+			life -= dmg;
 
 			PlaySound(0);
 			if (life <= 0) {
