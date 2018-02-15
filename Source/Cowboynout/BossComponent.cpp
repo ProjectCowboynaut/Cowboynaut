@@ -27,7 +27,7 @@ void UBossComponent::BeginPlay()
 {
 	numberOfTotalStateSwitches = 100 / stateSwitchPercentage;
 	//GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, FString::SanitizeFloat(stateSwitchPercentage));
-	bossState = BossState::BossShield;
+	bossState = BossState::BossIdle;
 	if (!boss) boss = Cast<AEnemy>(GetOwner());
 	if (boss != nullptr)
 		bossHealthMax = boss->health;
@@ -166,6 +166,85 @@ void UBossComponent::BossFight(float DeltaTime)
 				numberOfPhasesLive = 0;
 			}
 		}
+		else if (bossState == BossState::BossFinalStage)
+		{
+			// attack part
+			boss->bossDronesToSpawnThisPhase = stages[stateSwitchesCount].dronesToSpawn;
+			UGameplayStatics::GetAllActorsOfClass(GetWorld(), AEnemy::StaticClass(), foundActors);
+			//GetBossDrones();
+			ACowboynoutGameMode* gm = Cast<ACowboynoutGameMode>(GetWorld()->GetAuthGameMode());
+
+			/*	droneSpawnTimer += DeltaTime;*/
+			//droneSpawnTimer > droneSpawnTime
+			if (boss->bossDronesSpawnedThisPhase <= numberOfDronesToSpawnPerPhase)
+			{
+				if (gm && !gm->bossIsSpawning) {
+					gm->StartBossSpawn(0.f, .2f, 1.f, stages[stateSwitchesCount].spawnerList);
+				}
+			}
+			if (boss && boss->bossDronesSpawnedThisPhase > numberOfDronesToSpawnPerPhase)
+			{
+				ACowboynoutGameMode* gm = Cast<ACowboynoutGameMode>(GetWorld()->GetAuthGameMode());
+				gm->StopSpawn();
+				ACowboynoutCharacter* playerChar = Cast<ACowboynoutCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+				if (playerChar)
+				{
+					if (boss->bossDrones.Num() <= 1)
+					{
+						// switch to next state in list
+						SwitchState(stages[stateSwitchesCount + 1].stageType);
+					}
+				}
+			}
+
+
+			// ###  spawn part
+			if (stages[stateSwitchesCount].attackPatterns[phaseCtr].bulletLifeTime != 0)
+				float lifeTime = stages[stateSwitchesCount].attackPatterns[phaseCtr].bulletLifeTime != 0;
+
+			lastShotFired += DeltaTime;
+			// set life value for next trigger
+			healthForNextStage = bossHealthMax * stages[stateSwitchesCount].healthPercentageToSwitchStage;
+
+			shotTimer = stages[stateSwitchesCount].attackPatterns[phaseCtr].attackRate;
+
+			if (lastShotFired > shotTimer)
+			{
+				if (phaseCtr == NULL) phaseCtr = 0;
+				if (stateSwitchesCount == NULL) stateSwitchesCount = 0;
+
+				SpawnBullets(	stages[stateSwitchesCount].attackPatterns[phaseCtr].bulletBP,
+								stages[stateSwitchesCount].attackPatterns[phaseCtr].radius,
+								stages[stateSwitchesCount].attackPatterns[phaseCtr].numberOfBulletsToFire,
+								stages[stateSwitchesCount].attackPatterns[phaseCtr].bulletSpeed,
+								stages[stateSwitchesCount].attackPatterns[phaseCtr].bulletDamage,
+								DeltaTime,
+								stages[stateSwitchesCount].attackPatterns[phaseCtr].attackRate,
+								stages[stateSwitchesCount].attackPatterns[phaseCtr].bulletLifeTime
+							);
+				//GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, stages[stateSwitchesCount].attackPatterns[phaseCtr].bulletBP->GetFName().ToString());
+				lastShotFired = 0;
+				//  phase counter increase or reset @max
+				if (phaseCtr < stages[stateSwitchesCount].attackPatterns.Num() - 1)
+					phaseCtr++;
+				else phaseCtr = 0;
+			}
+
+			// switch attacks
+			phaseTimerLive += DeltaTime;
+			if (phaseTimerMax == 0) phaseTimerMax = 5.f;
+			if (phaseTimerLive >= phaseTimerMax)
+			{
+				numberOfPhasesLive++;		// incrase phase number
+				phaseTimerLive = 0;			// reset phase timer
+											//GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, FString::FromInt(numberOfPhasesLive));
+			}
+			// reset phases to 0 if max reached
+			if (numberOfPhasesLive > numberOfPhases)
+			{
+				numberOfPhasesLive = 0;
+			}
+		}
 	}
 }
 
@@ -183,8 +262,12 @@ void UBossComponent::SwitchState(BossState state)
 			bossState = BossState::BossAttack;
 			if (boss) boss->bossDronesSpawnedThisPhase = 0;
 			break;
-		case BossState::BossRage:
-			bossState = BossState::BossRage;
+		case BossState::BossIdle:
+			bossState = BossState::BossIdle;
+			if (boss) boss->bossDronesSpawnedThisPhase = 0;
+			break;
+		case BossState::BossFinalStage:
+			bossState = BossState::BossFinalStage;
 			if (boss) boss->bossDronesSpawnedThisPhase = 0;
 			break;
 	}

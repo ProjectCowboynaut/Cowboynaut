@@ -13,9 +13,10 @@
 UENUM(Blueprintable)
 enum class BossState : uint8
 {
+	BossIdle UMETA(DisplayName = "Boss Waiting"),
 	BossAttack UMETA(DisplayName = "Boss Attacking /w Shield deactivated"),
 	BossShield UMETA(DisplayName = "Boss Spawning w/ Shield activated"),
-	BossRage UMETA(DisplayName = "Boss Spawning and attacking!"),
+	BossFinalStage UMETA(DisplayName = "Boss Final")
 };
 
 
@@ -125,7 +126,7 @@ public:
 	TSubclassOf<AEnemy> DroneBP;
 
 	// idle, attack, spawn
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	BossState bossState;
 
 	// what kind of stage is the boss in
@@ -143,7 +144,7 @@ public:
 	int stateSwitchesCount;
 
 	// percentage of health to switch into next state
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	float stateSwitchPercentage;
 
 	// how long should drones be spawned (or ammount below)
@@ -167,7 +168,7 @@ public:
 	int numberOfDronesSpawned;
 
 	// number of phases to go through, b4 starting at 0 again  (different bullet during attack state)
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	int numberOfPhases;
 	
 	// number of the actual running phase

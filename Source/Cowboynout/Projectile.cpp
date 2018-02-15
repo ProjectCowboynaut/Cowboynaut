@@ -172,6 +172,10 @@ void AProjectile::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* Ot
 				//DebugMsg("e hit: " + OtherActor->GetName(), 1.5f, FColor::Red);
 				Destroy();
 			}
+			else if (OtherActor->ActorHasTag("environment"))
+			{
+				Destroy();
+			}
 			else 
 			{
 				if (playerProjectile) Destroy();
