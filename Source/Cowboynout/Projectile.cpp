@@ -141,7 +141,7 @@ void AProjectile::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* Ot
 			OtherComp->AddImpulseAtLocation(GetVelocity() * 5.0f, GetActorLocation());
 		}
 
-		if (hitEnemies.Contains(OtherActor)) 
+		if (!OtherActor->ActorHasTag("Player") && hitEnemies.Contains(OtherActor))
 		{
 			//DebugMsg("schon getroffen", 1.5f, FColor::Yellow);
 		}

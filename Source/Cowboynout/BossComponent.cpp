@@ -113,10 +113,6 @@ void UBossComponent::BossFight(float DeltaTime)
 		// attack stage
 		else if (bossState == BossState::BossAttack) 
 		{
-			if (stages[stateSwitchesCount].attackPatterns[phaseCtr].bulletLifeTime != 0)
-				float lifeTime = stages[stateSwitchesCount].attackPatterns[phaseCtr].bulletLifeTime != 0;
-
-
 			lastShotFired += DeltaTime;
 			// set life value for next trigger
 			healthForNextStage = bossHealthMax * stages[stateSwitchesCount].healthPercentageToSwitchStage;
@@ -200,9 +196,6 @@ void UBossComponent::BossFight(float DeltaTime)
 
 
 			// ###  spawn part
-			if (stages[stateSwitchesCount].attackPatterns[phaseCtr].bulletLifeTime != 0)
-				float lifeTime = stages[stateSwitchesCount].attackPatterns[phaseCtr].bulletLifeTime != 0;
-
 			lastShotFired += DeltaTime;
 			// set life value for next trigger
 			healthForNextStage = bossHealthMax * stages[stateSwitchesCount].healthPercentageToSwitchStage;

@@ -238,9 +238,9 @@ void ACowboynoutPlayerController::Tick(float deltaTime) {
 		UGameplayStatics::SaveGameToSlot(SaveGameInstance, SaveGameInstance->SaveSlotName, SaveGameInstance->UserIndex);*/
 
 		if (deathTimerActive <= 0) {
-			//ToggleWinScreen();
+			ToggleWinScreen();
 			
-			UGameplayStatics::OpenLevel(this, TEXT("/Game/Maps/WinScreen_Menu"), false);
+			// UGameplayStatics::OpenLevel(this, TEXT("/Game/Maps/WinScreen_Menu"), false);
 			deathTimer = 0;
 		}
 	}
@@ -385,7 +385,7 @@ void ACowboynoutPlayerController::ToggleDeathScreen()
 		myDeathW = CreateWidget<UUserWidget>(this, wDeathW);
 		if (myDeathW) 
 		{
-			myDeathW->AddToViewport();
+			myDeathW->AddToViewport(10);
 		}
 	}
 	else 
