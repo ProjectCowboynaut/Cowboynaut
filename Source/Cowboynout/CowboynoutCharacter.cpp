@@ -275,8 +275,8 @@ void ACowboynoutCharacter::ConvertChipStatA(int ammount) {
 		lifeMax += lifeGainPerLevel;
 		//life = lifeMax;
 	}
-	else
-		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "not enough chips to convert to stat A");
+	//else
+		//GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "not enough chips to convert to stat A");
 }
 
 // converts [ammount of chip B] of chips to upgrade stat B : speed, green
@@ -286,8 +286,8 @@ void ACowboynoutCharacter::ConvertChipStatB(int ammount) {
 		speed++;
 		GetCharacterMovement()->MaxWalkSpeed += speedGainPerLevel;
 	}
-	else
-		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "not enough chips to convert to stat B");
+	//else
+		//GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "not enough chips to convert to stat B");
 }
 
 // converts [ammount of chip C] of chips to upgrade stat C : attack, red
@@ -296,8 +296,8 @@ void ACowboynoutCharacter::ConvertChipStatC(int ammount) {
 		chipsC -= ammount;
 		attack += 1;
 	}
-	else
-		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "not enough chips to convert to stat C");
+	//else
+		//GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "not enough chips to convert to stat C");
 }
 
 // converts [ammount of chip A and B] of chips to upgrade skill A
@@ -307,8 +307,8 @@ void ACowboynoutCharacter::ConvertChipSkillA(int ammount) {
 		chipsB -= ammount;
 		skillLvlOne++;
 	}
-	else
-		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "not enough chips to convert to skill A");
+	//else
+		//GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "not enough chips to convert to skill A");
 }
 
 // converts [ammount of chip B and C] of chips to upgrade skill B
@@ -318,8 +318,8 @@ void ACowboynoutCharacter::ConvertChipSkillB(int ammount) {
 		chipsC -= ammount;
 		skillLvlTwo++;
 	}
-	else
-		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "not enough chips to convert to skill B");
+	//else
+		//GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "not enough chips to convert to skill B");
 }
 
 // returns ammount of chips Stat A : life
@@ -388,7 +388,7 @@ void ACowboynoutCharacter::FireSkillTwo() {
 		if (nades > 0) {
 			FActorSpawnParameters spawnInfo;
 			spawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-			FRotator rot;
+			FRotator rot = FRotator(0,0,0);
 			AGrenade* nade = GetWorld()->SpawnActor<AGrenade>(GrenadeClassT1, GetActorLocation(), rot, spawnInfo);
 				
 			PlaySound(2);
@@ -424,7 +424,7 @@ void ACowboynoutCharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, A
 	//GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "FU!");
 	// AE DMG 
 	if (OtherComp != NULL && OtherComp->ComponentHasTag("dmgArea")) {
-		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "AE DOMAGE!");
+		//GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Red, "AE DOMAGE!");
 		Damage(10);
 	}
 }

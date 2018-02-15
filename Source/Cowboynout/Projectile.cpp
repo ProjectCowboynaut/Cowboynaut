@@ -59,8 +59,8 @@ void AProjectile::Tick(float deltaTime)
  
 void AProjectile::DebugMsg(FString msg, float dTime, FColor clr) 
 {
-	if (debugEnabled)
-		GEngine->AddOnScreenDebugMessage(-1, dTime, clr, msg);
+	//if (debugEnabled)
+		//GEngine->AddOnScreenDebugMessage(-1, dTime, clr, msg);
 }
 
 void AProjectile::Initialize(int damage) 
@@ -172,7 +172,7 @@ void AProjectile::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* Ot
 				//DebugMsg("e hit: " + OtherActor->GetName(), 1.5f, FColor::Red);
 				Destroy();
 			}
-			else if (OtherActor->ActorHasTag("environment"))
+			else if (OtherActor->ActorHasTag("daWallE"))
 			{
 				Destroy();
 			}

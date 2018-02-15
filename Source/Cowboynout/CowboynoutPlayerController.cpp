@@ -76,7 +76,7 @@ ACowboynoutPlayerController::ACowboynoutPlayerController() {
 	dashDistance = 50.f;
 	dashTimer = .1f;
 
-	debugEnabled = true;
+	debugEnabled = false;
 
 	// init player vars & refs (overwritten if used in BP)
 }
@@ -126,7 +126,7 @@ void ACowboynoutPlayerController::SetupInputComponent() {
 		InputComponent->BindAction("SkillTwoLvlUp", IE_Pressed, this, &ACowboynoutPlayerController::OnSkillTwoLevelUp);
 	}
 	else {
-		DebugMsg("no movement!" + GetWorld()->GetMapName(), 2, FColor::Red);
+		//DebugMsg("no movement!" + GetWorld()->GetMapName(), 2, FColor::Red);
 	}
 }
 
@@ -228,7 +228,7 @@ void ACowboynoutPlayerController::Tick(float deltaTime) {
 			deathTimerNotSet = true;
 		}
 		deathTimerActive -= deltaTime;
-		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Cyan, FString::SanitizeFloat(deathTimerActive));
+		//GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Cyan, FString::SanitizeFloat(deathTimerActive));
 
 		// save score to gamesave
 		/*int PlayerScore = sessionScore;
@@ -636,10 +636,10 @@ void ACowboynoutPlayerController::SkillOne() {
 			cowboy->FireSkillOne();
 			skillOneCD = true;		// set CD
 		}
-		else DebugMsg("cowboy nullptr", displayTime, FColor::Red);
+		//else DebugMsg("cowboy nullptr", displayTime, FColor::Red);
 	}
 	else {
-		DebugMsg("skill one on CD", displayTime, FColor::Red);
+		//DebugMsg("skill one on CD", displayTime, FColor::Red);
 		return;
 	}
 	//AController::StopMovement();						// stop movement
@@ -653,15 +653,15 @@ void ACowboynoutPlayerController::SkillTwo() {
 	if (!skillTwoCD) {
 		cowboy = Cast<ACowboynoutCharacter>(GetCharacter());
 		if (cowboy) cowboy->FireSkillTwo();
-		else DebugMsg("cowboy nullptr", displayTime, FColor::Red);
+		//else DebugMsg("cowboy nullptr", displayTime, FColor::Red);
 	}
 	else {
-		DebugMsg("skill two on CD", displayTime, FColor::Red);
+		//DebugMsg("skill two on CD", displayTime, FColor::Red);
 		return;
 	}
 
 	// stop movement
-	AController::StopMovement();
+	//AController::StopMovement();
 	skillTwoCD = true;	// set CD
 
 	// play sound at player location
@@ -681,12 +681,12 @@ void ACowboynoutPlayerController::SkillTwoTP() {
 
 void ACowboynoutPlayerController::SkillThree() {
 	if (!skillThreeCD) {
-		DebugMsg("skill three fired", displayTime, FColor::Yellow);
+		//DebugMsg("skill three fired", displayTime, FColor::Yellow);
 		isDashing = true;
 		DodgeMove();
 	}
 	else {
-		DebugMsg("skill three on CD", displayTime, FColor::Red);
+		//DebugMsg("skill three on CD", displayTime, FColor::Red);
 		return;
 	}
 
@@ -708,7 +708,7 @@ void ACowboynoutPlayerController::MedPack() {
 			}
 		}
 		else {
-			DebugMsg("you have no medpacks, fewl!!", displayTime, FColor::Red);
+			//DebugMsg("you have no medpacks, fewl!!", displayTime, FColor::Red);
 		}
 	}
 }

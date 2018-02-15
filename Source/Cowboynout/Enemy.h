@@ -214,7 +214,7 @@ public:
 	UPROPERTY(VisibleAnywhere, BluePrintReadWrite)
 	bool timerActive;
 
-	UPROPERTY(EditAnywhere, BluePrintReaWrite, Category = "EnemyType Stats")
+	UPROPERTY(EditAnywhere, BluePrintReadWrite, Category = "EnemyType Stats")
 	bool isFriendly;
 	
 	UFUNCTION()

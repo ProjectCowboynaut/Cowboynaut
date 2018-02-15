@@ -283,7 +283,7 @@ void UBossComponent::SpawnBullets(TSubclassOf<AProjectile> bulletBP, float radiu
 	if (!GetOwner()->GetActorLocation().IsZero()) 
 	{
 		FString msg = FVector(GetOwner()->GetActorLocation().X, GetOwner()->GetActorLocation().Y, playerChar->GetActorLocation().Z).ToString();
-		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, msg);
+		//GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, msg);
 		if (playerChar)	center = FVector(GetOwner()->GetActorLocation().X, GetOwner()->GetActorLocation().Y, playerChar->GetActorLocation().Z);
 		else center = FVector(GetOwner()->GetActorLocation().X, GetOwner()->GetActorLocation().Y, -700.f);
 	}

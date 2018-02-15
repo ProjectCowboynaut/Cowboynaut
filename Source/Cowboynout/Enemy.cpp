@@ -352,14 +352,15 @@ void AEnemy::Die()
 	// if dead enemy == boss, start end
 	if (enemyType == EnemyType::EnemyBoss) 
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::White, "Boss killed, the end is nigh");
+		//GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::White, "Boss killed, the end is nigh");
 		deathTimerActive = true;
 	}
 	UObject* worldContextObject = GetWorld();
 	FVector spawnLocation = this->GetActorLocation();
 
 	FActorSpawnParameters spawnInfo;
-	AActor* borkedDrone = GetWorld()->SpawnActor<AActor>(brokenDroneMesh, spawnLocation, FRotator(90,0,0), spawnInfo);
+
+	AActor* borkedDrone = GetWorld()->SpawnActor<AActor>(brokenDroneMesh, spawnLocation, FRotator(90.f,.0f,.0f), spawnInfo);
 	// Create a damage event  
 	TSubclassOf<UDamageType> const ValidDamageTypeClass = TSubclassOf<UDamageType>(UDamageType::StaticClass());
 	FDamageEvent DamageEvent(ValidDamageTypeClass);
@@ -372,7 +373,7 @@ void AEnemy::Die()
 
 	worldContextObject = GetWorld();
 	spawnLocation = this->GetActorLocation();
-	FRotator spawnRotation = this->GetActorRotation();
+	FRotator spawnRotation = FRotator(1.1f, 1.1f, 1.1f);
 
 	UGameplayStatics::SpawnEmitterAtLocation(worldContextObject, dmgEffectParticle, spawnLocation, spawnRotation, true);
 

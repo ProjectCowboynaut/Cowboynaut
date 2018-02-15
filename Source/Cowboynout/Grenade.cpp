@@ -43,7 +43,7 @@ void AGrenade::Tick(float DeltaTime) {
 
 void AGrenade::DebugMsg(FString msg, float dTime, FColor clr)
 {
-	GEngine->AddOnScreenDebugMessage(-1, dTime, clr, msg);
+	//GEngine->AddOnScreenDebugMessage(-1, dTime, clr, msg);
 }
 
 void AGrenade::Initialize(int damage) 
@@ -83,7 +83,7 @@ void AGrenade::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* Other
 					//hitEnemy->PlaySound(0);
 				}
 			}
-			else DebugMsg("no actor", 1.5f, FColor::Red);
+			//else DebugMsg("no actor", 1.5f, FColor::Red);
 		}
 	}
 	else DebugMsg("no actor", 1.5f, FColor::Red);
