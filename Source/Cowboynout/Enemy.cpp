@@ -463,7 +463,7 @@ void AEnemy::Damage(int dmg) {
 	
 }
 
-// 0: been hit; 1: attack; 
+// 0: been hit; 1: attack; 3 boss shield on; 4 boss shield off
 void AEnemy::PlaySound(int sound) 
 {
 	float volumeMultiplier = 1.f;
@@ -516,6 +516,14 @@ void AEnemy::PlaySound(int sound)
 				UGameplayStatics::PlaySound2D(worldContextObject, bossSoundSkill1b, volumeMultiplier, pitchMultiplier, startTime);
 			else if (rnd == 3)
 				UGameplayStatics::PlaySound2D(worldContextObject, bossSoundSkill1c, volumeMultiplier, pitchMultiplier, startTime);
+		}
+		else if (sound == 3)
+		{
+			UGameplayStatics::PlaySound2D(worldContextObject, bossSoundShieldOn, volumeMultiplier, pitchMultiplier, startTime);
+		}
+		else if (sound == 4)
+		{
+			UGameplayStatics::PlaySound2D(worldContextObject, bossSoundShieldOff, volumeMultiplier, pitchMultiplier, startTime);
 		}
 	}
 	

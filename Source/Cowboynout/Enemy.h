@@ -220,8 +220,6 @@ public:
 	UFUNCTION()
 	void Die();
 
-	// sound stuff
-
 	// Soundstuff
 	UFUNCTION()
 	void PlaySound(int sound);
@@ -239,16 +237,22 @@ public:
 	USoundBase* soundHit;
 
 	UPROPERTY(EditDefaultsOnly, Category = "SFX")
-		USoundBase* bossSoundSkill1a;
+	USoundBase* bossSoundSkill1a;
 
 	UPROPERTY(EditDefaultsOnly, Category = "SFX")
-		USoundBase* bossSoundSkill1b;
+	USoundBase* bossSoundSkill1b;
 
 	UPROPERTY(EditDefaultsOnly, Category = "SFX")
-		USoundBase* bossSoundSkill1c;
+	USoundBase* bossSoundSkill1c;
 
 	UPROPERTY(EditDefaultsOnly, Category = "SFX")
-		USoundBase* bossSoundHit;
+	USoundBase* bossSoundHit;
+
+	UPROPERTY(EditDefaultsOnly, Category = "SFX")
+	USoundBase* bossSoundShieldOff;
+
+	UPROPERTY(EditDefaultsOnly, Category = "SFX")
+	USoundBase* bossSoundShieldOn;
 
 	UFUNCTION(BlueprintCallable)
 	void FollowActor(AActor* actor, float deltaTime);

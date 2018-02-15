@@ -103,6 +103,7 @@ void UBossComponent::BossFight(float DeltaTime)
 					if (boss->bossDrones.Num() <= 1)
 					{
 						// switch to next state in list
+						boss->PlaySound(4);
 						SwitchState(stages[stateSwitchesCount+1].stageType);
 					}
 				}
@@ -256,7 +257,11 @@ void UBossComponent::SwitchState(BossState state)
 	{
 		case  BossState::BossShield:
 			bossState = BossState::BossShield;
-			if (boss) boss->bossDronesSpawnedThisPhase = 0;
+			if (boss)
+			{
+				boss->PlaySound(3);
+				boss->bossDronesSpawnedThisPhase = 0;
+			}
 			break;
 		case BossState::BossAttack:
 			bossState = BossState::BossAttack;
